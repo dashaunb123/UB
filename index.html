@@ -1097,7 +1097,7 @@
     }
     .ng-actions {
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:1fr;
       gap:8px;
       margin-top:auto;
       padding-top:18px;
@@ -1134,6 +1134,129 @@
       border-color:#ede0b8;
       outline:none;
     }
+    .ng-super-panel {
+      display:none;
+      gap:8px;
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(8,7,4,0.22);
+      padding:10px;
+    }
+    .ng-super-panel.show {
+      display:grid;
+    }
+    .ng-super-label {
+      color:rgba(237,224,184,0.64);
+      font-size:clamp(5px,0.64vw,7px);
+      line-height:1.6;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .ng-super-range {
+      width:100%;
+      accent-color:#c08a18;
+    }
+    .ng-super-start {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(6px,0.72vw,8px);
+      padding:10px 8px;
+      cursor:pointer;
+      color:#ede0b8;
+      background:#a82418;
+      border:2px solid rgba(237,224,184,0.56);
+    }
+    .ng-super-start:hover,
+    .ng-super-start:focus-visible {
+      border-color:#ede0b8;
+      outline:none;
+    }
+    .standings-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .standings-screen::-webkit-scrollbar { display:none; }
+    .standings-shell {
+      width:100%;
+      max-width:1180px;
+      display:grid;
+      gap:18px;
+      min-height:0;
+    }
+    .standings-header {
+      border-bottom:2px solid rgba(192,138,24,0.28);
+      padding-bottom:14px;
+    }
+    .standings-eyebrow {
+      display:block;
+      font-size:clamp(6px,0.9vw,8px);
+      color:#c08a18;
+      letter-spacing:3px;
+      text-shadow:1px 1px 0 #3a2400;
+      margin-bottom:8px;
+    }
+    .standings-title {
+      display:block;
+      font-size:clamp(14px,2.6vw,26px);
+      color:#ede0b8;
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .standings-controls {
+      margin-top:12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:rgba(237,224,184,0.58);
+      font-size:clamp(5px,0.68vw,8px);
+    }
+    .standings-select {
+      border:2px solid rgba(237,224,184,0.24);
+      background:#140f08;
+      color:#ede0b8;
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.68vw,8px);
+      padding:8px;
+    }
+    .standings-list {
+      display:grid;
+      gap:6px;
+    }
+    .standing-row {
+      display:grid;
+      grid-template-columns:48px 1fr auto auto;
+      gap:12px;
+      align-items:center;
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(22,18,9,0.22);
+      padding:10px 12px;
+      color:rgba(237,224,184,0.66);
+      font-size:clamp(6px,0.78vw,9px);
+      line-height:1.5;
+    }
+    .standing-row.user-team {
+      border-color:rgba(192,138,24,0.58);
+      background:rgba(192,138,24,0.11);
+    }
+    .standing-rank {
+      color:#c08a18;
+    }
+    .standing-team {
+      color:#ede0b8;
+      overflow-wrap:anywhere;
+    }
+    .standing-conf {
+      color:rgba(237,224,184,0.38);
+      font-size:clamp(5px,0.62vw,7px);
+      text-align:right;
+    }
+    .standing-record {
+      color:#c08a18;
+      font-size:clamp(5px,0.62vw,7px);
+      text-align:right;
+      white-space:nowrap;
+    }
 
     /* roster */
     .roster-screen {
@@ -1154,6 +1277,29 @@
       font-size:clamp(14px,2.4vw,26px);
       line-height:1.25;
       text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .roster-top {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .roster-action-btn {
+      border:2px solid #c08a18;
+      background:rgba(22,18,9,0.56);
+      color:#ede0b8;
+      padding:10px 14px;
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(6px,0.76vw,9px);
+      cursor:pointer;
+      box-shadow:4px 4px 0 #350a04;
+    }
+    .roster-action-btn:hover,
+    .roster-action-btn:focus-visible {
+      background:#a82418;
+      border-color:#ede0b8;
+      outline:none;
     }
     .roster-grid {
       display:grid;
@@ -1176,6 +1322,326 @@
       border-color:rgba(192,138,24,0.32);
     }
     .player-row strong {
+      color:#ede0b8;
+      font-weight:400;
+    }
+    .gameplan-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .gameplan-screen::-webkit-scrollbar { display:none; }
+    .gameplan-shell {
+      width:100%;
+      max-width:1180px;
+      display:grid;
+      gap:14px;
+    }
+    .gameplan-title {
+      color:#ede0b8;
+      font-size:clamp(14px,2.4vw,26px);
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .gameplan-note {
+      color:rgba(237,224,184,0.64);
+      font-size:clamp(6px,0.74vw,8px);
+      line-height:1.7;
+    }
+    .gameplan-grid {
+      display:grid;
+      grid-template-columns:1fr 1.25fr;
+      gap:14px;
+      align-items:start;
+    }
+    .gameplan-panel {
+      border:2px solid rgba(237,224,184,0.16);
+      background:rgba(22,18,9,0.28);
+      padding:14px;
+      display:grid;
+      gap:12px;
+    }
+    .gameplan-panel-title {
+      color:#c08a18;
+      font-size:clamp(7px,0.9vw,10px);
+      line-height:1.5;
+    }
+    .gameplan-field {
+      display:grid;
+      gap:6px;
+    }
+    .gameplan-field label {
+      color:rgba(237,224,184,0.74);
+      font-size:clamp(6px,0.74vw,8px);
+      line-height:1.4;
+    }
+    .gameplan-select,
+    .minute-input {
+      width:100%;
+      border:2px solid rgba(237,224,184,0.26);
+      background:#140f08;
+      color:#ede0b8;
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(6px,0.72vw,8px);
+      line-height:1.5;
+      padding:9px;
+      min-height:38px;
+    }
+    .gameplan-select:focus,
+    .minute-input:focus {
+      outline:none;
+      border-color:#c08a18;
+    }
+    .presser-text {
+      color:rgba(237,224,184,0.58);
+      font-size:clamp(5px,0.66vw,7px);
+      line-height:1.7;
+    }
+    .rotation-grid {
+      display:grid;
+      gap:8px;
+    }
+    .rot-pos-header {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:5px 8px;
+      background:rgba(192,138,24,0.10);
+      border-left:3px solid #c08a18;
+      color:#c08a18;
+      font-size:clamp(5px,0.68vw,8px);
+      margin-top:4px;
+    }
+    .rotation-row {
+      display:grid;
+      grid-template-columns:1fr .34fr .36fr .52fr;
+      gap:8px;
+      align-items:center;
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(8,7,4,0.22);
+      padding:8px;
+      color:rgba(237,224,184,0.72);
+      font-size:clamp(5px,0.68vw,8px);
+      line-height:1.5;
+    }
+    .rotation-row.header {
+      color:#c08a18;
+      border-color:rgba(192,138,24,0.32);
+    }
+    .rotation-row strong {
+      color:#ede0b8;
+      font-weight:400;
+    }
+    .min-stepper {
+      display:flex; align-items:center; gap:3px;
+    }
+    .stepper-btn {
+      width:20px; height:20px;
+      border:2px solid rgba(237,224,184,0.24);
+      background:transparent;
+      color:#ede0b8;
+      font-family:'Press Start 2P',monospace;
+      font-size:7px; cursor:pointer; line-height:1;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .stepper-btn:hover, .stepper-btn:focus-visible {
+      border-color:#c08a18; color:#c08a18; outline:none;
+    }
+    .stepper-val {
+      width:24px; text-align:center;
+      color:#ede0b8;
+      font-size:clamp(5px,0.66vw,8px);
+    }
+    .gameplan-actions {
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .gameplan-save {
+      border:2px solid #ede0b8;
+      background:#a82418;
+      color:#ede0b8;
+      padding:10px 14px;
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(6px,0.76vw,9px);
+      cursor:pointer;
+      box-shadow:4px 4px 0 #350a04;
+    }
+    .gameplan-save:hover,
+    .gameplan-save:focus-visible {
+      background:#c42c1e;
+      outline:none;
+    }
+    .gameplan-save:disabled {
+      background:#2a1f10;
+      border-color:rgba(237,224,184,0.18);
+      color:rgba(237,224,184,0.28);
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+    .game-screen,
+    .box-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .game-screen::-webkit-scrollbar,
+    .box-screen::-webkit-scrollbar { display:none; }
+    .game-shell,
+    .box-shell {
+      width:100%;
+      max-width:1180px;
+      display:grid;
+      gap:14px;
+    }
+    .game-scoreboard {
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      gap:14px;
+      align-items:center;
+      border:2px solid rgba(237,224,184,0.16);
+      background:rgba(22,18,9,0.34);
+      padding:16px;
+    }
+    .game-team {
+      display:grid;
+      gap:8px;
+      color:#ede0b8;
+      font-size:clamp(8px,1vw,12px);
+      line-height:1.4;
+    }
+    .game-team.away { text-align:right; }
+    .game-team-score {
+      color:#c08a18;
+      font-size:clamp(22px,4vw,44px);
+      line-height:1;
+      text-shadow:3px 3px 0 #350a04;
+    }
+    .game-clock {
+      text-align:center;
+      color:rgba(237,224,184,0.7);
+      font-size:clamp(7px,0.9vw,10px);
+      line-height:1.8;
+      min-width:150px;
+    }
+    .game-clock strong {
+      display:block;
+      color:#ede0b8;
+      font-size:clamp(13px,2vw,24px);
+      line-height:1.2;
+    }
+    .game-controls {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .game-btn {
+      border:2px solid rgba(237,224,184,0.28);
+      background:rgba(22,18,9,0.48);
+      color:#ede0b8;
+      padding:10px 12px;
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.68vw,8px);
+      cursor:pointer;
+    }
+    .game-btn.primary {
+      border-color:#ede0b8;
+      background:#a82418;
+      box-shadow:4px 4px 0 #350a04;
+    }
+    .game-btn:hover,
+    .game-btn:focus-visible {
+      border-color:#c08a18;
+      color:#c08a18;
+      outline:none;
+    }
+    .game-btn:disabled {
+      color:rgba(237,224,184,0.25);
+      border-color:rgba(237,224,184,0.12);
+      cursor:not-allowed;
+    }
+    .game-feed {
+      display:grid;
+      gap:7px;
+      max-height:315px;
+      overflow-y:auto;
+      scrollbar-width:none;
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(8,7,4,0.22);
+      padding:12px;
+    }
+    .game-feed::-webkit-scrollbar { display:none; }
+    .game-feed-line {
+      color:rgba(237,224,184,0.68);
+      font-size:clamp(5px,0.66vw,8px);
+      line-height:1.7;
+      border-bottom:1px solid rgba(237,224,184,0.06);
+      padding-bottom:6px;
+    }
+    .game-feed-line strong { color:#ede0b8; font-weight:400; }
+    .game-week-loading {
+      display:none;
+      border:2px solid rgba(192,138,24,0.34);
+      background:rgba(192,138,24,0.09);
+      color:#ede0b8;
+      padding:12px;
+      font-size:clamp(6px,0.78vw,9px);
+      line-height:1.7;
+      text-align:center;
+    }
+    .game-week-loading.show {
+      display:block;
+    }
+    .game-finished {
+      display:none;
+      justify-content:center;
+    }
+    .game-finished.show { display:flex; }
+    .box-title {
+      color:#ede0b8;
+      font-size:clamp(14px,2.4vw,26px);
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .box-summary {
+      color:#c08a18;
+      font-size:clamp(7px,0.9vw,10px);
+      line-height:1.6;
+    }
+    .box-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .box-team-panel {
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(22,18,9,0.28);
+      padding:12px;
+      display:grid;
+      gap:8px;
+    }
+    .box-team-title {
+      color:#c08a18;
+      font-size:clamp(7px,0.86vw,10px);
+      line-height:1.5;
+    }
+    .box-row {
+      display:grid;
+      grid-template-columns:1fr .32fr .32fr .32fr .32fr .32fr;
+      gap:6px;
+      color:rgba(237,224,184,0.66);
+      font-size:clamp(5px,0.62vw,7px);
+      line-height:1.5;
+      padding:5px 0;
+      border-bottom:1px solid rgba(237,224,184,0.08);
+    }
+    .box-row.header {
+      color:#ede0b8;
+      border-bottom-color:rgba(192,138,24,0.32);
+    }
+    .box-row strong {
       color:#ede0b8;
       font-weight:400;
     }
@@ -1206,7 +1672,32 @@
       .roster-screen {
         padding:24px 28px 20px;
       }
+      .gameplan-screen {
+        padding:24px 28px 20px;
+      }
+      .gameplan-grid {
+        grid-template-columns:1fr;
+      }
+      .standing-row {
+        grid-template-columns:38px 1fr;
+      }
+      .standing-conf,
+      .standing-record {
+        grid-column:2;
+        text-align:left;
+      }
+      .game-scoreboard,
+      .box-grid {
+        grid-template-columns:1fr;
+      }
+      .game-team,
+      .game-team.away {
+        text-align:center;
+      }
       .player-row {
+        grid-template-columns:1fr;
+      }
+      .rotation-row {
         grid-template-columns:1fr;
       }
       .personality-grid {
@@ -1295,7 +1786,7 @@
     .sched-section-label:first-child { border-top:none; margin-top:0; padding-top:2px; }
     .sched-game {
       display:grid;
-      grid-template-columns:58px 36px 1fr auto;
+      grid-template-columns:58px 36px 1fr auto auto;
       align-items:center;
       gap:10px;
       padding:7px 10px;
@@ -1322,6 +1813,12 @@
     .sched-type {
       font-size:clamp(4px,0.5vw,5px); letter-spacing:1px;
       color:rgba(237,224,184,0.3); white-space:nowrap;
+    }
+    .sched-result {
+      font-size:clamp(5px,0.62vw,7px);
+      color:#c08a18;
+      white-space:nowrap;
+      text-align:right;
     }
     .sched-summary {
       display:flex; gap:18px; flex-wrap:wrap;
@@ -1467,6 +1964,29 @@
     </div>
   </div>
 
+  <!-- STANDINGS -->
+  <div id="standings-screen" class="screen-panel standings-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToDashboard()">â—„ DASHBOARD</button>
+    </div>
+    <div class="standings-shell">
+      <div class="standings-header">
+        <span class="standings-eyebrow">* NATIONAL RANKINGS *</span>
+        <span class="standings-title">TOP 25 TEAMS</span>
+        <div class="standings-controls">
+          <label for="standings-count">SHOW</label>
+          <select class="standings-select" id="standings-count" onchange="renderStandings()">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">ALL</option>
+          </select>
+        </div>
+      </div>
+      <div class="standings-list" id="standings-list"></div>
+    </div>
+  </div>
+
   <!-- PRESS CONFERENCE -->
   <div id="press-screen" class="screen-panel press-screen hidden">
     <div class="press-shell">
@@ -1490,7 +2010,7 @@
           <span class="dash-title" id="dash-team-name"></span>
           <span class="dash-conf" id="dash-conf-name"></span>
         </div>
-        <div class="dash-record">0-0</div>
+        <div class="dash-record" id="dash-record">0-0</div>
       </div>
       <div class="dash-main">
         <div class="next-game-panel">
@@ -1501,7 +2021,7 @@
           <button class="dash-btn" type="button" onclick="goToRoster()">ROSTER</button>
           <button class="dash-btn" type="button">RECRUITING</button>
           <button class="dash-btn" type="button" onclick="goToSchedule()">SCHEDULE</button>
-          <button class="dash-btn" type="button">STANDINGS</button>
+          <button class="dash-btn" type="button" onclick="goToStandings()">STANDINGS</button>
           <button class="dash-btn" type="button">STATS</button>
         </div>
       </div>
@@ -1514,8 +2034,79 @@
       <button class="back-btn" onclick="goToDashboard()">◄ DASHBOARD</button>
     </div>
     <div class="roster-shell">
-      <div class="roster-title" id="roster-title"></div>
+      <div class="roster-top">
+        <div class="roster-title" id="roster-title"></div>
+        <button class="roster-action-btn" type="button" onclick="goToGameplan()">GAMEPLAN</button>
+      </div>
       <div class="roster-grid" id="roster-grid"></div>
+    </div>
+  </div>
+
+  <!-- GAMEPLAN -->
+  <div id="gameplan-screen" class="screen-panel gameplan-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToRoster()">&lt; ROSTER</button>
+    </div>
+    <div class="gameplan-shell">
+      <div class="gameplan-title" id="gameplan-title"></div>
+      <div class="gameplan-note" id="gameplan-note"></div>
+      <div class="gameplan-grid">
+        <div class="gameplan-panel" id="gameplan-style-panel"></div>
+        <div class="gameplan-panel" id="gameplan-rotation-panel"></div>
+      </div>
+      <div class="gameplan-actions">
+        <button class="roster-action-btn" type="button" onclick="autoFillGameplanFromPresser()">AUTO FROM PRESSER</button>
+        <button class="gameplan-save" type="button" onclick="saveGameplan()">SAVE GAMEPLAN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME SIM -->
+  <div id="game-screen" class="screen-panel game-screen hidden">
+    <div class="back-row">
+      <span class="conf-badge" id="game-matchup-label"></span>
+    </div>
+    <div class="game-shell">
+      <div class="game-scoreboard">
+        <div class="game-team away">
+          <span id="game-away-name"></span>
+          <span class="game-team-score" id="game-away-score">0</span>
+        </div>
+        <div class="game-clock">
+          <span id="game-period-label">Q1</span>
+          <strong id="game-clock-label">12:00</strong>
+          <span id="game-status-label">SIMULATING</span>
+        </div>
+        <div class="game-team">
+          <span id="game-home-name"></span>
+          <span class="game-team-score" id="game-home-score">0</span>
+        </div>
+      </div>
+      <div class="game-controls">
+        <button class="game-btn" type="button" onclick="toggleGamePause()" id="game-pause-btn">PAUSE</button>
+        <button class="game-btn" type="button" onclick="cycleGameSpeed()" id="game-speed-btn">SPEED 1X</button>
+        <button class="game-btn" type="button" onclick="simGameToEnd()">SIM TO END</button>
+      </div>
+      <div class="game-feed" id="game-feed"></div>
+      <div class="game-week-loading" id="game-week-sim-loading">
+        SIMMING THE REMAINDER OF THE WEEK... UPDATING SCORES, RECORDS, AND NATIONAL STANDINGS.
+      </div>
+      <div class="game-finished" id="game-finished-actions">
+        <button class="game-btn primary" type="button" onclick="showBoxScore()">BOX SCORE</button>
+        <button class="game-btn primary" type="button" onclick="continueAfterGame()">CONTINUE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOX SCORE -->
+  <div id="box-screen" class="screen-panel box-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToDashboard()">&lt; DASHBOARD</button>
+    </div>
+    <div class="box-shell">
+      <div class="box-title" id="box-title"></div>
+      <div class="box-summary" id="box-summary"></div>
+      <div class="box-grid" id="box-grid"></div>
     </div>
   </div>
 
@@ -1858,6 +2449,12 @@ let pressAnswers = [];
 let currentGameIndex = 0;
 let allRosters = null;
 let namePool = null;
+let gameplan = null;
+let gameplanKey = null;
+let activeGame = null;
+let gameTimer = null;
+let lastBoxScore = null;
+let standingsState = null;
 let coachProfile = {
   firstName:'',
   lastName:'',
@@ -1925,13 +2522,24 @@ function goToCoachBuilder(step = 'info') {
 function goToDashboard() {
   document.getElementById('dash-team-name').textContent = selectedTeam || '';
   document.getElementById('dash-conf-name').textContent = selectedConf || '';
+  renderDashboardRecord();
   if (!cachedSchedule) {
-    cachedSchedule = generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
+    cachedSchedule = loadCachedSchedule() || generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
+    saveCachedSchedule();
   }
+  currentGameIndex = getNextUnplayedGameIndex();
+  ensureDefaultGameplanSaved();
   flash(() => {
     showPanel('dashboard');
     renderNextGame();
   });
+}
+
+function renderDashboardRecord() {
+  const recordEl = document.getElementById('dash-record');
+  if (!recordEl || !selectedTeam) return;
+  const entry = getTeamStandingEntry(selectedTeam);
+  recordEl.textContent = entry ? `${entry.wins}-${entry.losses}` : '0-0';
 }
 
 function getTeamConf(teamName) {
@@ -1967,21 +2575,68 @@ function renderNextGame() {
       `<div class="ng-opponent">${game.opponent}</div>` +
       `<div class="ng-actions">` +
         `<button class="ng-play-btn" type="button" onclick="playGame()">▶ PLAY GAME</button>` +
-        `<button class="ng-sim-btn"  type="button" onclick="quickSim()">⚡ QUICK SIM</button>` +
+        `<button class="ng-sim-btn"  type="button" onclick="toggleSuperSimPanel()">SUPER SIM</button>` +
+        `<div class="ng-super-panel" id="ng-super-panel">` +
+          `<label class="ng-super-label" for="ng-super-count"><span>GAMES TO SIM</span><span id="ng-super-value">1</span></label>` +
+          `<input class="ng-super-range" id="ng-super-count" type="range" min="1" max="${Math.max(1, total - currentGameIndex)}" value="1" oninput="updateSuperSimValue(this.value)">` +
+          `<button class="ng-super-start" type="button" onclick="quickSim()">START SUPER SIM</button>` +
+        `</div>` +
       `</div>` +
     `</div>`;
 }
 
-function playGame()  { /* TODO */ }
-function quickSim()  { /* TODO */ }
+function playGame()  {
+  ensureDefaultGameplanSaved();
+  startGameSimulation(false);
+}
+
+function getScheduleStateKey() {
+  return `schedule:${seasonNumber || 1}:${selectedConf || ''}:${selectedTeam || ''}`;
+}
+
+function saveCachedSchedule() {
+  if (cachedSchedule) sessionStorage.setItem(getScheduleStateKey(), JSON.stringify(cachedSchedule));
+}
+
+function loadCachedSchedule() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(getScheduleStateKey()) || 'null');
+    if (Array.isArray(saved)) return saved;
+  } catch (err) {}
+  return null;
+}
+
+function getNextUnplayedGameIndex() {
+  const idx = (cachedSchedule || []).findIndex(g => !g.result);
+  return idx < 0 ? (cachedSchedule || []).length : idx;
+}
+function quickSim()  {
+  ensureDefaultGameplanSaved();
+  const input = document.getElementById('ng-super-count');
+  const count = input ? Number(input.value) || 1 : 1;
+  startMultiGameSuperSim(count);
+}
+
+function toggleSuperSimPanel() {
+  const panel = document.getElementById('ng-super-panel');
+  if (panel) panel.classList.toggle('show');
+}
+
+function updateSuperSimValue(value) {
+  const label = document.getElementById('ng-super-value');
+  if (label) label.textContent = value;
+}
 
 function goToRoster() {
-  if (!allRosters) {
-    const saved = sessionStorage.getItem('allRosters');
-    allRosters = saved ? JSON.parse(saved) : generateAllRosters(getFallbackNamePool());
-  }
+  ensureRosterLoaded();
   renderRoster();
   flash(() => showPanel('roster'));
+}
+
+function goToStandings() {
+  ensureRosterLoaded();
+  renderStandings();
+  flash(() => showPanel('standings'));
 }
 
 function goToCutscene() {
@@ -1999,8 +2654,11 @@ function goToPressConference() {
   pressAnswers = [];
   cachedSchedule = null;    // new season start — reset schedule
   currentGameIndex = 0;
+  standingsState = null;
   sessionStorage.removeItem('pressPersonality');
   sessionStorage.removeItem('pressAnswers');
+  sessionStorage.removeItem(getStandingsStateKey());
+  sessionStorage.removeItem(getScheduleStateKey());
   flash(() => {
     showPanel('press');
     renderPressConference();
@@ -2067,6 +2725,8 @@ async function prepareRosters() {
   namePool = await loadNamePool();
   allRosters = generateAllRosters(namePool);
   sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+  standingsState = buildInitialStandingsState();
+  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
 }
 
 async function loadNamePool() {
@@ -2117,6 +2777,7 @@ function generateAllRosters(names) {
 
 function generateTeamRoster(teamOverall, names) {
   const grades = ['Freshman','Freshman','Freshman','Sophomore','Sophomore','Sophomore','Junior','Junior','Senior','Senior'];
+  const positions = ['PG','SG','SF','PF','C','PG','SG','SF','PF','C'];
   shuffle(grades);
   const potentials = makePotentialSet(teamOverall, grades);
   const usedNames = new Set();
@@ -2129,6 +2790,7 @@ function generateTeamRoster(teamOverall, names) {
     const name = makePlayerName(names, usedNames);
     return {
       name,
+      position:positions[i],
       grade,
       overall,
       potential,
@@ -2231,6 +2893,419 @@ function renderRoster() {
   `;
 }
 
+function getTeamIndexScore(roster) {
+  if (!roster || !roster.length) return 0;
+  return sum(roster.map(p => Math.pow(Number(p.overall) || 0, 2))) / roster.length;
+}
+
+function getStandingsStateKey() {
+  return `standings:${seasonNumber || 1}`;
+}
+
+function getTeamKey(conf, team) {
+  return `${conf}::${team}`;
+}
+
+function buildInitialStandingsState() {
+  const teams = {};
+  Object.entries(allRosters || {}).forEach(([conf, confTeams]) => {
+    Object.entries(confTeams || {}).forEach(([team, roster]) => {
+      teams[getTeamKey(conf, team)] = {
+        conf,
+        team,
+        wins:0,
+        losses:0,
+        power:getTeamIndexScore(roster)
+      };
+    });
+  });
+  return { season:seasonNumber || 1, weeksSimmed:{}, teams };
+}
+
+function ensureStandingsState() {
+  if (!allRosters) ensureRosterLoaded();
+  if (!standingsState) {
+    try {
+      standingsState = JSON.parse(sessionStorage.getItem(getStandingsStateKey()) || 'null');
+    } catch (err) {
+      standingsState = null;
+    }
+  }
+  if (!standingsState || !standingsState.teams) standingsState = buildInitialStandingsState();
+  if (!standingsState.weeksSimmed) standingsState.weeksSimmed = {};
+  Object.entries(allRosters || {}).forEach(([conf, confTeams]) => {
+    Object.entries(confTeams || {}).forEach(([team, roster]) => {
+      const key = getTeamKey(conf, team);
+      if (!standingsState.teams[key]) {
+        standingsState.teams[key] = {
+          conf,
+          team,
+          wins:0,
+          losses:0,
+          power:getTeamIndexScore(roster)
+        };
+      }
+    });
+  });
+  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+}
+
+function getTeamStandingEntry(teamName) {
+  ensureStandingsState();
+  const conf = getTeamConf(teamName) || selectedConf;
+  const key = getTeamKey(conf, teamName);
+  return standingsState.teams[key] || null;
+}
+
+function getLossScale(margin) {
+  if (margin >= 15) return 1;
+  if (margin >= 10) return 0.75;
+  if (margin >= 5) return 3 / 14;
+  return 0.1;
+}
+
+function applyGameResultToStandings(winnerTeam, loserTeam, margin) {
+  ensureStandingsState();
+  const winner = getTeamStandingEntry(winnerTeam);
+  const loser = getTeamStandingEntry(loserTeam);
+  if (!winner || !loser) return;
+  const winnerPower = Math.max(1, Number(winner.power) || 1);
+  const loserPower = Math.max(1, Number(loser.power) || 1);
+  const baseDecrease = (loserPower / winnerPower) * (loserPower / 5);
+  winner.wins += 1;
+  loser.losses += 1;
+  winner.power += Math.round(loserPower / 10);
+  loser.power = Math.max(1, loser.power - Math.round(baseDecrease * getLossScale(margin)));
+  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+}
+
+function getRankedTeams(limit) {
+  ensureStandingsState();
+  const ranked = Object.values(standingsState.teams || {})
+    .sort((a, b) => b.power - a.power || b.wins - a.wins || a.team.localeCompare(b.team));
+  return limit === 'all' ? ranked : ranked.slice(0, Number(limit) || 25);
+}
+
+function renderStandings() {
+  const list = document.getElementById('standings-list');
+  const countSelect = document.getElementById('standings-count');
+  const limit = countSelect ? countSelect.value : '25';
+  const rankedTeams = getRankedTeams(limit);
+  const title = document.querySelector('.standings-title');
+  if (title) title.textContent = limit === 'all' ? 'ALL TEAMS' : `TOP ${limit} TEAMS`;
+  list.innerHTML = rankedTeams.map((entry, i) => `
+    <div class="standing-row${entry.team === selectedTeam && entry.conf === selectedConf ? ' user-team' : ''}">
+      <div class="standing-rank">#${i + 1}</div>
+      <div class="standing-team">${escapeAttr(entry.team)}</div>
+      <div class="standing-conf">${escapeAttr(entry.conf)}</div>
+      <div class="standing-record">${entry.wins}-${entry.losses}</div>
+    </div>
+  `).join('');
+}
+
+function goToGameplan() {
+  ensureRosterLoaded();
+  ensureGameplan();
+  renderGameplan();
+  flash(() => showPanel('gameplan'));
+}
+
+function ensureRosterLoaded() {
+  if (!allRosters) {
+    const saved = sessionStorage.getItem('allRosters');
+    allRosters = saved ? JSON.parse(saved) : generateAllRosters(getFallbackNamePool());
+  }
+  hydrateRosterPositions();
+}
+
+function hydrateRosterPositions() {
+  if (!allRosters) return;
+  const defaults = ['PG','SG','SF','PF','C','PG','SG','SF','PF','C'];
+  const core = ['PG','SG','SF','PF','C'];
+  Object.values(allRosters).forEach(confRosters => {
+    Object.values(confRosters).forEach(roster => {
+      const counts = {};
+      roster.forEach((player, i) => {
+        if (core.includes(player.position)) counts[player.position] = (counts[player.position] || 0) + 1;
+      });
+      const needsCorePositions = roster.some(player => !core.includes(player.position)) || core.some(pos => !counts[pos]);
+      roster.forEach((player, i) => {
+        if (needsCorePositions || !player.position) player.position = defaults[i] || core[i % core.length];
+      });
+    });
+  });
+}
+
+function getSavedGameplanKey() {
+  return `gameplan:${selectedConf || ''}:${selectedTeam || ''}`;
+}
+
+function getPressAnswers() {
+  if (pressAnswers.length) return pressAnswers;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('pressAnswers') || '[]');
+    return Array.isArray(saved) ? saved : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function getPressAnswerByKey(key) {
+  return getPressAnswers().find(a => a.key === key) || null;
+}
+
+function getStyleOptions(key) {
+  const q = PRESS_QUESTIONS.find(item => item.key === key);
+  return q ? q.answers : [];
+}
+
+function splitMinutes48(count) {
+  const table = { 1:[48], 2:[30,18], 3:[22,16,10], 4:[16,13,10,9], 5:[14,11,10,8,5] };
+  if (table[count]) return table[count];
+  return (table[5] || []).concat(Array(Math.max(0, count - 5)).fill(0));
+}
+
+function buildRotationDefaults(roster) {
+  // Group players by position, then assign minutes so each position totals 48
+  const posGroups = {};
+  roster.forEach(p => {
+    const pos = p.position || 'G';
+    if (!posGroups[pos]) posGroups[pos] = [];
+    posGroups[pos].push(p.name);
+  });
+  const posAlloc = {};
+  Object.entries(posGroups).forEach(([pos, names]) => {
+    const splits = splitMinutes48(names.length);
+    names.forEach((name, i) => { posAlloc[name] = splits[i] || 0; });
+  });
+  return roster.map(p => ({ playerName: p.name, minutes: posAlloc[p.name] || 0 }));
+}
+
+function buildGameplanFromPresser() {
+  const roster = ((allRosters || {})[selectedConf] || {})[selectedTeam] || [];
+  const defense = getPressAnswerByKey('defense');
+  const offense = getPressAnswerByKey('offense');
+  const tempo = getPressAnswerByKey('tempo');
+  return {
+    offensiveStyle:offense ? offense.answer : 'Get to the basket',
+    defensiveStyle:defense ? defense.answer : 'Disciplined',
+    tempo:tempo ? tempo.answer : 'Normal',
+    rotation:buildRotationDefaults(roster)
+  };
+}
+
+function ensureGameplan() {
+  const key = getSavedGameplanKey();
+  if (gameplanKey !== key) {
+    gameplan = null;
+    gameplanKey = key;
+  }
+  if (!gameplan) {
+    try {
+      gameplan = JSON.parse(sessionStorage.getItem(key) || 'null');
+    } catch (err) {
+      gameplan = null;
+    }
+  }
+  if (!gameplan || !gameplan.minutesSaved || !hasValidPositionMinutes(gameplan)) {
+    const fresh = buildGameplanFromPresser();
+    if (gameplan) {
+      fresh.offensiveStyle = gameplan.offensiveStyle || fresh.offensiveStyle;
+      fresh.defensiveStyle = gameplan.defensiveStyle || fresh.defensiveStyle;
+      fresh.tempo          = gameplan.tempo          || fresh.tempo;
+    }
+    gameplan = fresh;
+  } else {
+    syncGameplanWithRoster();
+  }
+}
+
+function ensureDefaultGameplanSaved() {
+  if (!selectedConf || !selectedTeam) return;
+  ensureRosterLoaded();
+  ensureGameplan();
+  if (!hasValidPositionMinutes(gameplan)) {
+    gameplan = buildGameplanFromPresser();
+  }
+  if (hasValidPositionMinutes(gameplan)) {
+    gameplan.minutesSaved = true;
+    sessionStorage.setItem(getSavedGameplanKey(), JSON.stringify(gameplan));
+  }
+}
+
+function syncGameplanWithRoster() {
+  const roster = ((allRosters || {})[selectedConf] || {})[selectedTeam] || [];
+  const existing = new Map((gameplan.rotation || []).map(item => [item.playerName, item.minutes]));
+  gameplan.rotation = roster
+    .map(p => ({
+      playerName:p.name,
+      minutes:existing.has(p.name) ? existing.get(p.name) : 0
+    }))
+    .sort((a, b) => {
+      const oldA = (gameplan.rotation || []).findIndex(item => item.playerName === a.playerName);
+      const oldB = (gameplan.rotation || []).findIndex(item => item.playerName === b.playerName);
+      return (oldA < 0 ? 999 : oldA) - (oldB < 0 ? 999 : oldB);
+    });
+}
+
+function renderGameplan() {
+  ensureGameplan();
+  document.getElementById('gameplan-title').textContent = `${selectedTeam} GAMEPLAN`;
+  document.getElementById('gameplan-note').textContent = 'Each position must total exactly 48 minutes before you can save.';
+  renderGameplanStyles();
+  renderGameplanRotation();
+}
+
+function renderGameplanStyles() {
+  const panel = document.getElementById('gameplan-style-panel');
+  const offense = getPressAnswerByKey('offense');
+  const defense = getPressAnswerByKey('defense');
+  const tempo = getPressAnswerByKey('tempo');
+  panel.innerHTML = `
+    <div class="gameplan-panel-title">STYLE</div>
+    ${renderStyleSelect('offensiveStyle', 'OFFENSIVE STYLE', getStyleOptions('offense'), gameplan.offensiveStyle, offense)}
+    ${renderStyleSelect('defensiveStyle', 'DEFENSIVE STYLE', getStyleOptions('defense'), gameplan.defensiveStyle, defense)}
+    ${renderStyleSelect('tempo', 'TEMPO', getStyleOptions('tempo'), gameplan.tempo, tempo)}
+  `;
+}
+
+function renderStyleSelect(field, label, options, value, presserAnswer) {
+  const response = presserAnswer ? presserAnswer.response : 'No presser answer saved for this category yet.';
+  return `
+    <div class="gameplan-field">
+      <label for="gp-${field}">${label}</label>
+      <select class="gameplan-select" id="gp-${field}" onchange="updateGameplanStyle('${field}', this.value)">
+        ${options.map(opt => `<option value="${escapeAttr(opt)}"${opt === value ? ' selected' : ''}>${opt}</option>`).join('')}
+      </select>
+      <div class="presser-text">${escapeAttr(response)}</div>
+    </div>
+  `;
+}
+
+const POS_ORDER = ['PG','SG','SF','PF','C','G','F'];
+
+function renderGameplanRotation() {
+  const panel = document.getElementById('gameplan-rotation-panel');
+  const roster = ((allRosters || {})[selectedConf] || {})[selectedTeam] || [];
+  const playerMap = new Map(roster.map(p => [p.name, p]));
+  const rotation = gameplan.rotation || [];
+
+  const groups = {};
+  rotation.forEach((item, i) => {
+    const pos = (playerMap.get(item.playerName) || {}).position || 'G';
+    if (!groups[pos]) groups[pos] = [];
+    groups[pos].push({ item, idx: i });
+  });
+  const posKeys = POS_ORDER.filter(p => groups[p])
+    .concat(Object.keys(groups).filter(p => !POS_ORDER.includes(p)));
+
+  let rows = '';
+  posKeys.forEach(pos => {
+    const used = sum(groups[pos].map(e => Number(e.item.minutes) || 0));
+    rows += `<div class="rot-pos-header"><span>${pos}</span><span>${used} / 48 MIN</span></div>`;
+    groups[pos].forEach(({ item, idx: gi }) => {
+      const player = playerMap.get(item.playerName) || {};
+      const mins = Number(item.minutes) || 0;
+      const role = gi < 5 ? 'START' : 'BENCH';
+      rows += `
+      <div class="rotation-row">
+        <div><strong>${escapeAttr(item.playerName)}</strong></div>
+        <div>${player.overall || '--'}</div>
+        <div>${role}</div>
+        <div class="min-stepper">
+          <button class="stepper-btn" type="button" onclick="updateRotationMinutesBy(${gi},-1)">-</button>
+          <span class="stepper-val">${mins}</span>
+          <button class="stepper-btn" type="button" onclick="updateRotationMinutesBy(${gi},1)">+</button>
+        </div>
+      </div>`;
+    });
+  });
+
+  panel.innerHTML = `<div class="gameplan-panel-title">ROTATION</div><div class="rotation-grid">${rows}</div>`;
+  updateSaveButtonState();
+}
+
+function updateGameplanStyle(field, value) {
+  ensureGameplan();
+  gameplan[field] = value;
+  renderGameplan();
+}
+
+function updateRotationMinutes(index, value) {
+  ensureGameplan();
+  const minutes = clamp(parseInt(value, 10) || 0, 0, 48);
+  if (gameplan.rotation[index]) gameplan.rotation[index].minutes = minutes;
+  renderGameplanRotation();
+}
+
+function updateRotationMinutesBy(index, delta) {
+  ensureGameplan();
+  const current = Number((gameplan.rotation[index] || {}).minutes) || 0;
+  updateRotationMinutes(index, current + delta);
+}
+
+function moveRotation(index, dir) {
+  ensureGameplan();
+  const next = index + dir;
+  if (next < 0 || next >= gameplan.rotation.length) return;
+  [gameplan.rotation[index], gameplan.rotation[next]] = [gameplan.rotation[next], gameplan.rotation[index]];
+  renderGameplanRotation();
+}
+
+function autoFillGameplanFromPresser() {
+  ensureRosterLoaded();
+  gameplan = buildGameplanFromPresser();
+  saveGameplan();
+  renderGameplan();
+}
+
+function getPositionMinuteTotals() {
+  return getPositionMinuteTotalsFor(gameplan);
+}
+
+function getPositionMinuteTotalsFor(plan) {
+  const roster = ((allRosters || {})[selectedConf] || {})[selectedTeam] || [];
+  const playerMap = new Map(roster.map(p => [p.name, p]));
+  const totals = {};
+  ((plan || {}).rotation || []).forEach(item => {
+    const pos = (playerMap.get(item.playerName) || {}).position || 'G';
+    totals[pos] = (totals[pos] || 0) + (Number(item.minutes) || 0);
+  });
+  return totals;
+}
+
+function isRotationValid() {
+  return hasValidPositionMinutes(gameplan);
+}
+
+function hasValidPositionMinutes(plan) {
+  const totals = getPositionMinuteTotalsFor(plan);
+  const required = ['PG','SG','SF','PF','C'];
+  if (!required.every(pos => totals[pos] === 48)) return false;
+  return Object.values(totals).every(t => t === 48);
+}
+
+function updateSaveButtonState() {
+  const btn = document.querySelector('.gameplan-save');
+  if (!btn) return;
+  btn.disabled = !isRotationValid();
+}
+
+function saveGameplan() {
+  ensureGameplan();
+  if (!isRotationValid()) {
+    const totals = getPositionMinuteTotals();
+    const bad = Object.entries(totals).filter(([, t]) => t !== 48).map(([p, t]) => `${p}: ${t}`).join(', ');
+    const note = document.getElementById('gameplan-note');
+    if (note) note.textContent = `Every position must total exactly 48 min. Check: ${bad}`;
+    return;
+  }
+  gameplan.minutesSaved = true;
+  sessionStorage.setItem(getSavedGameplanKey(), JSON.stringify(gameplan));
+  const note = document.getElementById('gameplan-note');
+  if (note) note.textContent = 'Gameplan saved.';
+}
+
 function balanceValues(obj, keys, targetSum, min, max) {
   let guard = 0;
   while (sum(keys.map(k => obj[k])) !== targetSum && guard < 500) {
@@ -2315,6 +3390,7 @@ function renderCoachInfo() {
       </div>
       <div class="coach-error" id="coach-error"></div>
       <div class="coach-actions-row">
+        <button class="coach-secondary" id="coach-skip-btn" type="button">SKIP</button>
         <button class="coach-primary" id="coach-next-btn" type="button">CONTINUE</button>
       </div>
     </div>
@@ -2329,6 +3405,7 @@ function renderCoachInfo() {
   document.getElementById('coach-hometown').addEventListener('change', e => {
     coachProfile.hometown = e.target.value;
   });
+  document.getElementById('coach-skip-btn').addEventListener('click', skipCoachSetup);
   document.getElementById('coach-next-btn').addEventListener('click', saveCoachInfoAndContinue);
   document.getElementById('coach-first-name').focus();
 }
@@ -2347,6 +3424,44 @@ function saveCoachInfoAndContinue() {
   sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
   coachStep = 'customize';
   flash(renderCoachBuilder);
+}
+
+function buildDefaultCoachProfile() {
+  const firstNameInput = document.getElementById('coach-first-name');
+  const lastNameInput = document.getElementById('coach-last-name');
+  const stateSelect = document.getElementById('coach-state');
+  const hometownSelect = document.getElementById('coach-hometown');
+  const homeState = stateSelect ? stateSelect.value : coachProfile.homeState || 'Indiana';
+  const hometowns = STATE_HOMETOWNS[homeState] || [];
+  const hometown = hometownSelect ? hometownSelect.value : hometowns[0] || 'Indianapolis';
+  const teamParts = (selectedTeam || '').split(/\s+/).filter(Boolean);
+  const fallbackLastName = teamParts[teamParts.length - 1] || 'Coach';
+
+  return {
+    ...coachProfile,
+    firstName:(firstNameInput ? firstNameInput.value.trim() : coachProfile.firstName) || 'Default',
+    lastName:(lastNameInput ? lastNameInput.value.trim() : coachProfile.lastName) || fallbackLastName,
+    homeState,
+    hometown
+  };
+}
+
+async function skipCoachSetup() {
+  coachProfile = buildDefaultCoachProfile();
+  resourceDecision = resourceDecision || 'scouts';
+  pressPersonality = pressPersonality || 'steady';
+  pressQuestionIndex = PRESS_QUESTIONS.length;
+  activeReporterIndex = null;
+  pressAnswers = [];
+  cachedSchedule = null;
+  currentGameIndex = 0;
+  sessionStorage.removeItem(getScheduleStateKey());
+  sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
+  sessionStorage.setItem('resourceDecision', resourceDecision);
+  sessionStorage.setItem('pressPersonality', pressPersonality);
+  sessionStorage.setItem('pressAnswers', JSON.stringify(pressAnswers));
+  await prepareRosters();
+  goToDashboard();
 }
 
 function renderCoachCustomize() {
@@ -2898,7 +4013,7 @@ const CONF_DATES = [
 ];
 
 function generateTeamSchedule(team, conf, season) {
-  const rng = mulberry32(strHash(team + '|' + conf + '|' + season));
+  const rng = () => Math.random();
   const confTeams = CONFERENCES[conf].filter(t => t !== team);
 
   // --- Conference: 18 games ---
@@ -2940,7 +4055,8 @@ function generateTeamSchedule(team, conf, season) {
 
 function goToSchedule() {
   if (!cachedSchedule) {
-    cachedSchedule = generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
+    cachedSchedule = loadCachedSchedule() || generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
+    saveCachedSchedule();
   }
   flash(() => {
     showPanel('schedule');
@@ -2973,7 +4089,8 @@ function renderSchedule() {
         `<span class="sched-date">${g.date}</span>` +
         `<span class="sched-ha ${g.home ? 'home' : 'away'}">${g.home ? 'HOME' : 'AWAY'}</span>` +
         `<span class="sched-opp">${g.opponent}</span>` +
-        `<span class="sched-type">${g.isConf ? 'CONF' : 'NON-CONF'}</span>`;
+        `<span class="sched-type">${g.isConf ? 'CONF' : 'NON-CONF'}</span>` +
+        `<span class="sched-result">${getScheduleResultLabel(g)}</span>`;
       body.appendChild(row);
     });
   }
@@ -3003,6 +4120,14 @@ function renderSchedule() {
       `* ${selectedConf.toUpperCase()} HAS ${confSize} TEAMS — SOME OPPONENTS APPEAR MORE THAN ONCE TO FILL 18 CONF GAMES`;
     body.appendChild(note);
   }
+}
+
+function getScheduleResultLabel(game) {
+  if (!game || !game.result) return '';
+  const userScore = game.home ? game.result.homeScore : game.result.awayScore;
+  const oppScore = game.home ? game.result.awayScore : game.result.homeScore;
+  const outcome = userScore > oppScore ? 'W' : 'L';
+  return `${outcome} ${userScore}-${oppScore}`;
 }
 
 function formulatePressResponse(question, answer) {
@@ -3194,7 +4319,27 @@ window.addEventListener('keydown', e => {
       e.preventDefault();
       goToCoachBuilder('customize');
     }
+  } else if (currentScreen === 'standings') {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      goToDashboard();
+    }
   } else if (currentScreen === 'roster') {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      goToDashboard();
+    }
+  } else if (currentScreen === 'gameplan') {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      goToRoster();
+    }
+  } else if (currentScreen === 'game') {
+    if ((e.code === 'Escape' || e.code === 'Backspace') && activeGame && activeGame.complete) {
+      e.preventDefault();
+      goToDashboard();
+    }
+  } else if (currentScreen === 'box') {
     if (e.code === 'Escape' || e.code === 'Backspace') {
       e.preventDefault();
       goToDashboard();
@@ -3410,5 +4555,6 @@ window.addEventListener('resize', () => {
   requestAnimationFrame(drawBtnBorder);
 });
 </script>
+<script src="gameplay.js"></script>
 </body>
 </html>
