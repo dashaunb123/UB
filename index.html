@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>University Basketball</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; image-rendering:pixelated; }
+
+    html, body {
+      width:100%; height:100%; overflow:hidden;
+      background:#161209;
+      font-family:'Press Start 2P', monospace;
+    }
+
+    #screen {
+      position:relative;
+      width:100vw; height:100vh;
+      overflow:hidden;
+    }
+
+    /* ── persistent layers ── */
+    #grain {
+      position:absolute; inset:0;
+      pointer-events:none; z-index:60; opacity:0.07;
+    }
+    #border-canvas {
+      position:absolute; inset:0;
+      pointer-events:none; z-index:50;
+    }
+    #version {
+      position:absolute; bottom:8px; right:14px;
+      font-size:6px; color:rgba(237,224,184,.18); z-index:55;
+    }
+
+    /* ── court layer (home only) ── */
+    #court-layer {
+      position:absolute; inset:0; z-index:3;
+      transition:opacity 0.05s;
+    }
+    #court-layer.hidden { display:none; }
+
+    #court-canvas {
+      position:absolute; bottom:0; left:0;
+      width:100%; height:32vh;
+      pointer-events:none;
+    }
+    #crowd {
+      position:absolute; bottom:32vh; left:0; width:100%;
+      height:52px;
+      display:flex; align-items:flex-end;
+      justify-content:center; gap:2px; padding:0 6px;
+    }
+    .fan {
+      width:8px; flex-shrink:0;
+      display:flex; flex-direction:column; align-items:center;
+      animation:sway var(--d,1.9s) ease-in-out infinite;
+      animation-delay:var(--dl,0s);
+    }
+    .fan-head { width:8px; height:8px; background:currentColor; }
+    .fan-body { width:8px; height:14px; background:currentColor; }
+    @keyframes sway {
+      0%,100% { transform:translateY(0); }
+      50%      { transform:translateY(-5px); }
+    }
+    .hoop { position:absolute; bottom:calc(32vh + 14px); z-index:5; }
+    #hoop-l { left:2.5%; }
+    #hoop-r { right:2.5%; transform:scaleX(-1); }
+
+    /* ── screen panels ── */
+    .screen-panel {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      z-index:10;
+    }
+    .screen-panel.hidden { display:none; }
+
+    /* ── home screen ── */
+    #home-screen { margin-top:-3vh; /* visual offset so court shows */ }
+    #home-screen > * { position:relative; }
+
+    #ball { display:block; width:80px; height:80px; margin-bottom:10px; }
+
+    #title { text-align:center; line-height:1; }
+    .t-eyebrow {
+      display:block; font-size:clamp(7px,1.3vw,12px);
+      color:#c08a18; letter-spacing:5px;
+      text-shadow:2px 2px 0 #3a2400; margin-bottom:10px;
+    }
+    .t-main {
+      display:block; font-size:clamp(26px,6.5vw,76px);
+      color:#ede0b8; line-height:1.18;
+      text-shadow:4px 4px 0 #a82418, 8px 8px 0 #350a04;
+    }
+    .t-sub {
+      display:block; font-size:clamp(7px,1.2vw,12px);
+      color:#a82418; letter-spacing:6px;
+      text-shadow:2px 2px 0 #350a04; margin-top:8px;
+    }
+
+    #btn-wrap { position:relative; margin-top:26px; }
+    #btn-border { position:absolute; top:0; left:0; pointer-events:none; }
+    #start-btn {
+      display:block; font-family:'Press Start 2P', monospace;
+      font-size:clamp(8px,1.4vw,13px); color:#ede0b8;
+      background:transparent; border:none; outline:none;
+      padding:14px 30px; cursor:pointer; letter-spacing:3px;
+      animation:blink 1s step-end infinite; position:relative; z-index:1;
+    }
+    #start-btn:hover { animation:none; opacity:1; color:#c08a18; }
+    #start-btn:active { transform:translate(2px,2px); }
+    @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+    #tagline {
+      font-size:clamp(5px,0.8vw,7px); color:rgba(237,224,184,0.38);
+      letter-spacing:2px; margin-top:16px;
+      animation:pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:.38} 50%{opacity:.72} }
+
+    /* ── selection screens shared ── */
+    .sel-screen {
+      justify-content:flex-start;
+      padding:28px 48px 18px;
+      overflow:hidden;
+      gap:0;
+    }
+
+    .back-row {
+      display:flex; align-items:center; gap:14px;
+      width:100%; max-width:920px;
+      margin-bottom:12px;
+    }
+    .back-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(6px,0.85vw,8px);
+      color:rgba(237,224,184,0.42);
+      background:transparent; border:none; cursor:pointer;
+      letter-spacing:1px; padding:4px 0;
+    }
+    .back-btn:hover { color:#ede0b8; }
+
+    .conf-badge {
+      font-size:clamp(6px,0.85vw,8px);
+      color:#c08a18; letter-spacing:2px;
+      text-shadow:1px 1px 0 #3a2400;
+    }
+
+    .sel-header {
+      text-align:center; width:100%; max-width:920px;
+      margin-bottom:18px;
+    }
+    .sel-eyebrow {
+      display:block; font-size:clamp(6px,0.9vw,8px);
+      color:#c08a18; letter-spacing:3px;
+      text-shadow:1px 1px 0 #3a2400; margin-bottom:8px;
+    }
+    .sel-title {
+      display:block; font-size:clamp(11px,2.2vw,20px);
+      color:#ede0b8;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+
+    /* scrollable grid body */
+    .sel-body {
+      width:100%; max-width:920px;
+      overflow-y:auto; scrollbar-width:none;
+      flex:1; padding:2px 2px 8px;
+    }
+    .sel-body::-webkit-scrollbar { display:none; }
+
+    .pick-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:7px;
+    }
+    .pick-grid.two-col { grid-template-columns:repeat(2,1fr); }
+
+    .pick-item {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.7vw,7px);
+      color:rgba(237,224,184,0.42);
+      border:2px dashed rgba(237,224,184,0.16);
+      padding:8px 8px 10px; cursor:pointer;
+      text-align:center; line-height:1.6;
+      background:transparent; outline:none;
+      width:100%; letter-spacing:0.3px;
+      display:flex; flex-direction:column; align-items:center; gap:4px;
+    }
+    .pick-item.active {
+      color:#ede0b8;
+      border:2px solid #ede0b8;
+      background:#a82418;
+      text-shadow:1px 1px 0 #350a04;
+    }
+    .pick-item:hover:not(.active) {
+      color:rgba(237,224,184,0.78);
+      border-color:rgba(237,224,184,0.45);
+      border-style:solid;
+    }
+    .team-name { display:block; }
+    .team-stats {
+      display:block;
+      font-size:clamp(4px,0.48vw,5px);
+      color:transparent;
+      letter-spacing:0.5px;
+      line-height:1.5;
+      white-space:nowrap;
+      overflow:hidden;
+      max-width:100%;
+    }
+    .pick-item:hover .team-stats,
+    .pick-item.active .team-stats {
+      color:rgba(192,138,24,0.92);
+    }
+
+    /* ── flash ── */
+    #flash {
+      position:fixed; inset:0; background:#ede0b8;
+      opacity:0; pointer-events:none; z-index:300;
+    }
+  </style>
+</head>
+<body>
+<div id="flash"></div>
+<div id="screen">
+
+  <canvas id="grain"></canvas>
+  <canvas id="border-canvas"></canvas>
+  <div id="version">VER 1.00</div>
+
+  <!-- Court layer — hidden on selection screens -->
+  <div id="court-layer">
+    <canvas class="hoop" id="hoop-l" width="96" height="112"></canvas>
+    <canvas class="hoop" id="hoop-r" width="96" height="112"></canvas>
+    <div id="crowd"></div>
+    <canvas id="court-canvas"></canvas>
+  </div>
+
+  <!-- ═══════════ HOME ═══════════ -->
+  <div id="home-screen" class="screen-panel">
+    <canvas id="ball" width="80" height="80"></canvas>
+    <div id="title">
+      <span class="t-eyebrow">* UNIVERSITY *</span>
+      <span class="t-main">BASKETBALL</span>
+      
+    </div>
+    <div id="btn-wrap">
+      <canvas id="btn-border"></canvas>
+      <button id="start-btn" onclick="goToConf()">► PRESS START ◄</button>
+    </div>
+    <div id="tagline">— CHOOSE YOUR TEAM TO BEGIN —</div>
+  </div>
+
+  <!-- ═══════════ CONFERENCE SELECT ═══════════ -->
+  <div id="conf-screen" class="screen-panel sel-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goHome()">◄ BACK</button>
+    </div>
+    <div class="sel-header">
+      <span class="sel-eyebrow">* STEP 1 OF 2 *</span>
+      <span class="sel-title">SELECT CONFERENCE</span>
+    </div>
+    <div class="sel-body">
+      <div id="conf-grid" class="pick-grid"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ TEAM SELECT ═══════════ -->
+  <div id="team-screen" class="screen-panel sel-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToConf()">◄ BACK</button>
+      <span class="conf-badge" id="conf-badge"></span>
+    </div>
+    <div class="sel-header">
+      <span class="sel-eyebrow">* STEP 2 OF 2 *</span>
+      <span class="sel-title">SELECT YOUR TEAM</span>
+    </div>
+    <div class="sel-body">
+      <div id="team-grid" class="pick-grid"></div>
+    </div>
+  </div>
+
+</div>
+<script>
+/* ═══════════════════════════════════════════
+   CONFERENCE + TEAM DATA
+═══════════════════════════════════════════ */
+const CONFERENCES = {
+  "ACC": [
+    "Boston College","California","Clemson","Duke","Florida State",
+    "Georgia Tech","Louisville","Miami (FL)","North Carolina",
+    "North Carolina State","Notre Dame","Pittsburgh","SMU",
+    "Stanford","Syracuse","Virginia","Virginia Tech","Wake Forest"
+  ],
+  "America East": [
+    "Albany","Binghamton","Bryant","Maine","New Hampshire",
+    "NJIT","UMass-Lowell","UMBC","Vermont"
+  ],
+  "American": [
+    "Charlotte","East Carolina","FAU","Memphis","North Texas",
+    "Rice","South Florida","Temple","Tulane","Tulsa",
+    "UAB","UTSA","Wichita State"
+  ],
+  "ASUN": [
+    "Austin Peay","Bellarmine","Central Arkansas","Eastern Kentucky",
+    "FGCU","Jacksonville","Lipscomb","North Alabama",
+    "North Florida","Queens","Stetson","West Georgia"
+  ],
+  "Atlantic 10": [
+    "Davidson","Dayton","Duquesne","Fordham","George Mason",
+    "George Washington","La Salle","Loyola-Chicago","Rhode Island",
+    "Richmond","Saint Bonaventure","Saint Joseph's","Saint Louis","VCU"
+  ],
+  "Big 12": [
+    "Arizona","Arizona State","Baylor","BYU","Cincinnati",
+    "Colorado","Houston","Iowa State","Kansas","Kansas State",
+    "Oklahoma State","TCU","Texas Tech","UCF","Utah","West Virginia"
+  ],
+  "Big East": [
+    "Butler","Connecticut","Creighton","DePaul","Georgetown",
+    "Marquette","Providence","Saint John's","Seton Hall",
+    "Villanova","Xavier"
+  ],
+  "Big Sky": [
+    "Eastern Washington","Idaho","Idaho State","Montana",
+    "Montana State","Northern Arizona","Northern Colorado",
+    "Portland State","Sacramento State","Weber State"
+  ],
+  "Big South": [
+    "Charleston Southern","Gardner-Webb","High Point","Longwood",
+    "Presbyterian College","Radford","South Carolina Upstate",
+    "UNC Asheville","Winthrop"
+  ],
+  "Big Ten": [
+    "Illinois","Indiana","Iowa","Maryland","Michigan",
+    "Michigan State","Minnesota","Nebraska","Northwestern",
+    "Ohio State","Oregon","Penn State","Purdue","Rutgers",
+    "UCLA","USC","Washington","Wisconsin"
+  ],
+  "Big West": [
+    "Cal Poly","Cal State Bakersfield","Cal State Fullerton",
+    "Cal State Northridge","Hawaii","Long Beach State",
+    "UC Davis","UC Irvine","UC Riverside","UC San Diego",
+    "UC Santa Barbara"
+  ],
+  "Coastal Athletic": [
+    "Campbell","Charleston","Drexel","Elon","Hampton",
+    "Hofstra","Monmouth","North Carolina A&T","Northeastern",
+    "Stony Brook","Towson","UNCW","William & Mary"
+  ],
+  "Conference USA": [
+    "Delaware","FIU","Jacksonville State","Kennesaw State",
+    "Liberty","Louisiana Tech","Middle Tennessee","Missouri State",
+    "New Mexico State","Sam Houston State","UTEP","Western Kentucky"
+  ],
+  "Horizon League": [
+    "Cleveland State","Detroit","Green Bay","IU Indianapolis",
+    "Milwaukee","Northern Kentucky","Oakland","Purdue Fort Wayne",
+    "Robert Morris","Wright State","Youngstown State"
+  ],
+  "Ivy League": [
+    "Brown","Columbia","Cornell","Dartmouth",
+    "Harvard","Penn","Princeton","Yale"
+  ],
+  "MAAC": [
+    "Canisius","Fairfield","Iona","Manhattan","Marist",
+    "Merrimack","Mount Saint Mary's","Niagara","Quinnipiac",
+    "Rider","Sacred Heart","Saint Peter's","Siena"
+  ],
+  "MEAC": [
+    "Coppin State","Delaware State","Howard","Maryland Eastern Shore",
+    "Morgan State","Norfolk State","North Carolina Central",
+    "South Carolina State"
+  ],
+  "Mid-American": [
+    "Akron","Ball State","Bowling Green","Buffalo",
+    "Central Michigan","Eastern Michigan","Kent State",
+    "Miami (OH)","Northern Illinois","Ohio","Toledo",
+    "UMass","Western Michigan"
+  ],
+  "Missouri Valley": [
+    "Belmont","Bradley","Drake","Evansville","Illinois State",
+    "Indiana State","Murray State","Northern Iowa",
+    "Southern Illinois","UIC","Valparaiso"
+  ],
+  "Mountain West": [
+    "Air Force","Boise State","Colorado State","Fresno State",
+    "Grand Canyon","Nevada","New Mexico","San Diego State",
+    "San Jose State","UNLV","Utah State","Wyoming"
+  ],
+  "NEC": [
+    "Central Connecticut","Chicago State","Fairleigh Dickinson",
+    "Le Moyne","Long Island","Mercyhurst","New Haven",
+    "Saint Francis (PA)","Stonehill","Wagner"
+  ],
+  "Ohio Valley": [
+    "Eastern Illinois","Lindenwood","Little Rock","Morehead State",
+    "SIUE","Southeast Missouri","Southern Indiana","Tennessee State",
+    "Tennessee Tech","Tennessee-Martin","Western Illinois"
+  ],
+  "Patriot League": [
+    "American","Army","Boston University","Bucknell","Colgate",
+    "Holy Cross","Lafayette","Lehigh","Loyola-Maryland","Navy"
+  ],
+  "SEC": [
+    "Alabama","Arkansas","Auburn","Florida","Georgia","Kentucky",
+    "LSU","Mississippi State","Missouri","Oklahoma","Ole Miss",
+    "South Carolina","Tennessee","Texas","Texas A&M","Vanderbilt"
+  ],
+  "Southern": [
+    "Chattanooga","East Tennessee State","Furman","Mercer",
+    "Samford","The Citadel","UNCG","VMI",
+    "Western Carolina","Wofford"
+  ],
+  "Southland": [
+    "East Texas A&M","Houston Christian","Incarnate Word","Lamar",
+    "McNeese","New Orleans","Nicholls","Northwestern State",
+    "Southeastern Louisiana","Stephen F. Austin",
+    "Texas A&M-Corpus Christi","UTRGV"
+  ],
+  "Sun Belt": [
+    "Appalachian State","Arkansas State","Coastal Carolina",
+    "Georgia Southern","Georgia State","James Madison","Louisiana",
+    "Marshall","Old Dominion","South Alabama","Southern Miss",
+    "Texas State","Troy","ULM"
+  ],
+  "SWAC": [
+    "Alabama A&M","Alabama State","Alcorn State","Arkansas-Pine Bluff",
+    "Bethune-Cookman","Florida A&M","Grambling State","Jackson State",
+    "Mississippi Valley State","Prairie View A&M","Southern",
+    "Texas Southern"
+  ],
+  "Summit League": [
+    "Denver","North Dakota","North Dakota State","Omaha",
+    "Oral Roberts","Saint Thomas","South Dakota",
+    "South Dakota State","UMKC"
+  ],
+  "West Coast": [
+    "Gonzaga","Loyola-Marymount","Oregon State","Pacific",
+    "Pepperdine","Portland","Saint Mary's College","San Diego",
+    "San Francisco","Santa Clara","Seattle University","Washington State"
+  ],
+  "Western Athletic": [
+    "Abilene Christian","California Baptist","Southern Utah",
+    "Tarleton State","UTA","Utah Tech","Utah Valley"
+  ]
+};
+
+const TEAM_DATA = {
+  "ACC":{"Boston College":{p:79,n:8.5,o:66},"California":{p:72,n:7.5,o:86},"Clemson":{p:74,n:7.8,o:87},"Duke":{p:100,n:15.0,o:97},"Florida State":{p:76,n:8.1,o:87},"Georgia Tech":{p:72,n:7.5,o:66},"Louisville":{p:89,n:12.0,o:92},"Miami (FL)":{p:75,n:8.1,o:92},"North Carolina":{p:99,n:13.5,o:91},"North Carolina State":{p:77,n:8.2,o:88},"Notre Dame":{p:76,n:8.4,o:67},"Pittsburgh":{p:76,n:8.1,o:68},"SMU":{p:72,n:7.8,o:86},"Stanford":{p:75,n:8.1,o:87},"Syracuse":{p:84,n:9.6,o:89},"Virginia":{p:83,n:9.3,o:93},"Virginia Tech":{p:72,n:7.5,o:86},"Wake Forest":{p:75,n:7.9,o:87}},
+  "America East":{"Albany":{p:30,n:0.6,o:71},"Binghamton":{p:33,n:0.65,o:72},"Bryant":{p:33,n:0.65,o:72},"Maine":{p:31,n:0.6,o:71},"New Hampshire":{p:30,n:0.6,o:71},"NJIT":{p:26,n:0.55,o:70},"UMass-Lowell":{p:27,n:0.55,o:70},"UMBC":{p:34,n:0.65,o:72},"Vermont":{p:58,n:1.5,o:78}},
+  "American":{"Charlotte":{p:57,n:3.05,o:80},"East Carolina":{p:53,n:2.85,o:79},"FAU":{p:62,n:2.9,o:81},"Memphis":{p:82,n:5.0,o:86},"North Texas":{p:58,n:3.1,o:80},"Rice":{p:49,n:2.65,o:78},"South Florida":{p:50,n:2.7,o:78},"Temple":{p:68,n:3.6,o:82},"Tulane":{p:48,n:2.6,o:78},"Tulsa":{p:51,n:2.75,o:78},"UAB":{p:60,n:3.2,o:81},"UTSA":{p:56,n:3.0,o:80},"Wichita State":{p:70,n:3.4,o:83}},
+  "ASUN":{"Austin Peay":{p:30,n:0.65,o:71},"Bellarmine":{p:34,n:0.65,o:72},"Central Arkansas":{p:30,n:0.65,o:71},"Eastern Kentucky":{p:32,n:0.65,o:72},"FGCU":{p:34,n:0.65,o:72},"Jacksonville":{p:37,n:0.7,o:73},"Lipscomb":{p:27,n:0.6,o:71},"North Alabama":{p:32,n:0.65,o:72},"North Florida":{p:33,n:0.65,o:72},"Queens":{p:36,n:0.7,o:73},"Stetson":{p:31,n:0.65,o:72},"West Georgia":{p:36,n:0.7,o:73}},
+  "Atlantic 10":{"Davidson":{p:62,n:2.95,o:81},"Dayton":{p:72,n:4.0,o:84},"Duquesne":{p:56,n:2.65,o:80},"Fordham":{p:51,n:2.4,o:78},"George Mason":{p:60,n:2.85,o:81},"George Washington":{p:58,n:2.75,o:80},"La Salle":{p:59,n:2.8,o:80},"Loyola-Chicago":{p:63,n:3.0,o:81},"Rhode Island":{p:50,n:2.35,o:78},"Richmond":{p:60,n:2.85,o:81},"Saint Bonaventure":{p:60,n:2.85,o:81},"Saint Joseph's":{p:55,n:2.6,o:79},"Saint Louis":{p:63,n:3.0,o:81},"VCU":{p:70,n:3.5,o:83}},
+  "Big 12":{"Arizona":{p:91,n:10.5,o:97},"Arizona State":{p:73,n:7.9,o:87},"Baylor":{p:86,n:9.9,o:91},"BYU":{p:78,n:13.0,o:90},"Cincinnati":{p:78,n:8.6,o:89},"Colorado":{p:72,n:7.7,o:87},"Houston":{p:88,n:10.5,o:96},"Iowa State":{p:82,n:9.7,o:96},"Kansas":{p:99,n:12.5,o:93},"Kansas State":{p:76,n:8.3,o:88},"Oklahoma State":{p:75,n:8.1,o:88},"TCU":{p:73,n:7.8,o:87},"Texas Tech":{p:81,n:11.5,o:92},"UCF":{p:75,n:8.1,o:88},"Utah":{p:73,n:7.8,o:87},"West Virginia":{p:76,n:8.5,o:88}},
+  "Big East":{"Butler":{p:79,n:8.1,o:88},"Connecticut":{p:96,n:11.0,o:98},"Creighton":{p:78,n:8.3,o:88},"DePaul":{p:83,n:8.7,o:89},"Georgetown":{p:74,n:7.6,o:87},"Marquette":{p:82,n:8.0,o:89},"Providence":{p:78,n:8.1,o:88},"Saint John's":{p:80,n:10.5,o:95},"Seton Hall":{p:76,n:7.8,o:87},"Villanova":{p:88,n:8.0,o:90},"Xavier":{p:77,n:8.0,o:88}},
+  "Big Sky":{"Eastern Washington":{p:42,n:0.7,o:74},"Idaho":{p:25,n:0.5,o:70},"Idaho State":{p:31,n:0.55,o:71},"Montana":{p:44,n:0.7,o:74},"Montana State":{p:43,n:0.7,o:74},"Northern Arizona":{p:33,n:0.6,o:72},"Northern Colorado":{p:29,n:0.55,o:71},"Portland State":{p:30,n:0.55,o:71},"Sacramento State":{p:33,n:0.6,o:72},"Weber State":{p:43,n:0.7,o:74}},
+  "Big South":{"Charleston Southern":{p:30,n:0.5,o:71},"Gardner-Webb":{p:27,n:0.5,o:70},"High Point":{p:48,n:0.65,o:75},"Longwood":{p:29,n:0.5,o:70},"Presbyterian College":{p:25,n:0.45,o:70},"Radford":{p:26,n:0.45,o:70},"South Carolina Upstate":{p:25,n:0.45,o:70},"UNC Asheville":{p:34,n:0.55,o:72},"Winthrop":{p:25,n:0.45,o:70}},
+  "Big Ten":{"Illinois":{p:83,n:9.3,o:96},"Indiana":{p:91,n:15.0,o:91},"Iowa":{p:76,n:8.7,o:94},"Maryland":{p:81,n:9.5,o:90},"Michigan":{p:84,n:11.0,o:99},"Michigan State":{p:90,n:10.5,o:95},"Minnesota":{p:72,n:7.9,o:87},"Nebraska":{p:73,n:8.1,o:94},"Northwestern":{p:70,n:7.6,o:87},"Ohio State":{p:80,n:9.8,o:89},"Oregon":{p:81,n:9.8,o:90},"Penn State":{p:71,n:7.7,o:87},"Purdue":{p:87,n:9.8,o:96},"Rutgers":{p:72,n:7.9,o:87},"UCLA":{p:96,n:9.5,o:91},"USC":{p:78,n:9.2,o:89},"Washington":{p:76,n:8.8,o:88},"Wisconsin":{p:80,n:9.4,o:92}},
+  "Big West":{"Cal Poly":{p:38,n:0.8,o:73},"Cal State Bakersfield":{p:36,n:0.8,o:73},"Cal State Fullerton":{p:29,n:0.7,o:71},"Cal State Northridge":{p:32,n:0.7,o:72},"Hawaii":{p:47,n:0.95,o:75},"Long Beach State":{p:48,n:0.95,o:76},"UC Davis":{p:34,n:0.75,o:72},"UC Irvine":{p:52,n:1.4,o:77},"UC Riverside":{p:32,n:0.7,o:72},"UC San Diego":{p:50,n:0.95,o:76},"UC Santa Barbara":{p:49,n:0.95,o:76}},
+  "Coastal Athletic":{"Campbell":{p:38,n:0.9,o:73},"Charleston":{p:57,n:1.2,o:77},"Drexel":{p:37,n:0.9,o:73},"Elon":{p:32,n:0.8,o:72},"Hampton":{p:31,n:0.8,o:72},"Hofstra":{p:31,n:0.8,o:72},"Monmouth":{p:38,n:0.9,o:73},"North Carolina A&T":{p:40,n:0.95,o:74},"Northeastern":{p:31,n:0.8,o:72},"Stony Brook":{p:34,n:0.85,o:72},"Towson":{p:31,n:0.8,o:72},"UNCW":{p:52,n:1.1,o:76},"William & Mary":{p:39,n:0.9,o:73}},
+  "Conference USA":{"Delaware":{p:39,n:1.25,o:74},"FIU":{p:45,n:1.35,o:76},"Jacksonville State":{p:42,n:1.3,o:75},"Kennesaw State":{p:46,n:1.4,o:76},"Liberty":{p:61,n:2.0,o:80},"Louisiana Tech":{p:56,n:1.65,o:78},"Middle Tennessee":{p:47,n:1.4,o:76},"Missouri State":{p:44,n:1.35,o:75},"New Mexico State":{p:58,n:1.7,o:79},"Sam Houston State":{p:38,n:1.2,o:74},"UTEP":{p:47,n:1.4,o:76},"Western Kentucky":{p:62,n:1.75,o:80}},
+  "Horizon League":{"Cleveland State":{p:46,n:1.85,o:76},"Detroit":{p:45,n:1.85,o:75},"Green Bay":{p:42,n:1.75,o:75},"IU Indianapolis":{p:35,n:1.55,o:73},"Milwaukee":{p:45,n:1.85,o:75},"Northern Kentucky":{p:47,n:1.9,o:76},"Oakland":{p:50,n:1.4,o:76},"Purdue Fort Wayne":{p:35,n:1.55,o:73},"Robert Morris":{p:35,n:1.55,o:73},"Wright State":{p:47,n:1.9,o:76},"Youngstown State":{p:39,n:1.65,o:74}},
+  "Ivy League":{"Brown":{p:36,n:0.95,o:73},"Columbia":{p:42,n:1.05,o:74},"Cornell":{p:49,n:1.2,o:76},"Dartmouth":{p:39,n:1.0,o:74},"Harvard":{p:53,n:1.25,o:77},"Penn":{p:52,n:1.25,o:77},"Princeton":{p:56,n:1.7,o:78},"Yale":{p:54,n:1.4,o:77}},
+  "MAAC":{"Canisius":{p:33,n:0.65,o:72},"Fairfield":{p:27,n:0.6,o:71},"Iona":{p:53,n:0.9,o:76},"Manhattan":{p:27,n:0.6,o:71},"Marist":{p:35,n:0.7,o:72},"Merrimack":{p:45,n:0.8,o:75},"Mount Saint Mary's":{p:35,n:0.7,o:72},"Niagara":{p:36,n:0.7,o:73},"Quinnipiac":{p:45,n:0.8,o:75},"Rider":{p:34,n:0.65,o:72},"Sacred Heart":{p:31,n:0.65,o:71},"Saint Peter's":{p:50,n:0.85,o:76},"Siena":{p:28,n:0.6,o:71}},
+  "MEAC":{"Coppin State":{p:28,n:0.45,o:68},"Delaware State":{p:29,n:0.45,o:69},"Howard":{p:43,n:0.6,o:73},"Maryland Eastern Shore":{p:21,n:0.4,o:67},"Morgan State":{p:23,n:0.45,o:67},"Norfolk State":{p:45,n:0.6,o:73},"North Carolina Central":{p:29,n:0.45,o:69},"South Carolina State":{p:24,n:0.45,o:67}},
+  "Mid-American":{"Akron":{p:55,n:1.4,o:77},"Ball State":{p:34,n:1.1,o:72},"Bowling Green":{p:42,n:1.25,o:74},"Buffalo":{p:44,n:1.3,o:74},"Central Michigan":{p:39,n:1.2,o:73},"Eastern Michigan":{p:37,n:1.15,o:73},"Kent State":{p:54,n:1.55,o:77},"Miami (OH)":{p:43,n:1.3,o:74},"Northern Illinois":{p:44,n:1.3,o:74},"Ohio":{p:54,n:1.55,o:77},"Toledo":{p:52,n:1.5,o:76},"UMass":{p:58,n:1.6,o:78},"Western Michigan":{p:37,n:1.15,o:73}},
+  "Missouri Valley":{"Belmont":{p:56,n:1.7,o:78},"Bradley":{p:58,n:1.75,o:79},"Drake":{p:62,n:2.0,o:80},"Evansville":{p:44,n:1.35,o:76},"Illinois State":{p:45,n:1.4,o:76},"Indiana State":{p:55,n:1.65,o:78},"Murray State":{p:58,n:1.75,o:79},"Northern Iowa":{p:56,n:1.7,o:78},"Southern Illinois":{p:47,n:1.45,o:76},"UIC":{p:45,n:1.4,o:76},"Valparaiso":{p:48,n:1.5,o:77}},
+  "Mountain West":{"Air Force":{p:61,n:2.95,o:81},"Boise State":{p:66,n:3.2,o:82},"Colorado State":{p:53,n:2.55,o:79},"Fresno State":{p:53,n:2.55,o:79},"Grand Canyon":{p:63,n:3.2,o:82},"Nevada":{p:65,n:3.15,o:82},"New Mexico":{p:70,n:3.4,o:83},"San Diego State":{p:78,n:4.5,o:85},"San Jose State":{p:56,n:2.7,o:80},"UNLV":{p:72,n:3.2,o:84},"Utah State":{p:66,n:3.2,o:82},"Wyoming":{p:62,n:3.0,o:81}},
+  "NEC":{"Central Connecticut":{p:24,n:0.45,o:68},"Chicago State":{p:30,n:0.5,o:70},"Fairleigh Dickinson":{p:30,n:0.5,o:70},"Le Moyne":{p:23,n:0.45,o:68},"Long Island":{p:21,n:0.4,o:67},"Mercyhurst":{p:20,n:0.4,o:67},"New Haven":{p:23,n:0.45,o:68},"Saint Francis (PA)":{p:24,n:0.45,o:68},"Stonehill":{p:20,n:0.4,o:67},"Wagner":{p:27,n:0.45,o:68}},
+  "Ohio Valley":{"Eastern Illinois":{p:30,n:0.55,o:71},"Lindenwood":{p:34,n:0.6,o:72},"Little Rock":{p:45,n:0.7,o:74},"Morehead State":{p:47,n:0.7,o:75},"SIUE":{p:27,n:0.5,o:70},"Southeast Missouri":{p:28,n:0.55,o:71},"Southern Indiana":{p:32,n:0.55,o:71},"Tennessee State":{p:34,n:0.6,o:72},"Tennessee Tech":{p:30,n:0.55,o:71},"Tennessee-Martin":{p:32,n:0.55,o:71},"Western Illinois":{p:30,n:0.55,o:71}},
+  "Patriot League":{"American":{p:33,n:0.65,o:72},"Army":{p:41,n:0.7,o:73},"Boston University":{p:42,n:0.75,o:74},"Bucknell":{p:45,n:0.75,o:74},"Colgate":{p:48,n:0.8,o:75},"Holy Cross":{p:34,n:0.65,o:72},"Lafayette":{p:28,n:0.6,o:70},"Lehigh":{p:35,n:0.65,o:72},"Loyola-Maryland":{p:33,n:0.65,o:72},"Navy":{p:41,n:0.7,o:73}},
+  "SEC":{"Alabama":{p:83,n:9.8,o:94},"Arkansas":{p:86,n:13.0,o:94},"Auburn":{p:82,n:9.6,o:89},"Florida":{p:84,n:9.8,o:95},"Georgia":{p:72,n:9.4,o:87},"Kentucky":{p:99,n:22.0,o:91},"LSU":{p:76,n:9.9,o:88},"Mississippi State":{p:72,n:9.2,o:87},"Missouri":{p:73,n:9.5,o:87},"Oklahoma":{p:78,n:9.9,o:89},"Ole Miss":{p:72,n:9.2,o:87},"South Carolina":{p:73,n:9.3,o:87},"Tennessee":{p:86,n:10.5,o:95},"Texas":{p:86,n:11.0,o:92},"Texas A&M":{p:76,n:9.9,o:88},"Vanderbilt":{p:71,n:9.0,o:93}},
+  "Southern":{"Chattanooga":{p:50,n:0.9,o:76},"East Tennessee State":{p:51,n:0.9,o:76},"Furman":{p:51,n:0.9,o:76},"Mercer":{p:30,n:0.65,o:71},"Samford":{p:52,n:0.95,o:76},"The Citadel":{p:32,n:0.65,o:72},"UNCG":{p:33,n:0.7,o:72},"VMI":{p:34,n:0.7,o:72},"Western Carolina":{p:30,n:0.65,o:71},"Wofford":{p:30,n:0.65,o:71}},
+  "Southland":{"East Texas A&M":{p:27,n:0.55,o:70},"Houston Christian":{p:25,n:0.5,o:70},"Incarnate Word":{p:32,n:0.6,o:71},"Lamar":{p:33,n:0.6,o:72},"McNeese":{p:54,n:1.6,o:77},"New Orleans":{p:33,n:0.6,o:72},"Nicholls":{p:27,n:0.55,o:70},"Northwestern State":{p:31,n:0.55,o:71},"Southeastern Louisiana":{p:30,n:0.55,o:71},"Stephen F. Austin":{p:50,n:0.75,o:75},"Texas A&M-Corpus Christi":{p:25,n:0.5,o:70},"UTRGV":{p:42,n:0.7,o:74}},
+  "Sun Belt":{"Appalachian State":{p:34,n:1.0,o:73},"Arkansas State":{p:34,n:1.0,o:73},"Coastal Carolina":{p:34,n:1.0,o:73},"Georgia Southern":{p:39,n:1.1,o:74},"Georgia State":{p:37,n:1.1,o:74},"James Madison":{p:33,n:1.0,o:73},"Louisiana":{p:42,n:1.2,o:75},"Marshall":{p:39,n:1.1,o:74},"Old Dominion":{p:37,n:1.1,o:74},"South Alabama":{p:35,n:1.05,o:73},"Southern Miss":{p:35,n:1.05,o:73},"Texas State":{p:39,n:1.1,o:74},"Troy":{p:34,n:1.0,o:73},"ULM":{p:40,n:1.15,o:74}},
+  "SWAC":{"Alabama A&M":{p:26,n:0.5,o:68},"Alabama State":{p:29,n:0.5,o:69},"Alcorn State":{p:31,n:0.55,o:70},"Arkansas-Pine Bluff":{p:29,n:0.5,o:69},"Bethune-Cookman":{p:32,n:0.55,o:70},"Florida A&M":{p:27,n:0.5,o:68},"Grambling State":{p:31,n:0.55,o:70},"Jackson State":{p:27,n:0.5,o:68},"Mississippi Valley State":{p:26,n:0.5,o:60},"Prairie View A&M":{p:30,n:0.5,o:70},"Southern":{p:32,n:0.55,o:70},"Texas Southern":{p:48,n:0.7,o:74}},
+  "Summit League":{"Denver":{p:33,n:0.65,o:72},"North Dakota":{p:33,n:0.65,o:72},"North Dakota State":{p:47,n:0.85,o:75},"Omaha":{p:28,n:0.6,o:71},"Oral Roberts":{p:50,n:0.85,o:76},"Saint Thomas":{p:34,n:0.7,o:72},"South Dakota":{p:30,n:0.65,o:71},"South Dakota State":{p:51,n:1.2,o:76},"UMKC":{p:33,n:0.65,o:72}},
+  "West Coast":{"Gonzaga":{p:88,n:8.5,o:93},"Loyola-Marymount":{p:50,n:2.25,o:79},"Oregon State":{p:66,n:3.0,o:82},"Pacific":{p:53,n:2.4,o:79},"Pepperdine":{p:50,n:2.25,o:79},"Portland":{p:48,n:2.2,o:78},"Saint Mary's College":{p:75,n:3.3,o:84},"San Diego":{p:55,n:2.5,o:80},"San Francisco":{p:62,n:2.8,o:81},"Santa Clara":{p:60,n:2.7,o:81},"Seattle University":{p:55,n:2.5,o:80},"Washington State":{p:67,n:3.0,o:83}},
+  "Western Athletic":{"Abilene Christian":{p:45,n:0.8,o:75},"California Baptist":{p:31,n:0.65,o:72},"Southern Utah":{p:30,n:0.65,o:72},"Tarleton State":{p:42,n:0.75,o:74},"UTA":{p:30,n:0.65,o:72},"Utah Tech":{p:35,n:0.7,o:73},"Utah Valley":{p:46,n:0.8,o:75}}
+};
+
+function prestigeBar(p) {
+  const n = Math.round(p / 10);
+  return '█'.repeat(n) + '░'.repeat(10 - n);
+}
+function formatNIL(m) {
+  if (m >= 1) return '$' + (m === Math.floor(m) ? m : parseFloat(m.toFixed(1))) + 'M';
+  return '$' + Math.round(m * 1000) + 'K';
+}
+
+const CONF_NAMES = Object.keys(CONFERENCES);
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let currentScreen = 'home';
+let confCursor = 0;
+let teamCursor = 0;
+let selectedConf = null;
+
+/* ═══════════════════════════════════════════
+   SCREEN TRANSITIONS
+═══════════════════════════════════════════ */
+function flash(cb) {
+  const f = document.getElementById('flash');
+  f.style.opacity = '0.75';
+  setTimeout(() => { f.style.opacity = '0'; cb(); }, 90);
+}
+
+function showPanel(name) {
+  document.querySelectorAll('.screen-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById(name + '-screen').classList.remove('hidden');
+  const courtLayer = document.getElementById('court-layer');
+  courtLayer.classList.toggle('hidden', name !== 'home');
+  currentScreen = name;
+}
+
+function goHome() {
+  flash(() => showPanel('home'));
+}
+
+function goToConf() {
+  const homeBtn = document.getElementById('start-btn');
+  if (homeBtn) homeBtn.disabled = false;
+  flash(() => {
+    confCursor = 0;
+    showPanel('conf');
+    renderConf();
+  });
+}
+
+function goToTeam(confName) {
+  selectedConf = confName;
+  teamCursor = 0;
+  flash(() => {
+    showPanel('team');
+    renderTeam();
+  });
+}
+
+/* ═══════════════════════════════════════════
+   RENDER GRIDS
+═══════════════════════════════════════════ */
+function renderConf() {
+  const grid = document.getElementById('conf-grid');
+  grid.className = 'pick-grid'; // 3 cols
+  grid.innerHTML = '';
+  CONF_NAMES.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'pick-item' + (i === confCursor ? ' active' : '');
+    btn.textContent = name;
+    btn.addEventListener('click', () => { confCursor = i; goToTeam(name); });
+    btn.addEventListener('mouseenter', () => {
+      confCursor = i;
+      grid.querySelectorAll('.pick-item').forEach((el, idx) => {
+        el.classList.toggle('active', idx === i);
+      });
+    });
+    grid.appendChild(btn);
+  });
+  scrollActiveIntoView(grid);
+}
+
+function renderTeam() {
+  document.getElementById('conf-badge').textContent = selectedConf;
+  const teams = CONFERENCES[selectedConf];
+  const grid = document.getElementById('team-grid');
+  // use 2 cols for small conferences, 3 for larger
+  grid.className = 'pick-grid' + (teams.length <= 10 ? ' two-col' : '');
+  grid.innerHTML = '';
+  teams.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'pick-item' + (i === teamCursor ? ' active' : '');
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'team-name';
+    nameSpan.textContent = name;
+    btn.appendChild(nameSpan);
+    const d = (TEAM_DATA[selectedConf] || {})[name];
+    if (d) {
+      const statsSpan = document.createElement('span');
+      statsSpan.className = 'team-stats';
+      statsSpan.textContent = prestigeBar(d.p) + ' · ' + formatNIL(d.n) + ' · OVR ' + d.o;
+      btn.appendChild(statsSpan);
+    }
+    btn.addEventListener('click', () => { teamCursor = i; selectTeam(); });
+    btn.addEventListener('mouseenter', () => {
+      teamCursor = i;
+      grid.querySelectorAll('.pick-item').forEach((el, idx) => {
+        el.classList.toggle('active', idx === i);
+      });
+    });
+    grid.appendChild(btn);
+  });
+  scrollActiveIntoView(grid);
+}
+
+function scrollActiveIntoView(grid) {
+  const active = grid.querySelector('.active');
+  if (active) active.scrollIntoView({ block: 'nearest' });
+}
+
+function selectTeam() {
+  const team = CONFERENCES[selectedConf][teamCursor];
+  // Store selection for the game — replace with actual navigation when game is built
+  sessionStorage.setItem('playerConf', selectedConf);
+  sessionStorage.setItem('playerTeam', team);
+  flash(() => {
+    // Placeholder: bounce back for now until game screen exists
+    alert(`LOCKED IN:\n${team}\n(${selectedConf})`);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   KEYBOARD NAV
+═══════════════════════════════════════════ */
+window.addEventListener('keydown', e => {
+  if (currentScreen === 'home') {
+    if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); goToConf(); }
+    return;
+  }
+
+  if (currentScreen === 'conf') {
+    const cols = 3;
+    const len  = CONF_NAMES.length;
+    handleGridNav(e, cols, len,
+      () => confCursor,
+      v  => { confCursor = v; renderConf(); },
+      ()  => goToTeam(CONF_NAMES[confCursor]),
+      ()  => goHome()
+    );
+  } else if (currentScreen === 'team') {
+    const teams = CONFERENCES[selectedConf];
+    const cols  = teams.length <= 10 ? 2 : 3;
+    handleGridNav(e, cols, teams.length,
+      () => teamCursor,
+      v  => { teamCursor = v; renderTeam(); },
+      ()  => selectTeam(),
+      ()  => { confCursor = CONF_NAMES.indexOf(selectedConf); showPanel('conf'); renderConf(); }
+    );
+  }
+});
+
+function handleGridNav(e, cols, len, getCursor, setCursor, onSelect, onBack) {
+  const cur = getCursor();
+  let next = cur;
+  switch (e.code) {
+    case 'ArrowLeft':  e.preventDefault(); next = Math.max(0, cur - 1); break;
+    case 'ArrowRight': e.preventDefault(); next = Math.min(len - 1, cur + 1); break;
+    case 'ArrowUp':    e.preventDefault(); next = Math.max(0, cur - cols); break;
+    case 'ArrowDown':  e.preventDefault(); next = Math.min(len - 1, cur + cols); break;
+    case 'Enter':      e.preventDefault(); onSelect(); return;
+    case 'Escape':
+    case 'Backspace':  e.preventDefault(); onBack(); return;
+    default: return;
+  }
+  if (next !== cur) setCursor(next);
+}
+
+/* ═══════════════════════════════════════════
+   VISUALS
+═══════════════════════════════════════════ */
+
+/* Seeded random */
+function seededRand(seed) {
+  let s = seed;
+  return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+}
+
+/* Paper grain */
+const grainEl = document.getElementById('grain');
+const gc = grainEl.getContext('2d');
+function resizeGrain() {
+  grainEl.width  = window.innerWidth;
+  grainEl.height = window.innerHeight;
+  grainEl.style.cssText = 'position:absolute;inset:0;width:100vw;height:100vh;';
+}
+resizeGrain();
+function drawGrain() {
+  const W = grainEl.width, H = grainEl.height;
+  const id = gc.createImageData(W, H);
+  const r = seededRand(42);
+  for (let i = 0; i < id.data.length; i += 4) {
+    const v = r() * 255 | 0;
+    id.data[i] = id.data[i+1] = id.data[i+2] = v; id.data[i+3] = 255;
+  }
+  gc.putImageData(id, 0, 0);
+}
+drawGrain();
+
+/* Rough rect */
+function roughRect(ctx, x, y, w, h, color, lw, seed) {
+  const r = seededRand(seed);
+  const j = () => (r() - 0.5) * 3.5;
+  const steps = 18;
+  ctx.strokeStyle = color; ctx.lineWidth = lw;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x+j(), y+j());
+  for (let i=1;i<=steps;i++) ctx.lineTo(x+(w/steps)*i+j(), y+j());
+  for (let i=1;i<=steps;i++) ctx.lineTo(x+w+j(), y+(h/steps)*i+j());
+  for (let i=steps-1;i>=0;i--) ctx.lineTo(x+(w/steps)*i+j(), y+h+j());
+  for (let i=steps-1;i>=0;i--) ctx.lineTo(x+j(), y+(h/steps)*i+j());
+  ctx.closePath(); ctx.stroke();
+}
+
+/* Outer border */
+const borderEl = document.getElementById('border-canvas');
+const bctx = borderEl.getContext('2d');
+function drawBorder() {
+  borderEl.width = window.innerWidth; borderEl.height = window.innerHeight;
+  const M = 14;
+  roughRect(bctx, M,   M,   window.innerWidth-M*2,    window.innerHeight-M*2,    'rgba(192,138,24,0.55)', 3, 11);
+  roughRect(bctx, M+5, M+5, window.innerWidth-M*2-10, window.innerHeight-M*2-10, 'rgba(168,36,24,0.3)',   2, 77);
+  const corners = [[M+2,M+2],[window.innerWidth-M-28,M+2],[M+2,window.innerHeight-M-28],[window.innerWidth-M-28,window.innerHeight-M-28]];
+  for (const [cx,cy] of corners) {
+    const r2 = seededRand(cx+cy);
+    const j = () => (r2()-0.5)*2;
+    bctx.strokeStyle = 'rgba(192,138,24,0.4)'; bctx.lineWidth = 2;
+    bctx.beginPath();
+    bctx.moveTo(cx+j(),cy+j()); bctx.lineTo(cx+22+j(),cy+j());
+    bctx.moveTo(cx+j(),cy+j()); bctx.lineTo(cx+j(),cy+22+j());
+    bctx.stroke();
+  }
+}
+drawBorder();
+
+/* Button rough border */
+const btnBorderEl = document.getElementById('btn-border');
+const btnCtx = btnBorderEl.getContext('2d');
+const btnEl = document.getElementById('start-btn');
+function drawBtnBorder() {
+  const w = btnEl.offsetWidth + 10, h = btnEl.offsetHeight + 10;
+  btnBorderEl.width = w; btnBorderEl.height = h;
+  btnBorderEl.style.width = w+'px'; btnBorderEl.style.height = h+'px';
+  roughRect(btnCtx, 2, 2, w-4, h-4, 'rgba(237,224,184,0.65)', 2.5, 33);
+}
+requestAnimationFrame(drawBtnBorder);
+
+/* Court */
+const courtEl = document.getElementById('court-canvas');
+const cc = courtEl.getContext('2d');
+function drawCourt() {
+  const W = window.innerWidth, H = window.innerHeight * 0.32;
+  courtEl.width = W; courtEl.height = H;
+  courtEl.style.width = '100%'; courtEl.style.height = '32vh';
+  const r = seededRand(99); const j = (a=2) => (r()-0.5)*a;
+  const plankC = ['#6b3d18','#724218','#693b16','#704010'];
+  for (let x = 0; x < W; x += 72) {
+    cc.fillStyle = plankC[Math.floor(x/72) % plankC.length];
+    cc.fillRect(x, 0, 72, H);
+    cc.strokeStyle = '#3a1e08'; cc.lineWidth = 1.5;
+    cc.beginPath(); cc.moveTo(x+j(),0); cc.lineTo(x+j(),H); cc.stroke();
+  }
+  cc.strokeStyle = '#8c5520'; cc.lineWidth = 4;
+  cc.beginPath();
+  for (let x=0;x<=W;x+=20) { const y=j(2.5); x===0?cc.moveTo(x,y):cc.lineTo(x,y); }
+  cc.stroke();
+  cc.strokeStyle='rgba(200,150,60,0.28)'; cc.lineWidth=3;
+  cc.beginPath();
+  for (let y=0;y<=H;y+=12) { const x=W/2+j(2); y===0?cc.moveTo(x,y):cc.lineTo(x,y); }
+  cc.stroke();
+  cc.strokeStyle='rgba(200,150,60,0.22)'; cc.lineWidth=3;
+  cc.beginPath();
+  for (let a=0;a<=Math.PI;a+=0.15) {
+    const px=W/2+Math.cos(a)*(110+j(3)), py=Math.sin(a)*(110+j(3));
+    a===0?cc.moveTo(px,py):cc.lineTo(px,py);
+  }
+  cc.stroke();
+  for (const side of [-1,1]) {
+    const lx = side===-1 ? 0 : W-130;
+    cc.strokeStyle='rgba(200,150,60,0.22)'; cc.lineWidth=2;
+    cc.strokeRect(lx+j(),j(),130+j(3),90+j(3));
+    cc.beginPath();
+    cc.arc(lx+(side===-1?130:0)+j(), 45+j(), 40, -Math.PI/2, Math.PI/2);
+    cc.stroke();
+  }
+}
+drawCourt();
+
+/* Pixel basketball */
+const ballEl = document.getElementById('ball');
+const bc = ballEl.getContext('2d');
+const PX = 10;
+const BALL = [
+  [0,0,0,1,1,0,0,0],
+  [0,0,1,1,1,1,0,0],
+  [0,1,3,1,1,2,1,0],
+  [1,1,1,2,1,1,1,1],
+  [1,1,2,1,1,2,1,1],
+  [0,1,1,1,2,1,1,0],
+  [0,0,1,1,1,1,0,0],
+  [0,0,0,1,1,0,0,0],
+];
+function drawBall() {
+  bc.clearRect(0,0,80,80);
+  for (let row=0;row<8;row++) for (let col=0;col<8;col++) {
+    const v = BALL[row][col]; if (!v) continue;
+    bc.fillStyle = v===2 ? '#6a2000' : v===3 ? '#e8620a' : '#c84800';
+    bc.fillRect(col*PX, row*PX, PX, PX);
+    bc.fillStyle = 'rgba(0,0,0,0.3)';
+    bc.fillRect(col*PX+PX-2, row*PX, 2, PX);
+    bc.fillRect(col*PX, row*PX+PX-2, PX, 2);
+  }
+}
+drawBall();
+let ballT = 0;
+(function animateBall() {
+  ballT += 0.05;
+  const steppedY = Math.round(Math.abs(Math.sin(ballT)) * -38 / 4) * 4;
+  ballEl.style.transform = `translateY(${steppedY}px)`;
+  requestAnimationFrame(animateBall);
+})();
+
+/* Pixel hoops */
+function drawHoop(id) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  const p = 4;
+  ctx.fillStyle='#444'; ctx.fillRect(0,0,p*2,p*26);
+  ctx.fillStyle='#d4c8a0'; ctx.fillRect(p*2,0,p*4,p*12);
+  ctx.strokeStyle='#3a3020'; ctx.lineWidth=2;
+  ctx.strokeRect(p*2+2,2,p*4-4,p*12-4);
+  ctx.strokeStyle='rgba(168,36,24,0.7)'; ctx.lineWidth=2;
+  ctx.strokeRect(p*3,p*3,p*2,p*3);
+  ctx.fillStyle='#555'; ctx.fillRect(p*6,p*6,p*5,p*2);
+  ctx.fillStyle='#b82418';
+  ctx.fillRect(p*11,p*6,p*6,p*2); ctx.fillRect(p*16,p*8,p*2,p*2);
+  ctx.fillStyle='rgba(237,224,184,0.55)';
+  for (let i=0;i<5;i++) ctx.fillRect(p*11+i*(p-1+2),p*10,2,p*2+(i%2)*p);
+  ctx.fillRect(p*11+2,p*14,p*4,2);
+}
+drawHoop('hoop-l'); drawHoop('hoop-r');
+
+/* Pixel crowd */
+const crowdEl = document.getElementById('crowd');
+const fanColors = ['#8a1a0a','#0a2a6a','#7a4800','#0a5a1a','#5a0a6a','#7a2a00','#0a4a6a','#5a1a00'];
+const fanCount = Math.max(48, Math.floor(window.innerWidth / 13));
+crowdEl.innerHTML = Array.from({length: fanCount}, (_, i) => {
+  const col = fanColors[i % fanColors.length];
+  const delay = (Math.random()*2.5).toFixed(2);
+  const dur   = (1.5+Math.random()*1.4).toFixed(2);
+  return `<div class="fan" style="color:${col};--d:${dur}s;--dl:${delay}s"><div class="fan-head"></div><div class="fan-body"></div></div>`;
+}).join('');
+
+/* Resize */
+window.addEventListener('resize', () => {
+  drawBorder(); drawCourt(); resizeGrain(); drawGrain();
+  requestAnimationFrame(drawBtnBorder);
+});
+</script>
+</body>
+</html>
