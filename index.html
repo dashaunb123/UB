@@ -216,6 +216,1130 @@
       color:rgba(192,138,24,0.92);
     }
 
+    /* coach builder */
+    .coach-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .coach-screen::-webkit-scrollbar { display:none; }
+    .coach-screen .back-row { max-width:1180px; }
+    .coach-shell {
+      width:100%;
+      max-width:1180px;
+      flex:1;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:18px;
+      min-height:0;
+    }
+    .coach-header {
+      border-bottom:2px solid rgba(192,138,24,0.28);
+      padding-bottom:14px;
+    }
+    .coach-eyebrow {
+      display:block;
+      font-size:clamp(6px,0.9vw,8px);
+      color:#c08a18;
+      letter-spacing:3px;
+      text-shadow:1px 1px 0 #3a2400;
+      margin-bottom:8px;
+    }
+    .coach-title {
+      display:block;
+      font-size:clamp(16px,3vw,32px);
+      color:#ede0b8;
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .coach-stage {
+      min-height:0;
+      animation:stagePop 260ms steps(4,end);
+    }
+    @keyframes stagePop {
+      0% { opacity:0; transform:translateY(14px); filter:contrast(1.8); }
+      100% { opacity:1; transform:translateY(0); filter:contrast(1); }
+    }
+    .coach-info-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+      align-content:start;
+    }
+    .field-block {
+      border:2px solid rgba(237,224,184,0.18);
+      background:rgba(22,18,9,0.3);
+      padding:16px;
+    }
+    .field-block label {
+      display:block;
+      color:#c08a18;
+      font-size:clamp(6px,0.85vw,8px);
+      letter-spacing:2px;
+      margin-bottom:10px;
+      text-shadow:1px 1px 0 #3a2400;
+    }
+    .coach-input,
+    .coach-select {
+      width:100%;
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(7px,0.95vw,10px);
+      color:#ede0b8;
+      background:#161209;
+      border:2px solid rgba(237,224,184,0.28);
+      outline:none;
+      padding:14px 12px;
+      min-height:46px;
+    }
+    .coach-input:focus,
+    .coach-select:focus {
+      border-color:#ede0b8;
+      box-shadow:0 0 0 3px rgba(168,36,24,0.45);
+    }
+    .coach-actions-row {
+      grid-column:1 / -1;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:4px;
+    }
+    .coach-primary,
+    .coach-secondary {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(7px,0.95vw,10px);
+      border:2px solid rgba(237,224,184,0.28);
+      padding:14px 18px;
+      cursor:pointer;
+      letter-spacing:1px;
+      text-shadow:1px 1px 0 #350a04;
+    }
+    .coach-primary {
+      color:#ede0b8;
+      background:#a82418;
+      border-color:rgba(237,224,184,0.7);
+    }
+    .coach-secondary {
+      color:rgba(237,224,184,0.66);
+      background:transparent;
+    }
+    .coach-primary:hover,
+    .coach-secondary:hover,
+    .coach-primary:focus-visible,
+    .coach-secondary:focus-visible {
+      color:#ede0b8;
+      border-color:#ede0b8;
+      outline:none;
+    }
+    .coach-error {
+      grid-column:1 / -1;
+      min-height:18px;
+      color:#a82418;
+      font-size:clamp(6px,0.8vw,8px);
+      letter-spacing:1px;
+      line-height:1.6;
+    }
+    .coach-custom-grid {
+      display:grid;
+      grid-template-columns:minmax(260px,0.75fr) minmax(0,1.25fr);
+      gap:16px;
+      min-height:0;
+    }
+    .coach-preview-panel {
+      border:3px solid rgba(237,224,184,0.22);
+      background:
+        linear-gradient(rgba(22,18,9,0.74), rgba(22,18,9,0.74)),
+        repeating-linear-gradient(90deg, rgba(192,138,24,0.13) 0 4px, transparent 4px 42px);
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      min-height:420px;
+      box-shadow:inset 0 0 0 4px rgba(168,36,24,0.1);
+    }
+    .coach-preview-title {
+      padding:16px 18px 12px;
+      color:#c08a18;
+      font-size:clamp(7px,1vw,10px);
+      letter-spacing:2px;
+      border-bottom:2px solid rgba(237,224,184,0.12);
+    }
+    .coach-canvas-wrap {
+      display:grid;
+      place-items:center;
+      padding:14px;
+    }
+    #coach-canvas {
+      width:min(240px,68%);
+      height:auto;
+    }
+    .coach-bio {
+      padding:14px 18px;
+      color:rgba(237,224,184,0.62);
+      font-size:clamp(5px,0.72vw,7px);
+      letter-spacing:1px;
+      line-height:1.7;
+      border-top:2px solid rgba(237,224,184,0.12);
+    }
+    .coach-controls {
+      min-height:0;
+      overflow-y:auto;
+      scrollbar-width:none;
+      display:grid;
+      gap:10px;
+      padding-right:2px;
+    }
+    .coach-controls::-webkit-scrollbar { display:none; }
+    .coach-control-group {
+      border:2px solid rgba(237,224,184,0.16);
+      background:rgba(22,18,9,0.26);
+      padding:12px;
+    }
+    .coach-control-title {
+      color:#c08a18;
+      font-size:clamp(6px,0.85vw,8px);
+      letter-spacing:2px;
+      margin-bottom:10px;
+      text-shadow:1px 1px 0 #3a2400;
+    }
+    .option-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:7px;
+    }
+    .option-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.7vw,7px);
+      color:rgba(237,224,184,0.58);
+      background:transparent;
+      border:2px dashed rgba(237,224,184,0.17);
+      padding:9px 7px;
+      min-height:36px;
+      cursor:pointer;
+      line-height:1.45;
+    }
+    .option-btn.active {
+      color:#ede0b8;
+      background:#a82418;
+      border-style:solid;
+      border-color:#ede0b8;
+      text-shadow:1px 1px 0 #350a04;
+    }
+    .option-btn:hover:not(.active) {
+      color:rgba(237,224,184,0.82);
+      border-style:solid;
+      border-color:rgba(237,224,184,0.42);
+    }
+
+    /* AD cutscene */
+    .cutscene-screen {
+      padding:28px 46px 30px;
+      overflow:hidden;
+      background:#161209;
+    }
+    .cutscene-shell {
+      width:100%;
+      max-width:1180px;
+      height:100%;
+      display:grid;
+      grid-template-rows:1fr auto;
+      gap:16px;
+    }
+    .scene-frame {
+      position:relative;
+      border:3px solid rgba(237,224,184,0.22);
+      background:#1b140b;
+      overflow:hidden;
+      box-shadow:inset 0 0 0 4px rgba(168,36,24,0.12);
+      animation:sceneIn 320ms steps(5,end);
+    }
+    @keyframes sceneIn {
+      0% { opacity:0; transform:translateY(10px); filter:contrast(2); }
+      100% { opacity:1; transform:translateY(0); filter:contrast(1); }
+    }
+    .scene-door,
+    .scene-office {
+      position:absolute;
+      inset:0;
+      display:none;
+    }
+    .scene-frame[data-scene="door"] .scene-door,
+    .scene-frame[data-scene="office"] .scene-office {
+      display:block;
+    }
+    .scene-door {
+      background:
+        linear-gradient(90deg, transparent 0 49%, rgba(0,0,0,0.32) 49% 51%, transparent 51%),
+        repeating-linear-gradient(90deg, #5c3216 0 34px, #663a1a 34px 68px);
+    }
+    .door-sign {
+      position:absolute;
+      left:50%;
+      top:26%;
+      transform:translateX(-50%);
+      width:min(520px,74%);
+      border:4px solid #3a2400;
+      background:#ede0b8;
+      color:#3a2400;
+      padding:22px 18px;
+      text-align:center;
+      box-shadow:8px 8px 0 rgba(0,0,0,0.28);
+    }
+    .door-sign-title {
+      display:block;
+      font-size:clamp(10px,1.8vw,18px);
+      line-height:1.55;
+      letter-spacing:2px;
+    }
+    .door-sign-sub {
+      display:block;
+      margin-top:14px;
+      color:#a82418;
+      font-size:clamp(6px,0.9vw,9px);
+      letter-spacing:2px;
+    }
+    .door-knob {
+      position:absolute;
+      right:28%;
+      top:52%;
+      width:18px;
+      height:18px;
+      background:#c08a18;
+      box-shadow:3px 3px 0 #3a2400;
+    }
+    .scene-office {
+      background:
+        linear-gradient(#352112 0 54%, #6b3d18 54% 100%);
+    }
+    .office-window {
+      position:absolute;
+      left:8%;
+      top:9%;
+      width:25%;
+      height:26%;
+      border:4px solid #3a2400;
+      background:
+        linear-gradient(rgba(29,95,168,0.45), rgba(29,95,168,0.12)),
+        repeating-linear-gradient(90deg, transparent 0 46%, rgba(237,224,184,0.28) 46% 54%, transparent 54%);
+    }
+    .office-pennant {
+      position:absolute;
+      right:9%;
+      top:12%;
+      width:120px;
+      height:42px;
+      background:#a82418;
+      clip-path:polygon(0 0,100% 50%,0 100%);
+      box-shadow:4px 4px 0 rgba(0,0,0,0.2);
+    }
+    .office-rug {
+      position:absolute;
+      left:23%;
+      right:23%;
+      bottom:7%;
+      height:18%;
+      background:rgba(168,36,24,0.34);
+      border:3px solid rgba(237,224,184,0.16);
+    }
+    .office-desk {
+      position:absolute;
+      left:25%;
+      right:25%;
+      bottom:18%;
+      height:30%;
+      background:#5c3216;
+      border:4px solid #3a2400;
+      box-shadow:0 8px 0 rgba(0,0,0,0.2);
+    }
+    .office-desk::before {
+      content:'';
+      position:absolute;
+      left:8%;
+      right:8%;
+      top:16%;
+      height:4px;
+      background:rgba(237,224,184,0.24);
+    }
+    .ad-nameplate {
+      position:absolute;
+      left:50%;
+      bottom:47%;
+      transform:translateX(-50%);
+      color:#3a2400;
+      background:#c08a18;
+      border:2px solid #3a2400;
+      padding:8px 10px;
+      font-size:clamp(5px,0.75vw,7px);
+      letter-spacing:1px;
+      z-index:5;
+    }
+    .scene-character {
+      position:absolute;
+      image-rendering:pixelated;
+      z-index:4;
+    }
+    #ad-canvas {
+      left:42%;
+      top:18%;
+      width:150px;
+      height:auto;
+    }
+    #cutscene-coach-canvas {
+      left:18%;
+      bottom:9%;
+      width:142px;
+      height:auto;
+      transform:scaleX(-1);
+    }
+    .dialogue-box {
+      border:3px solid rgba(237,224,184,0.28);
+      background:rgba(22,18,9,0.96);
+      min-height:128px;
+      padding:18px;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      box-shadow:inset 0 0 0 3px rgba(168,36,24,0.18);
+    }
+    .speaker-name {
+      color:#c08a18;
+      font-size:clamp(7px,0.95vw,10px);
+      letter-spacing:2px;
+      text-shadow:1px 1px 0 #3a2400;
+    }
+    .dialogue-text {
+      color:#ede0b8;
+      font-size:clamp(8px,1.1vw,12px);
+      line-height:1.8;
+      letter-spacing:1px;
+      min-height:44px;
+    }
+    .cutscene-actions {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+    }
+    .cutscene-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(7px,0.9vw,9px);
+      color:#ede0b8;
+      border:2px solid rgba(237,224,184,0.42);
+      background:#a82418;
+      padding:13px 14px;
+      cursor:pointer;
+      letter-spacing:1px;
+      text-shadow:1px 1px 0 #350a04;
+    }
+    .cutscene-btn:hover,
+    .cutscene-btn:focus-visible {
+      border-color:#ede0b8;
+      color:#c08a18;
+      outline:none;
+    }
+    .cutscene-fade {
+      position:absolute;
+      inset:0;
+      background:#000;
+      opacity:0;
+      pointer-events:none;
+      z-index:80;
+      transition:opacity 900ms steps(8,end);
+    }
+    .cutscene-fade.active { opacity:1; }
+
+    /* press conference */
+    .press-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .press-screen::-webkit-scrollbar { display:none; }
+    .press-shell {
+      width:100%;
+      max-width:1180px;
+      flex:1;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:18px;
+      min-height:0;
+    }
+    .press-header {
+      border-bottom:2px solid rgba(192,138,24,0.28);
+      padding-bottom:14px;
+    }
+    .press-eyebrow {
+      display:block;
+      font-size:clamp(6px,0.9vw,8px);
+      color:#c08a18;
+      letter-spacing:3px;
+      text-shadow:1px 1px 0 #3a2400;
+      margin-bottom:8px;
+    }
+    .press-title {
+      display:block;
+      font-size:clamp(16px,3vw,32px);
+      color:#ede0b8;
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .press-stage {
+      min-height:0;
+      animation:stagePop 260ms steps(4,end);
+    }
+    .personality-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+      align-content:start;
+    }
+    .personality-card {
+      font-family:'Press Start 2P', monospace;
+      color:rgba(237,224,184,0.72);
+      background:rgba(22,18,9,0.32);
+      border:2px solid rgba(237,224,184,0.18);
+      padding:18px;
+      cursor:pointer;
+      text-align:left;
+      min-height:142px;
+      display:grid;
+      align-content:center;
+      gap:12px;
+      line-height:1.7;
+    }
+    .personality-card:hover,
+    .personality-card:focus-visible {
+      color:#ede0b8;
+      border-color:#ede0b8;
+      background:#a82418;
+      outline:none;
+    }
+    .personality-card strong {
+      color:#c08a18;
+      font-size:clamp(8px,1vw,11px);
+      font-weight:400;
+      letter-spacing:1px;
+    }
+    .personality-card span {
+      font-size:clamp(5px,0.72vw,7px);
+      color:inherit;
+    }
+    /* press room — vertical stack */
+    .press-room {
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-height:0;
+    }
+    /* reporter row */
+    .reporter-row {
+      display:flex;
+      gap:10px;
+      justify-content:center;
+    }
+    .reporter-seat {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+      border:2px solid rgba(237,224,184,0.16);
+      background:rgba(22,18,9,0.28);
+      padding:10px 8px 8px;
+      flex:1;
+      max-width:200px;
+      position:relative;
+      transition:border-color 0.08s, background 0.08s, box-shadow 0.08s;
+    }
+    .reporter-seat:hover:not(.answered) {
+      border-color:rgba(237,224,184,0.5);
+      background:rgba(168,36,24,0.18);
+    }
+    .reporter-seat.active {
+      border-color:#c08a18;
+      background:rgba(168,36,24,0.28);
+      box-shadow:0 0 0 2px rgba(192,138,24,0.28), 0 0 18px rgba(192,138,24,0.16);
+    }
+    .reporter-seat.answered {
+      opacity:0.36;
+      cursor:default;
+      border-style:dashed;
+      border-color:rgba(237,224,184,0.18);
+    }
+    .reporter-seat canvas {
+      display:block;
+      image-rendering:pixelated;
+    }
+    .reporter-name-tag {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.62vw,6px);
+      color:rgba(237,224,184,0.7);
+      text-align:center;
+      line-height:1.6;
+      letter-spacing:0.4px;
+    }
+    .reporter-name-tag strong {
+      display:block;
+      color:#c08a18;
+      font-weight:400;
+      margin-bottom:2px;
+      font-size:clamp(5px,0.7vw,7px);
+    }
+    .reporter-answered-badge {
+      position:absolute;
+      top:5px; right:5px;
+      font-family:'Press Start 2P', monospace;
+      font-size:5px;
+      color:#c08a18;
+      letter-spacing:1px;
+    }
+    /* dialogue panel */
+    .press-dialogue {
+      border:3px solid rgba(237,224,184,0.22);
+      background:rgba(22,18,9,0.42);
+      display:flex;
+      flex-direction:column;
+      flex:1;
+      min-height:0;
+      box-shadow:inset 0 0 0 4px rgba(168,36,24,0.1);
+    }
+    .press-dialogue-who {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 18px 8px;
+      border-bottom:2px solid rgba(237,224,184,0.12);
+      flex-shrink:0;
+    }
+    .press-dialogue-who canvas {
+      display:block;
+      image-rendering:pixelated;
+      flex-shrink:0;
+    }
+    .press-who-meta {
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .press-who-name {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(7px,1vw,10px);
+      color:#c08a18;
+      letter-spacing:2px;
+    }
+    .press-who-outlet {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.65vw,7px);
+      color:rgba(237,224,184,0.48);
+      letter-spacing:1px;
+    }
+    .press-question-body {
+      padding:16px 18px 10px;
+      color:#ede0b8;
+      font-size:clamp(8px,1.05vw,12px);
+      line-height:1.9;
+      letter-spacing:1px;
+      flex:1;
+    }
+    .press-response {
+      margin-top:12px;
+      color:rgba(237,224,184,0.6);
+      font-size:clamp(6px,0.8vw,8px);
+      line-height:1.8;
+    }
+    .answer-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+      padding:0 18px 14px;
+      flex-shrink:0;
+    }
+    .answer-btn {
+      font-family:'Press Start 2P', monospace;
+      color:rgba(237,224,184,0.72);
+      background:transparent;
+      border:2px solid rgba(237,224,184,0.18);
+      padding:10px 10px;
+      cursor:pointer;
+      font-size:clamp(6px,0.78vw,8px);
+      text-align:left;
+      line-height:1.5;
+      display:flex;
+      align-items:flex-start;
+      gap:7px;
+    }
+    .answer-btn .choice-key {
+      color:#c08a18;
+      flex-shrink:0;
+      min-width:12px;
+    }
+    .answer-btn:hover,
+    .answer-btn:focus-visible {
+      color:#ede0b8;
+      border-color:#ede0b8;
+      border-style:solid;
+      background:#a82418;
+      outline:none;
+    }
+    .answer-btn:hover .choice-key,
+    .answer-btn:focus-visible .choice-key {
+      color:#ede0b8;
+    }
+    .answer-btn.next-btn {
+      grid-column:1/-1;
+      justify-content:center;
+      border-style:solid;
+      border-color:rgba(237,224,184,0.35);
+      color:rgba(237,224,184,0.82);
+    }
+    /* progress dots */
+    .press-progress {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 18px;
+      border-top:2px solid rgba(237,224,184,0.1);
+      flex-shrink:0;
+    }
+    .press-dot {
+      width:8px; height:8px;
+      background:rgba(237,224,184,0.12);
+      border:2px solid rgba(237,224,184,0.24);
+      flex-shrink:0;
+    }
+    .press-dot.done {
+      background:#c08a18;
+      border-color:#c08a18;
+    }
+    .press-dot.current {
+      background:#a82418;
+      border-color:#ede0b8;
+      animation:dotPulse 1s step-end infinite;
+    }
+    @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    .press-dot-label {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.65vw,6px);
+      color:rgba(237,224,184,0.4);
+      letter-spacing:1px;
+      margin-left:4px;
+    }
+
+    /* dashboard */
+    .dash-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .dash-screen::-webkit-scrollbar { display:none; }
+    .dash-screen .back-row { max-width:1180px; }
+    .dash-shell {
+      width:100%;
+      max-width:1180px;
+      flex:1;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:20px;
+      min-height:0;
+    }
+    .dash-header {
+      display:grid;
+      grid-template-columns:1fr auto;
+      align-items:end;
+      gap:18px;
+      padding:4px 0 2px;
+      border-bottom:2px solid rgba(192,138,24,0.28);
+    }
+    .dash-team-block { min-width:0; }
+    .dash-eyebrow {
+      display:block;
+      font-size:clamp(6px,0.9vw,8px);
+      color:#c08a18;
+      letter-spacing:3px;
+      text-shadow:1px 1px 0 #3a2400;
+      margin-bottom:8px;
+    }
+    .dash-title {
+      display:block;
+      font-size:clamp(16px,3.1vw,34px);
+      color:#ede0b8;
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+      overflow-wrap:anywhere;
+    }
+    .dash-conf {
+      display:block;
+      margin-top:10px;
+      font-size:clamp(5px,0.7vw,7px);
+      color:rgba(237,224,184,0.45);
+      letter-spacing:2px;
+    }
+    .dash-record {
+      color:#c08a18;
+      font-size:clamp(7px,1vw,10px);
+      letter-spacing:2px;
+      text-shadow:1px 1px 0 #3a2400;
+      white-space:nowrap;
+      padding-bottom:7px;
+    }
+    .dash-main {
+      display:grid;
+      grid-template-columns:minmax(0,1.25fr) minmax(280px,0.75fr);
+      gap:16px;
+      min-height:0;
+    }
+    .dash-actions {
+      display:grid;
+      grid-template-columns:1fr;
+      grid-template-rows:repeat(5,1fr);
+      gap:10px;
+      min-height:0;
+    }
+    .dash-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(8px,1vw,12px);
+      color:rgba(237,224,184,0.82);
+      border:3px solid rgba(237,224,184,0.24);
+      background:rgba(168,36,24,0.2);
+      min-height:0;
+      padding:18px 18px;
+      cursor:pointer;
+      letter-spacing:1px;
+      text-shadow:1px 1px 0 #350a04;
+      text-align:left;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:inset 0 -5px 0 rgba(53,10,4,0.28);
+    }
+    .dash-btn::after {
+      content:'>';
+      color:rgba(192,138,24,0.72);
+    }
+    .dash-btn:hover,
+    .dash-btn:focus-visible {
+      color:#ede0b8;
+      border-color:#ede0b8;
+      background:#a82418;
+      outline:none;
+    }
+    .next-game-panel {
+      border:3px solid rgba(237,224,184,0.22);
+      background:
+        linear-gradient(rgba(22,18,9,0.78), rgba(22,18,9,0.78)),
+        repeating-linear-gradient(90deg, rgba(192,138,24,0.16) 0 4px, transparent 4px 54px),
+        repeating-linear-gradient(0deg, rgba(237,224,184,0.08) 0 3px, transparent 3px 42px);
+      min-height:0;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      box-shadow:inset 0 0 0 4px rgba(168,36,24,0.12);
+    }
+    .next-game-title {
+      padding:16px 22px 12px;
+      font-size:clamp(9px,1.25vw,14px);
+      color:#c08a18;
+      letter-spacing:2px;
+      text-shadow:1px 1px 0 #3a2400;
+      border-bottom:2px solid rgba(237,224,184,0.14);
+    }
+    /* populated next game body */
+    #next-game-body {
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+    }
+    .ng-body {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      padding:16px 22px 18px;
+      min-height:0;
+    }
+    .ng-meta-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
+    .ng-game-num {
+      font-size:clamp(5px,0.62vw,6px);
+      color:rgba(237,224,184,0.35);
+      letter-spacing:2px;
+    }
+    .ng-type-tag {
+      font-size:clamp(4px,0.52vw,6px);
+      letter-spacing:2px;
+      padding:3px 6px;
+      border:1px solid;
+    }
+    .ng-type-tag.conf    { color:#c08a18; border-color:rgba(192,138,24,0.5); }
+    .ng-type-tag.nonconf { color:rgba(237,224,184,0.46); border-color:rgba(237,224,184,0.22); }
+    .ng-date-row {
+      font-size:clamp(6px,0.78vw,8px);
+      color:rgba(237,224,184,0.54);
+      letter-spacing:2px;
+      margin-bottom:14px;
+    }
+    .ng-date-row .ng-ha { color:#c08a18; }
+    .ng-opp-conf {
+      font-size:clamp(5px,0.6vw,6px);
+      color:rgba(237,224,184,0.28);
+      letter-spacing:2px;
+      margin-bottom:5px;
+    }
+    .ng-opponent {
+      font-size:clamp(13px,2.2vw,26px);
+      color:#ede0b8;
+      line-height:1.2;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+      letter-spacing:1px;
+      overflow-wrap:anywhere;
+    }
+    .ng-actions {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:auto;
+      padding-top:18px;
+    }
+    .ng-play-btn,
+    .ng-sim-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(6px,0.75vw,8px);
+      padding:13px 8px;
+      cursor:pointer;
+      letter-spacing:1px;
+      text-shadow:1px 1px 0 #350a04;
+      border:2px solid;
+    }
+    .ng-play-btn {
+      color:#ede0b8;
+      background:#a82418;
+      border-color:rgba(237,224,184,0.65);
+    }
+    .ng-play-btn:hover,
+    .ng-play-btn:focus-visible {
+      background:#c42c1e;
+      border-color:#ede0b8;
+      outline:none;
+    }
+    .ng-sim-btn {
+      color:rgba(237,224,184,0.65);
+      background:transparent;
+      border-color:rgba(237,224,184,0.24);
+    }
+    .ng-sim-btn:hover,
+    .ng-sim-btn:focus-visible {
+      color:#ede0b8;
+      border-color:#ede0b8;
+      outline:none;
+    }
+
+    /* roster */
+    .roster-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .roster-screen::-webkit-scrollbar { display:none; }
+    .roster-shell {
+      width:100%;
+      max-width:1180px;
+      display:grid;
+      gap:14px;
+    }
+    .roster-title {
+      color:#ede0b8;
+      font-size:clamp(14px,2.4vw,26px);
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .roster-grid {
+      display:grid;
+      gap:8px;
+    }
+    .player-row {
+      display:grid;
+      grid-template-columns:1.2fr .45fr .5fr .5fr 1fr;
+      gap:8px;
+      align-items:center;
+      border:2px solid rgba(237,224,184,0.16);
+      background:rgba(22,18,9,0.28);
+      padding:10px;
+      color:rgba(237,224,184,0.72);
+      font-size:clamp(5px,0.72vw,8px);
+      line-height:1.6;
+    }
+    .player-row.header {
+      color:#c08a18;
+      border-color:rgba(192,138,24,0.32);
+    }
+    .player-row strong {
+      color:#ede0b8;
+      font-weight:400;
+    }
+
+    @media (max-width:700px) {
+      .sel-screen,
+      .coach-screen,
+      .dash-screen {
+        padding:24px 28px 20px;
+      }
+      .coach-info-grid,
+      .coach-custom-grid {
+        grid-template-columns:1fr;
+      }
+      .coach-actions-row {
+        justify-content:stretch;
+        flex-direction:column;
+      }
+      .option-grid {
+        grid-template-columns:repeat(2,1fr);
+      }
+      .cutscene-screen {
+        padding:24px 28px 20px;
+      }
+      .press-screen {
+        padding:24px 28px 20px;
+      }
+      .roster-screen {
+        padding:24px 28px 20px;
+      }
+      .player-row {
+        grid-template-columns:1fr;
+      }
+      .personality-grid {
+        grid-template-columns:repeat(2,1fr);
+      }
+      .reporter-row {
+        flex-wrap:wrap;
+      }
+      .reporter-seat {
+        max-width:46%;
+        min-width:120px;
+      }
+      .answer-grid {
+        grid-template-columns:1fr;
+      }
+      .office-desk {
+        left:14%;
+        right:14%;
+      }
+      #ad-canvas {
+        left:34%;
+        width:128px;
+      }
+      #cutscene-coach-canvas {
+        left:7%;
+        width:116px;
+      }
+      .dash-header,
+      .dash-main {
+        grid-template-columns:1fr;
+      }
+      .dash-record {
+        padding-bottom:0;
+      }
+      .dash-actions {
+        grid-template-columns:1fr;
+        grid-template-rows:repeat(5,52px);
+      }
+      .dash-btn {
+        padding:10px 8px;
+      }
+    }
+
+    /* schedule screen */
+    .sched-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .sched-screen::-webkit-scrollbar { display:none; }
+    .sched-screen .back-row { max-width:960px; }
+    .sched-shell {
+      width:100%; max-width:960px; flex:1;
+      display:grid; grid-template-rows:auto 1fr;
+      gap:18px; min-height:0;
+    }
+    .sched-header {
+      border-bottom:2px solid rgba(192,138,24,0.28);
+      padding-bottom:14px;
+    }
+    .sched-eyebrow {
+      display:block; font-size:clamp(6px,0.9vw,8px);
+      color:#c08a18; letter-spacing:3px;
+      text-shadow:1px 1px 0 #3a2400; margin-bottom:8px;
+    }
+    .sched-title {
+      display:block; font-size:clamp(14px,2.6vw,26px);
+      color:#ede0b8; line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .sched-body {
+      overflow-y:auto; scrollbar-width:none;
+      display:flex; flex-direction:column; gap:3px;
+      padding-bottom:12px;
+    }
+    .sched-body::-webkit-scrollbar { display:none; }
+    .sched-section-label {
+      font-size:clamp(5px,0.68vw,7px);
+      color:#c08a18; letter-spacing:3px;
+      text-shadow:1px 1px 0 #3a2400;
+      padding:10px 0 5px;
+      border-top:1px solid rgba(192,138,24,0.2);
+      margin-top:6px;
+    }
+    .sched-section-label:first-child { border-top:none; margin-top:0; padding-top:2px; }
+    .sched-game {
+      display:grid;
+      grid-template-columns:58px 36px 1fr auto;
+      align-items:center;
+      gap:10px;
+      padding:7px 10px;
+      border:1px solid rgba(237,224,184,0.1);
+      background:rgba(22,18,9,0.18);
+    }
+    .sched-game:hover { background:rgba(22,18,9,0.42); border-color:rgba(237,224,184,0.22); }
+    .sched-date {
+      font-size:clamp(5px,0.62vw,6px);
+      color:rgba(237,224,184,0.46);
+      letter-spacing:1px; white-space:nowrap;
+    }
+    .sched-ha {
+      font-size:clamp(4px,0.58vw,6px); letter-spacing:1px;
+      text-align:center; padding:3px 4px; border:1px solid;
+    }
+    .sched-ha.home { color:#c08a18; border-color:rgba(192,138,24,0.5); }
+    .sched-ha.away { color:rgba(237,224,184,0.42); border-color:rgba(237,224,184,0.18); }
+    .sched-opp {
+      font-size:clamp(6px,0.78vw,8px); color:#ede0b8;
+      letter-spacing:0.4px; white-space:nowrap;
+      overflow:hidden; text-overflow:ellipsis;
+    }
+    .sched-type {
+      font-size:clamp(4px,0.5vw,5px); letter-spacing:1px;
+      color:rgba(237,224,184,0.3); white-space:nowrap;
+    }
+    .sched-summary {
+      display:flex; gap:18px; flex-wrap:wrap;
+      padding:10px 0 2px;
+      border-top:1px solid rgba(192,138,24,0.18);
+      margin-top:8px;
+    }
+    .sched-summary-item {
+      font-size:clamp(5px,0.62vw,6px);
+      color:rgba(237,224,184,0.42); letter-spacing:1px;
+    }
+    .sched-summary-item span { color:#c08a18; }
+    .sched-note {
+      font-size:clamp(4px,0.52vw,5px);
+      color:rgba(237,224,184,0.25);
+      letter-spacing:1px; margin-top:6px;
+    }
+
     /* ── flash ── */
     #flash {
       position:fixed; inset:0; background:#ede0b8;
@@ -280,6 +1404,118 @@
     </div>
     <div class="sel-body">
       <div id="team-grid" class="pick-grid"></div>
+    </div>
+  </div>
+
+  <!-- COACH BUILDER -->
+  <div id="coach-screen" class="screen-panel coach-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" id="coach-back-btn" type="button">◄ BACK</button>
+      <span class="conf-badge" id="coach-team-badge"></span>
+    </div>
+    <div class="coach-shell">
+      <div class="coach-header">
+        <span class="coach-eyebrow" id="coach-step-label">* COACH BUILDER *</span>
+        <span class="coach-title" id="coach-step-title">CREATE YOUR COACH</span>
+      </div>
+      <div class="coach-stage" id="coach-stage"></div>
+    </div>
+  </div>
+
+  <!-- ATHLETIC DIRECTOR CUTSCENE -->
+  <div id="cutscene-screen" class="screen-panel cutscene-screen hidden">
+    <div class="cutscene-shell">
+      <div class="scene-frame" id="scene-frame" data-scene="door">
+        <div class="scene-door">
+          <div class="door-sign">
+            <span class="door-sign-title">ATHLETIC DIRECTOR</span>
+            <span class="door-sign-sub" id="ad-door-team"></span>
+          </div>
+          <div class="door-knob"></div>
+        </div>
+        <div class="scene-office">
+          <div class="office-window"></div>
+          <div class="office-pennant"></div>
+          <div class="office-rug"></div>
+          <canvas class="scene-character" id="ad-canvas" width="180" height="240"></canvas>
+          <canvas class="scene-character" id="cutscene-coach-canvas" width="180" height="240"></canvas>
+          <div class="office-desk"></div>
+          <div class="ad-nameplate">AD</div>
+        </div>
+        <div class="cutscene-fade" id="cutscene-fade"></div>
+      </div>
+      <div class="dialogue-box">
+        <div class="speaker-name" id="cutscene-speaker">ATHLETIC DEPARTMENT</div>
+        <div class="dialogue-text" id="cutscene-text"></div>
+        <div class="cutscene-actions" id="cutscene-actions"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div id="schedule-screen" class="screen-panel sched-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToDashboard()">◄ DASHBOARD</button>
+      <span class="conf-badge" id="sched-conf-badge"></span>
+    </div>
+    <div class="sched-shell">
+      <div class="sched-header">
+        <span class="sched-eyebrow">* SEASON <span id="sched-season-num">1</span> SCHEDULE *</span>
+        <span class="sched-title" id="sched-title"></span>
+      </div>
+      <div class="sched-body" id="sched-body"></div>
+    </div>
+  </div>
+
+  <!-- PRESS CONFERENCE -->
+  <div id="press-screen" class="screen-panel press-screen hidden">
+    <div class="press-shell">
+      <div class="press-header">
+        <span class="press-eyebrow" id="press-eyebrow">* PRESS CONFERENCE *</span>
+        <span class="press-title" id="press-title">CHOOSE YOUR VOICE</span>
+      </div>
+      <div class="press-stage" id="press-stage"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard-screen" class="screen-panel dash-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToCoachBuilder('customize')">◄ COACH BUILDER</button>
+    </div>
+    <div class="dash-shell">
+      <div class="dash-header">
+        <div class="dash-team-block">
+          <span class="dash-eyebrow">* SEASON HUB *</span>
+          <span class="dash-title" id="dash-team-name"></span>
+          <span class="dash-conf" id="dash-conf-name"></span>
+        </div>
+        <div class="dash-record">0-0</div>
+      </div>
+      <div class="dash-main">
+        <div class="next-game-panel">
+          <div class="next-game-title">NEXT GAME</div>
+          <div id="next-game-body"></div>
+        </div>
+        <div class="dash-actions">
+          <button class="dash-btn" type="button" onclick="goToRoster()">ROSTER</button>
+          <button class="dash-btn" type="button">RECRUITING</button>
+          <button class="dash-btn" type="button" onclick="goToSchedule()">SCHEDULE</button>
+          <button class="dash-btn" type="button">STANDINGS</button>
+          <button class="dash-btn" type="button">STATS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROSTER -->
+  <div id="roster-screen" class="screen-panel roster-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToDashboard()">◄ DASHBOARD</button>
+    </div>
+    <div class="roster-shell">
+      <div class="roster-title" id="roster-title"></div>
+      <div class="roster-grid" id="roster-grid"></div>
     </div>
   </div>
 
@@ -494,6 +1730,116 @@ function formatNIL(m) {
 
 const CONF_NAMES = Object.keys(CONFERENCES);
 
+const STATE_HOMETOWNS = {
+  "Alabama":["Birmingham","Montgomery","Mobile","Huntsville","Tuscaloosa"],
+  "Alaska":["Anchorage","Fairbanks","Juneau","Sitka","Wasilla"],
+  "Arizona":["Phoenix","Tucson","Mesa","Flagstaff","Tempe"],
+  "Arkansas":["Little Rock","Fayetteville","Fort Smith","Jonesboro","Pine Bluff"],
+  "California":["Los Angeles","San Diego","San Jose","San Francisco","Sacramento"],
+  "Colorado":["Denver","Colorado Springs","Aurora","Fort Collins","Boulder"],
+  "Connecticut":["Bridgeport","New Haven","Hartford","Stamford","Waterbury"],
+  "Delaware":["Wilmington","Dover","Newark","Middletown","Smyrna"],
+  "Florida":["Jacksonville","Miami","Tampa","Orlando","Tallahassee"],
+  "Georgia":["Atlanta","Augusta","Savannah","Athens","Macon"],
+  "Hawaii":["Honolulu","Hilo","Kailua","Kapolei","Kaneohe"],
+  "Idaho":["Boise","Meridian","Nampa","Idaho Falls","Pocatello"],
+  "Illinois":["Chicago","Aurora","Rockford","Champaign","Peoria"],
+  "Indiana":["Indianapolis","Fort Wayne","Evansville","South Bend","Bloomington"],
+  "Iowa":["Des Moines","Cedar Rapids","Davenport","Iowa City","Ames"],
+  "Kansas":["Wichita","Overland Park","Kansas City","Topeka","Lawrence"],
+  "Kentucky":["Louisville","Lexington","Bowling Green","Owensboro","Covington"],
+  "Louisiana":["New Orleans","Baton Rouge","Shreveport","Lafayette","Lake Charles"],
+  "Maine":["Portland","Lewiston","Bangor","Augusta","Auburn"],
+  "Maryland":["Baltimore","Frederick","Rockville","College Park","Annapolis"],
+  "Massachusetts":["Boston","Worcester","Springfield","Lowell","Cambridge"],
+  "Michigan":["Detroit","Grand Rapids","Lansing","Ann Arbor","Flint"],
+  "Minnesota":["Minneapolis","Saint Paul","Duluth","Rochester","Mankato"],
+  "Mississippi":["Jackson","Gulfport","Hattiesburg","Oxford","Starkville"],
+  "Missouri":["Kansas City","Saint Louis","Springfield","Columbia","Independence"],
+  "Montana":["Billings","Missoula","Bozeman","Great Falls","Helena"],
+  "Nebraska":["Omaha","Lincoln","Bellevue","Grand Island","Kearney"],
+  "Nevada":["Las Vegas","Henderson","Reno","Sparks","Carson City"],
+  "New Hampshire":["Manchester","Nashua","Concord","Dover","Keene"],
+  "New Jersey":["Newark","Jersey City","Paterson","Trenton","Princeton"],
+  "New Mexico":["Albuquerque","Las Cruces","Santa Fe","Rio Rancho","Roswell"],
+  "New York":["New York","Buffalo","Rochester","Syracuse","Albany"],
+  "North Carolina":["Charlotte","Raleigh","Greensboro","Durham","Chapel Hill"],
+  "North Dakota":["Fargo","Bismarck","Grand Forks","Minot","Dickinson"],
+  "Ohio":["Columbus","Cleveland","Cincinnati","Dayton","Akron"],
+  "Oklahoma":["Oklahoma City","Tulsa","Norman","Stillwater","Lawton"],
+  "Oregon":["Portland","Eugene","Salem","Corvallis","Bend"],
+  "Pennsylvania":["Philadelphia","Pittsburgh","Allentown","Erie","State College"],
+  "Rhode Island":["Providence","Warwick","Cranston","Pawtucket","Newport"],
+  "South Carolina":["Charleston","Columbia","Greenville","Myrtle Beach","Rock Hill"],
+  "South Dakota":["Sioux Falls","Rapid City","Aberdeen","Brookings","Pierre"],
+  "Tennessee":["Nashville","Memphis","Knoxville","Chattanooga","Murfreesboro"],
+  "Texas":["Houston","Dallas","Austin","San Antonio","Fort Worth"],
+  "Utah":["Salt Lake City","Provo","Ogden","Logan","St. George"],
+  "Vermont":["Burlington","Montpelier","Rutland","Bennington","Brattleboro"],
+  "Virginia":["Virginia Beach","Richmond","Norfolk","Charlottesville","Blacksburg"],
+  "Washington":["Seattle","Spokane","Tacoma","Pullman","Olympia"],
+  "West Virginia":["Charleston","Morgantown","Huntington","Parkersburg","Wheeling"],
+  "Wisconsin":["Milwaukee","Madison","Green Bay","Kenosha","Eau Claire"],
+  "Wyoming":["Cheyenne","Casper","Laramie","Gillette","Jackson"]
+};
+
+const COACH_OPTIONS = {
+  hair:["Short","Fade","Flat Top","Waves","Bald"],
+  hairColor:["Black","Brown","Blonde","Red","Gray"],
+  facialHair:["None","Mustache","Goatee","Beard"],
+  height:["Short","Average","Tall"],
+  physique:["Lean","Average","Stocky"],
+  eyeColor:["Brown","Blue","Green","Hazel"],
+  skinColor:["Light","Tan","Medium","Dark","Deep"],
+  outfit:["Suit","Polo","Track Suit","Hoodie"],
+  shoes:["Black","White","Red","Gold"]
+};
+
+const COACH_PALETTE = {
+  hairColor:{Black:"#15100b",Brown:"#5b3518",Blonde:"#c08a18",Red:"#8f2d16",Gray:"#8b8675"},
+  eyeColor:{Brown:"#3b2412",Blue:"#1d5fa8",Green:"#2d7c3a",Hazel:"#8a6a1c"},
+  skinColor:{Light:"#f0c59a",Tan:"#c98952",Medium:"#9f633b",Dark:"#6c3b25",Deep:"#3a2118"},
+  outfit:{Suit:"#1f2530",Polo:"#a82418","Track Suit":"#1f4d78",Hoodie:"#6a2b75"},
+  shoes:{Black:"#111111",White:"#ede0b8",Red:"#a82418",Gold:"#c08a18"}
+};
+
+const PERSONALITIES = [
+  { id:'steady', name:'Steady', desc:'Measured answers with a calm locker-room tone.' },
+  { id:'fiery', name:'Fiery', desc:'Bold answers with competitive edge.' },
+  { id:'teacher', name:'Teacher', desc:'Detailed answers focused on development.' },
+  { id:'charmer', name:'Charmer', desc:'Polished answers that play well at the podium.' }
+];
+
+const REPORTERS = [
+  { name:'Dana Rowe',    outlet:'Campus Radio',    skin:'#f0c59a', hairColor:'#5b3518', hair:'long',    eyeColor:'#2d7c3a', prop:'notepad',  outfit:'#1f4d78' },
+  { name:'Miles Carter', outlet:'Hoops Wire',      skin:'#3a2118', hairColor:'#15100b', hair:'short',   eyeColor:'#3b2412', prop:'recorder', outfit:'#1f2530' },
+  { name:'Tessa Grant',  outlet:'State Journal',   skin:'#c98952', hairColor:'#8f2d16', hair:'bun',     eyeColor:'#1d5fa8', prop:'camera',   outfit:'#6a2b75' },
+  { name:'Andre Bell',   outlet:'Recruiting Desk', skin:'#9f633b', hairColor:'#15100b', hair:'fade',    eyeColor:'#3b2412', prop:'laptop',   outfit:'#a82418' }
+];
+
+const PRESS_QUESTIONS = [
+  {
+    key:'defense',
+    question:'How do you want your defense to play this year?',
+    answers:['Aggressive','Disciplined','Conservative','Limit Threes']
+  },
+  {
+    key:'offense',
+    question:'What about your offense?',
+    answers:['Play through our star','Shoot threes','Get to the basket','Post up']
+  },
+  {
+    key:'tempo',
+    question:'What about your offensive tempo?',
+    answers:['Fast','Normal','Slow','Super Slow']
+  },
+  {
+    key:'recruiting',
+    question:"Let's switch to recruiting. What type of players are you looking for?",
+    answers:['Experienced','Talented','Potential','Anyone']
+  }
+];
+
 /* ═══════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════ */
@@ -501,6 +1847,32 @@ let currentScreen = 'home';
 let confCursor = 0;
 let teamCursor = 0;
 let selectedConf = null;
+let selectedTeam = null;
+let coachStep = 'info';
+let cutsceneStep = 'door';
+let resourceDecision = null;
+let pressPersonality = null;
+let pressQuestionIndex = 0;
+let activeReporterIndex = null;
+let pressAnswers = [];
+let currentGameIndex = 0;
+let allRosters = null;
+let namePool = null;
+let coachProfile = {
+  firstName:'',
+  lastName:'',
+  homeState:'Indiana',
+  hometown:'Indianapolis',
+  hair:'Short',
+  hairColor:'Black',
+  facialHair:'None',
+  height:'Average',
+  physique:'Average',
+  eyeColor:'Brown',
+  skinColor:'Medium',
+  outfit:'Suit',
+  shoes:'Black'
+};
 
 /* ═══════════════════════════════════════════
    SCREEN TRANSITIONS
@@ -539,6 +1911,99 @@ function goToTeam(confName) {
   flash(() => {
     showPanel('team');
     renderTeam();
+  });
+}
+
+function goToCoachBuilder(step = 'info') {
+  coachStep = step;
+  flash(() => {
+    showPanel('coach');
+    renderCoachBuilder();
+  });
+}
+
+function goToDashboard() {
+  document.getElementById('dash-team-name').textContent = selectedTeam || '';
+  document.getElementById('dash-conf-name').textContent = selectedConf || '';
+  if (!cachedSchedule) {
+    cachedSchedule = generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
+  }
+  flash(() => {
+    showPanel('dashboard');
+    renderNextGame();
+  });
+}
+
+function getTeamConf(teamName) {
+  for (const [c, teams] of Object.entries(CONFERENCES)) {
+    if (teams.includes(teamName)) return c;
+  }
+  return '';
+}
+
+function renderNextGame() {
+  const body = document.getElementById('next-game-body');
+  if (!body) return;
+  const game = cachedSchedule ? cachedSchedule[currentGameIndex] : null;
+  if (!game) {
+    body.innerHTML = '';
+    return;
+  }
+  const gameNum = currentGameIndex + 1;
+  const total = cachedSchedule.length;
+  const oppConf = getTeamConf(game.opponent);
+  const haLabel = game.home ? 'HOME' : '<span class="ng-ha">AWAY</span>';
+  const typeClass = game.isConf ? 'conf' : 'nonconf';
+  const typeLabel = game.isConf ? 'CONFERENCE' : 'NON-CONF';
+
+  body.innerHTML =
+    `<div class="ng-body">` +
+      `<div class="ng-meta-row">` +
+        `<span class="ng-game-num">GAME ${gameNum} / ${total}</span>` +
+        `<span class="ng-type-tag ${typeClass}">${typeLabel}</span>` +
+      `</div>` +
+      `<div class="ng-date-row">${game.date} &nbsp;·&nbsp; ${haLabel}</div>` +
+      `<div class="ng-opp-conf">${oppConf || '&nbsp;'}</div>` +
+      `<div class="ng-opponent">${game.opponent}</div>` +
+      `<div class="ng-actions">` +
+        `<button class="ng-play-btn" type="button" onclick="playGame()">▶ PLAY GAME</button>` +
+        `<button class="ng-sim-btn"  type="button" onclick="quickSim()">⚡ QUICK SIM</button>` +
+      `</div>` +
+    `</div>`;
+}
+
+function playGame()  { /* TODO */ }
+function quickSim()  { /* TODO */ }
+
+function goToRoster() {
+  if (!allRosters) {
+    const saved = sessionStorage.getItem('allRosters');
+    allRosters = saved ? JSON.parse(saved) : generateAllRosters(getFallbackNamePool());
+  }
+  renderRoster();
+  flash(() => showPanel('roster'));
+}
+
+function goToCutscene() {
+  cutsceneStep = 'door';
+  flash(() => {
+    showPanel('cutscene');
+    renderCutscene();
+  });
+}
+
+function goToPressConference() {
+  pressPersonality = null;
+  pressQuestionIndex = 0;
+  activeReporterIndex = null;
+  pressAnswers = [];
+  cachedSchedule = null;    // new season start — reset schedule
+  currentGameIndex = 0;
+  sessionStorage.removeItem('pressPersonality');
+  sessionStorage.removeItem('pressAnswers');
+  flash(() => {
+    showPanel('press');
+    renderPressConference();
   });
 }
 
@@ -598,20 +2063,1075 @@ function renderTeam() {
   scrollActiveIntoView(grid);
 }
 
+async function prepareRosters() {
+  namePool = await loadNamePool();
+  allRosters = generateAllRosters(namePool);
+  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+}
+
+async function loadNamePool() {
+  try {
+    const res = await fetch('name_lists.py', { cache:'no-store' });
+    if (!res.ok) throw new Error('name list fetch failed');
+    const text = await res.text();
+    const first = parsePythonList(text, 'male_first_names');
+    const last = parsePythonList(text, 'last_names');
+    if (first.length && last.length) return { first, last };
+  } catch (err) {
+    // Opening the HTML directly can block fetch(); keep generation playable.
+  }
+  return getFallbackNamePool();
+}
+
+function parsePythonList(source, varName) {
+  const re = new RegExp(varName + '\\s*=\\s*\\[([\\s\\S]*?)\\]\\s*(?:\\n\\w|$)');
+  const match = source.match(re);
+  if (!match) return [];
+  const values = [];
+  const stringRe = /(['"])((?:\\.|(?!\1).)*)\1/g;
+  let item;
+  while ((item = stringRe.exec(match[1]))) {
+    values.push(item[2].replace(/\\'/g, "'").replace(/\\"/g, '"'));
+  }
+  return values;
+}
+
+function getFallbackNamePool() {
+  return {
+    first:['Aaron','Caleb','Darius','Elijah','Gavin','Isaiah','Jalen','Marcus','Noah','Tyler','Andre','Carter','Dylan','Malik','Owen','Xavier'],
+    last:['Anderson','Bennett','Carter','Davis','Evans','Garcia','Harris','Jackson','Johnson','Lewis','Miller','Robinson','Smith','Taylor','Walker','Young']
+  };
+}
+
+function generateAllRosters(names) {
+  const rosters = {};
+  for (const conf of Object.keys(CONFERENCES)) {
+    rosters[conf] = {};
+    for (const team of CONFERENCES[conf]) {
+      const teamOverall = ((TEAM_DATA[conf] || {})[team] || {}).o || 70;
+      rosters[conf][team] = generateTeamRoster(teamOverall, names);
+    }
+  }
+  return rosters;
+}
+
+function generateTeamRoster(teamOverall, names) {
+  const grades = ['Freshman','Freshman','Freshman','Sophomore','Sophomore','Sophomore','Junior','Junior','Senior','Senior'];
+  shuffle(grades);
+  const potentials = makePotentialSet(teamOverall, grades);
+  const usedNames = new Set();
+  return grades.map((grade, i) => {
+    const potential = potentials[i];
+    const overall = makeOverallFromPotential(potential, grade);
+    const attributes = makeAttributes(overall);
+    const homeState = randomChoice(Object.keys(STATE_HOMETOWNS));
+    const hometown = randomChoice(STATE_HOMETOWNS[homeState]);
+    const name = makePlayerName(names, usedNames);
+    return {
+      name,
+      grade,
+      overall,
+      potential,
+      attributes,
+      homeState,
+      hometown,
+      tendencies:makeTendencies(attributes)
+    };
+  }).sort((a, b) => b.overall - a.overall);
+}
+
+function makePotentialSet(teamOverall, grades) {
+  const targetSum = teamOverall * grades.length;
+  const values = grades.map(grade => {
+    const base = {
+      Freshman:teamOverall + 5,
+      Sophomore:teamOverall + 2,
+      Junior:teamOverall - 2,
+      Senior:teamOverall - 5
+    }[grade];
+    return clamp(Math.round(base + randInt(-4, 4)), 25, 99);
+  });
+  let guard = 0;
+  while (sum(values) !== targetSum && guard < 600) {
+    const diff = targetSum - sum(values);
+    const order = values.map((_, i) => i);
+    shuffle(order);
+    for (const idx of order) {
+      if (diff > 0 && values[idx] < 99) { values[idx]++; break; }
+      if (diff < 0 && values[idx] > 25) { values[idx]--; break; }
+    }
+    guard++;
+  }
+  return values;
+}
+
+function makeOverallFromPotential(potential, grade) {
+  const gap = {
+    Freshman:randInt(6, 14),
+    Sophomore:randInt(4, 10),
+    Junior:randInt(2, 7),
+    Senior:randInt(0, 5)
+  }[grade];
+  return clamp(potential - gap, 25, potential);
+}
+
+function makeAttributes(overall) {
+  const keys = ['threePoint','midRange','freeThrow','finishing','iq','dribbling','passing','defense'];
+  const attrs = {};
+  keys.forEach(key => { attrs[key] = clamp(overall + randInt(-9, 9), 25, 99); });
+  balanceValues(attrs, keys, overall * keys.length, 25, 99);
+  return attrs;
+}
+
+function makeTendencies(attributes) {
+  const weights = {
+    pass:Math.max(8, attributes.passing + attributes.iq - 80 + randInt(-10, 10)),
+    drive:Math.max(8, attributes.finishing + attributes.dribbling - 80 + randInt(-10, 10)),
+    iso:Math.max(8, attributes.dribbling + attributes.midRange - 88 + randInt(-10, 10)),
+    shoot:Math.max(8, attributes.threePoint + attributes.midRange - 82 + randInt(-10, 10)),
+    postUp:Math.max(8, attributes.finishing + attributes.iq - 92 + randInt(-10, 10))
+  };
+  const total = sum(Object.values(weights));
+  const tendencies = {};
+  Object.keys(weights).forEach(key => {
+    tendencies[key] = Math.max(0, Math.round(weights[key] / total * 100));
+  });
+  balanceValues(tendencies, Object.keys(tendencies), 100, 0, 100);
+  return tendencies;
+}
+
+function makePlayerName(names, usedNames) {
+  for (let i = 0; i < 30; i++) {
+    const full = `${randomChoice(names.first)} ${randomChoice(names.last)}`;
+    if (!usedNames.has(full)) {
+      usedNames.add(full);
+      return full;
+    }
+  }
+  return `${randomChoice(names.first)} ${randomChoice(names.last)}`;
+}
+
+function renderRoster() {
+  const roster = ((allRosters || {})[selectedConf] || {})[selectedTeam] || [];
+  document.getElementById('roster-title').textContent = `${selectedTeam} ROSTER`;
+  const grid = document.getElementById('roster-grid');
+  grid.innerHTML = `
+    <div class="player-row header">
+      <div>NAME</div><div>GRADE</div><div>OVR</div><div>POT</div><div>HOME</div>
+    </div>
+    ${roster.map(p => `
+      <div class="player-row">
+        <div><strong>${p.name}</strong></div>
+        <div>${p.grade}</div>
+        <div>${p.overall}</div>
+        <div>${p.potential}</div>
+        <div>${p.hometown}, ${p.homeState}</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function balanceValues(obj, keys, targetSum, min, max) {
+  let guard = 0;
+  while (sum(keys.map(k => obj[k])) !== targetSum && guard < 500) {
+    const diff = targetSum - sum(keys.map(k => obj[k]));
+    const key = randomChoice(keys);
+    if (diff > 0 && obj[key] < max) obj[key]++;
+    if (diff < 0 && obj[key] > min) obj[key]--;
+    guard++;
+  }
+}
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
+}
+
+function sum(values) {
+  return values.reduce((a, b) => a + b, 0);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = randInt(0, i);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function scrollActiveIntoView(grid) {
   const active = grid.querySelector('.active');
   if (active) active.scrollIntoView({ block: 'nearest' });
 }
 
+function renderCoachBuilder() {
+  document.getElementById('coach-team-badge').textContent = selectedTeam ? `${selectedTeam} / ${selectedConf}` : '';
+  document.getElementById('coach-step-label').textContent = coachStep === 'info' ? '* COACH BUILDER 1 OF 2 *' : '* COACH BUILDER 2 OF 2 *';
+  document.getElementById('coach-step-title').textContent = coachStep === 'info' ? 'CREATE YOUR COACH' : 'CUSTOMIZE YOUR LOOK';
+  document.getElementById('coach-back-btn').onclick = () => {
+    if (coachStep === 'info') {
+      goToTeam(selectedConf);
+    } else {
+      coachStep = 'info';
+      renderCoachBuilder();
+    }
+  };
+  if (coachStep === 'info') renderCoachInfo();
+  else renderCoachCustomize();
+}
+
+function renderCoachInfo() {
+  const states = Object.keys(STATE_HOMETOWNS);
+  const towns = STATE_HOMETOWNS[coachProfile.homeState] || [];
+  const stage = document.getElementById('coach-stage');
+  stage.innerHTML = `
+    <div class="coach-info-grid">
+      <div class="field-block">
+        <label for="coach-first-name">FIRST NAME</label>
+        <input class="coach-input" id="coach-first-name" maxlength="16" value="${escapeAttr(coachProfile.firstName)}" autocomplete="off"/>
+      </div>
+      <div class="field-block">
+        <label for="coach-last-name">LAST NAME</label>
+        <input class="coach-input" id="coach-last-name" maxlength="18" value="${escapeAttr(coachProfile.lastName)}" autocomplete="off"/>
+      </div>
+      <div class="field-block">
+        <label for="coach-state">HOME STATE</label>
+        <select class="coach-select" id="coach-state">
+          ${states.map(s => `<option value="${escapeAttr(s)}"${s === coachProfile.homeState ? ' selected' : ''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-block">
+        <label for="coach-hometown">HOMETOWN</label>
+        <select class="coach-select" id="coach-hometown">
+          ${towns.map(t => `<option value="${escapeAttr(t)}"${t === coachProfile.hometown ? ' selected' : ''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="coach-error" id="coach-error"></div>
+      <div class="coach-actions-row">
+        <button class="coach-primary" id="coach-next-btn" type="button">CONTINUE</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('coach-state').addEventListener('change', e => {
+    coachProfile.firstName = document.getElementById('coach-first-name').value.trim();
+    coachProfile.lastName = document.getElementById('coach-last-name').value.trim();
+    coachProfile.homeState = e.target.value;
+    coachProfile.hometown = STATE_HOMETOWNS[coachProfile.homeState][0];
+    renderCoachInfo();
+  });
+  document.getElementById('coach-hometown').addEventListener('change', e => {
+    coachProfile.hometown = e.target.value;
+  });
+  document.getElementById('coach-next-btn').addEventListener('click', saveCoachInfoAndContinue);
+  document.getElementById('coach-first-name').focus();
+}
+
+function saveCoachInfoAndContinue() {
+  const firstName = document.getElementById('coach-first-name').value.trim();
+  const lastName = document.getElementById('coach-last-name').value.trim();
+  const homeState = document.getElementById('coach-state').value;
+  const hometown = document.getElementById('coach-hometown').value;
+  const error = document.getElementById('coach-error');
+  if (!firstName || !lastName) {
+    error.textContent = 'ENTER A FIRST AND LAST NAME TO CONTINUE';
+    return;
+  }
+  Object.assign(coachProfile, { firstName, lastName, homeState, hometown });
+  sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
+  coachStep = 'customize';
+  flash(renderCoachBuilder);
+}
+
+function renderCoachCustomize() {
+  const stage = document.getElementById('coach-stage');
+  stage.innerHTML = `
+    <div class="coach-custom-grid">
+      <div class="coach-preview-panel">
+        <div class="coach-preview-title">COACH PREVIEW</div>
+        <div class="coach-canvas-wrap">
+          <canvas id="coach-canvas" width="180" height="240"></canvas>
+        </div>
+        <div class="coach-bio" id="coach-bio"></div>
+      </div>
+      <div class="coach-controls" id="coach-controls"></div>
+      <div class="coach-actions-row">
+        <button class="coach-secondary" id="coach-info-btn" type="button">BACK</button>
+        <button class="coach-primary" id="coach-finish-btn" type="button">START SEASON</button>
+      </div>
+    </div>
+  `;
+  renderCoachControls();
+  drawCoach();
+  document.getElementById('coach-info-btn').addEventListener('click', () => {
+    coachStep = 'info';
+    renderCoachBuilder();
+  });
+  document.getElementById('coach-finish-btn').addEventListener('click', finishCoachBuilder);
+}
+
+function renderCoachControls() {
+  const controls = document.getElementById('coach-controls');
+  const labels = {
+    hair:'HAIR',
+    hairColor:'HAIR COLOR',
+    facialHair:'FACIAL HAIR',
+    height:'HEIGHT',
+    physique:'PHYSIQUE',
+    eyeColor:'EYE COLOR',
+    skinColor:'SKIN COLOR',
+    outfit:'OUTFIT',
+    shoes:'SHOES'
+  };
+  controls.innerHTML = Object.entries(COACH_OPTIONS).map(([key, values]) => `
+    <div class="coach-control-group">
+      <div class="coach-control-title">${labels[key]}</div>
+      <div class="option-grid">
+        ${values.map(value => `<button class="option-btn${coachProfile[key] === value ? ' active' : ''}" type="button" data-key="${key}" data-value="${escapeAttr(value)}">${value}</button>`).join('')}
+      </div>
+    </div>
+  `).join('');
+  controls.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      coachProfile[btn.dataset.key] = btn.dataset.value;
+      sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
+      renderCoachControls();
+      drawCoach();
+    });
+  });
+}
+
+function finishCoachBuilder() {
+  sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
+  goToCutscene();
+}
+
+function drawCoach(canvasId = 'coach-canvas', profile = coachProfile) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const skin = COACH_PALETTE.skinColor[profile.skinColor];
+  const hair = COACH_PALETTE.hairColor[profile.hairColor];
+  const eyes = COACH_PALETTE.eyeColor[profile.eyeColor];
+  const outfit = COACH_PALETTE.outfit[profile.outfit];
+  const shoes = COACH_PALETTE.shoes[profile.shoes];
+  const tall = profile.height === 'Tall' ? 12 : profile.height === 'Short' ? -8 : 0;
+  const wide = profile.physique === 'Stocky' ? 8 : profile.physique === 'Lean' ? -5 : 0;
+  const shoeY = 210;
+  const headY = 48 - tall;
+  const hairTopY = headY - 12;
+  const bodyY = headY + 54;
+  const bodyH = 58 + Math.round(tall * 0.25);
+  const legY = bodyY + bodyH - 2;
+  const legH = shoeY - legY;
+
+  ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = 'rgba(192,138,24,0.12)';
+  ctx.fillRect(35, 215, 110, 8);
+
+  ctx.fillStyle = shoes;
+  ctx.fillRect(54 - wide / 2, shoeY, 28 + wide / 2, 10);
+  ctx.fillRect(98, shoeY, 28 + wide / 2, 10);
+  ctx.fillStyle = '#2b2518';
+  ctx.fillRect(62, legY, 18 + wide / 2, legH);
+  ctx.fillRect(100, legY, 18 + wide / 2, legH);
+
+  ctx.fillStyle = outfit;
+  ctx.fillRect(54 - wide, bodyY, 72 + wide * 2, bodyH);
+  ctx.fillStyle = 'rgba(237,224,184,0.62)';
+  if (profile.outfit === 'Suit') {
+    ctx.fillRect(84, bodyY + 4, 12, bodyH - 8);
+    ctx.fillStyle = '#a82418';
+    ctx.fillRect(88, bodyY + 8, 6, bodyH - 24);
+  } else {
+    ctx.fillRect(62 - wide, bodyY + 10, 56 + wide * 2, 8);
+  }
+  ctx.fillStyle = outfit;
+  ctx.fillRect(39 - wide, bodyY + 6, 18, 48);
+  ctx.fillRect(123 + wide, bodyY + 6, 18, 48);
+  ctx.fillStyle = skin;
+  ctx.fillRect(37 - wide, bodyY + 52, 20, 14);
+  ctx.fillRect(123 + wide, bodyY + 52, 20, 14);
+
+  ctx.fillStyle = skin;
+  ctx.fillRect(76, bodyY - 8, 28, 10);
+  ctx.fillRect(58, headY, 64, 58);
+  ctx.fillRect(66, headY - 12, 48, 16);
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.fillRect(58, headY + 48, 64, 10);
+
+  ctx.fillStyle = hair;
+  if (profile.hair === 'Short') {
+    ctx.fillRect(58, headY - 10, 64, 14);
+    ctx.fillRect(50, headY + 6, 10, 24);
+  } else if (profile.hair === 'Fade') {
+    ctx.fillRect(62, headY - 12, 56, 10);
+    ctx.fillRect(54, headY, 8, 18);
+  } else if (profile.hair === 'Flat Top') {
+    ctx.fillRect(60, hairTopY - 10, 60, 22);
+    ctx.fillRect(56, hairTopY + 6, 68, 8);
+  } else if (profile.hair === 'Waves') {
+    ctx.fillRect(56, headY - 12, 68, 12);
+    ctx.fillRect(62, headY - 18, 12, 8);
+    ctx.fillRect(84, headY - 19, 12, 8);
+    ctx.fillRect(106, headY - 17, 12, 8);
+  }
+
+  ctx.fillStyle = 'rgba(237,224,184,0.82)';
+  ctx.fillRect(70, headY + 16, 12, 9);
+  ctx.fillRect(98, headY + 16, 12, 9);
+  ctx.fillStyle = eyes;
+  ctx.fillRect(73, headY + 18, 6, 5);
+  ctx.fillRect(101, headY + 18, 6, 5);
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.fillRect(74, headY + 18, 2, 2);
+  ctx.fillRect(102, headY + 18, 2, 2);
+  ctx.fillStyle = '#2b160e';
+  if (profile.facialHair === 'Mustache') {
+    ctx.fillRect(78, headY + 34, 24, 6);
+  } else if (profile.facialHair === 'Goatee') {
+    ctx.fillRect(78, headY + 34, 24, 6);
+    ctx.fillRect(84, headY + 42, 12, 12);
+  } else if (profile.facialHair === 'Beard') {
+    ctx.fillRect(68, headY + 34, 44, 8);
+    ctx.fillRect(72, headY + 42, 36, 14);
+  }
+  ctx.fillStyle = 'rgba(237,224,184,0.5)';
+  ctx.fillRect(76, headY + 42, 28, 4);
+
+  const bio = document.getElementById('coach-bio');
+  if (bio && canvasId === 'coach-canvas') {
+    bio.textContent = `${profile.firstName || 'Coach'} ${profile.lastName || ''} / ${profile.hometown}, ${profile.homeState}`;
+  }
+}
+
+function drawAthleticDirector() {
+  const canvas = document.getElementById('ad-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = false;
+  const skin = '#c98952';
+  const suit = '#202838';
+
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.fillRect(46, 216, 88, 8);
+  ctx.fillStyle = '#191919';
+  ctx.fillRect(58, 205, 26, 10);
+  ctx.fillRect(98, 205, 26, 10);
+  ctx.fillStyle = '#2b2518';
+  ctx.fillRect(64, 155, 18, 50);
+  ctx.fillRect(100, 155, 18, 50);
+  ctx.fillStyle = suit;
+  ctx.fillRect(50, 102, 80, 58);
+  ctx.fillStyle = '#ede0b8';
+  ctx.fillRect(82, 106, 16, 48);
+  ctx.fillStyle = '#c08a18';
+  ctx.fillRect(87, 112, 7, 34);
+  ctx.fillStyle = suit;
+  ctx.fillRect(36, 108, 18, 45);
+  ctx.fillRect(126, 108, 18, 45);
+  ctx.fillStyle = skin;
+  ctx.fillRect(35, 150, 20, 14);
+  ctx.fillRect(125, 150, 20, 14);
+  ctx.fillRect(76, 94, 28, 10);
+  ctx.fillRect(58, 48, 64, 58);
+  ctx.fillRect(66, 36, 48, 16);
+  ctx.fillStyle = '#8b8675';
+  ctx.fillRect(58, 36, 64, 14);
+  ctx.fillRect(52, 52, 8, 30);
+  ctx.fillRect(120, 52, 8, 30);
+  ctx.fillStyle = 'rgba(237,224,184,0.9)';
+  ctx.fillRect(70, 64, 12, 9);
+  ctx.fillRect(98, 64, 12, 9);
+  ctx.fillStyle = '#3b2412';
+  ctx.fillRect(73, 66, 6, 5);
+  ctx.fillRect(101, 66, 6, 5);
+  ctx.fillStyle = '#2b160e';
+  ctx.fillRect(76, 86, 28, 5);
+}
+
+function drawReporter(ctx, r, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = false;
+  const s = r.skin, hc = r.hairColor, ec = r.eyeColor, out = r.outfit;
+  // desk surface
+  ctx.fillStyle = 'rgba(192,138,24,0.18)';
+  ctx.fillRect(0, h - 20, w, 3);
+  // torso
+  ctx.fillStyle = out;
+  ctx.fillRect(Math.round(w*0.28), Math.round(h*0.42), Math.round(w*0.44), Math.round(h*0.36));
+  // arms
+  ctx.fillStyle = out;
+  ctx.fillRect(Math.round(w*0.1),  Math.round(h*0.46), Math.round(w*0.18), Math.round(h*0.28));
+  ctx.fillRect(Math.round(w*0.72), Math.round(h*0.46), Math.round(w*0.18), Math.round(h*0.28));
+  // hands
+  ctx.fillStyle = s;
+  ctx.fillRect(Math.round(w*0.1),  Math.round(h*0.7),  Math.round(w*0.16), Math.round(h*0.1));
+  ctx.fillRect(Math.round(w*0.74), Math.round(h*0.7),  Math.round(w*0.16), Math.round(h*0.1));
+  // neck
+  ctx.fillStyle = s;
+  ctx.fillRect(Math.round(w*0.42), Math.round(h*0.32), Math.round(w*0.16), Math.round(h*0.12));
+  // head
+  ctx.fillRect(Math.round(w*0.26), Math.round(h*0.06), Math.round(w*0.48), Math.round(h*0.28));
+  ctx.fillStyle = 'rgba(0,0,0,0.14)';
+  ctx.fillRect(Math.round(w*0.26), Math.round(h*0.3),  Math.round(w*0.48), Math.round(h*0.04));
+  // hair
+  ctx.fillStyle = hc;
+  if (r.hair === 'short') {
+    ctx.fillRect(Math.round(w*0.24), Math.round(h*0.04), Math.round(w*0.52), Math.round(h*0.08));
+    ctx.fillRect(Math.round(w*0.22), Math.round(h*0.08), Math.round(w*0.08), Math.round(h*0.14));
+  } else if (r.hair === 'long') {
+    ctx.fillRect(Math.round(w*0.22), Math.round(h*0.04), Math.round(w*0.56), Math.round(h*0.08));
+    ctx.fillRect(Math.round(w*0.18), Math.round(h*0.08), Math.round(w*0.1),  Math.round(h*0.26));
+    ctx.fillRect(Math.round(w*0.72), Math.round(h*0.08), Math.round(w*0.1),  Math.round(h*0.26));
+  } else if (r.hair === 'bun') {
+    ctx.fillRect(Math.round(w*0.24), Math.round(h*0.04), Math.round(w*0.52), Math.round(h*0.07));
+    ctx.fillRect(Math.round(w*0.38), Math.round(h*0.0),  Math.round(w*0.22), Math.round(h*0.08));
+    ctx.fillRect(Math.round(w*0.42), Math.round(h*-0.02),Math.round(w*0.14), Math.round(h*0.06));
+  } else if (r.hair === 'fade') {
+    ctx.fillRect(Math.round(w*0.3),  Math.round(h*0.04), Math.round(w*0.4),  Math.round(h*0.07));
+    ctx.fillRect(Math.round(w*0.26), Math.round(h*0.07), Math.round(w*0.48), Math.round(h*0.04));
+  }
+  // eyes whites
+  ctx.fillStyle = 'rgba(237,224,184,0.88)';
+  ctx.fillRect(Math.round(w*0.32), Math.round(h*0.15), Math.round(w*0.14), Math.round(h*0.08));
+  ctx.fillRect(Math.round(w*0.54), Math.round(h*0.15), Math.round(w*0.14), Math.round(h*0.08));
+  ctx.fillStyle = ec;
+  ctx.fillRect(Math.round(w*0.35), Math.round(h*0.16), Math.round(w*0.08), Math.round(h*0.06));
+  ctx.fillRect(Math.round(w*0.57), Math.round(h*0.16), Math.round(w*0.08), Math.round(h*0.06));
+  ctx.fillStyle = 'rgba(255,255,255,0.65)';
+  ctx.fillRect(Math.round(w*0.36), Math.round(h*0.16), Math.round(w*0.03), Math.round(h*0.03));
+  ctx.fillRect(Math.round(w*0.58), Math.round(h*0.16), Math.round(w*0.03), Math.round(h*0.03));
+  // mouth
+  ctx.fillStyle = 'rgba(43,22,14,0.8)';
+  ctx.fillRect(Math.round(w*0.38), Math.round(h*0.27), Math.round(w*0.24), Math.round(h*0.04));
+  // prop
+  if (r.prop === 'notepad') {
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(Math.round(w*0.12), Math.round(h*0.72), Math.round(w*0.3), Math.round(h*0.16));
+    ctx.fillStyle = 'rgba(168,36,24,0.7)';
+    ctx.fillRect(Math.round(w*0.12), Math.round(h*0.77), Math.round(w*0.3), Math.round(h*0.02));
+    ctx.fillRect(Math.round(w*0.12), Math.round(h*0.81), Math.round(w*0.22), Math.round(h*0.02));
+    ctx.fillRect(Math.round(w*0.12), Math.round(h*0.85), Math.round(w*0.26), Math.round(h*0.02));
+  } else if (r.prop === 'recorder') {
+    ctx.fillStyle = '#111';
+    ctx.fillRect(Math.round(w*0.74), Math.round(h*0.56), Math.round(w*0.12), Math.round(h*0.22));
+    ctx.fillStyle = '#c08a18';
+    ctx.fillRect(Math.round(w*0.77), Math.round(h*0.58), Math.round(w*0.06), Math.round(h*0.06));
+    ctx.fillStyle = 'rgba(237,224,184,0.3)';
+    ctx.fillRect(Math.round(w*0.75), Math.round(h*0.68), Math.round(w*0.1),  Math.round(h*0.04));
+  } else if (r.prop === 'camera') {
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(Math.round(w*0.1),  Math.round(h*0.48), Math.round(w*0.3),  Math.round(h*0.18));
+    ctx.fillStyle = '#333';
+    ctx.fillRect(Math.round(w*0.37), Math.round(h*0.52), Math.round(w*0.08), Math.round(h*0.1));
+    ctx.fillStyle = 'rgba(80,160,200,0.55)';
+    ctx.fillRect(Math.round(w*0.14), Math.round(h*0.5),  Math.round(w*0.18), Math.round(h*0.14));
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(Math.round(w*0.15), Math.round(h*0.51), Math.round(w*0.06), Math.round(h*0.05));
+  } else if (r.prop === 'laptop') {
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(Math.round(w*0.08), Math.round(h*0.62), Math.round(w*0.32), Math.round(h*0.18));
+    ctx.fillStyle = 'rgba(80,180,255,0.28)';
+    ctx.fillRect(Math.round(w*0.1),  Math.round(h*0.64), Math.round(w*0.28), Math.round(h*0.14));
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(Math.round(w*0.06), Math.round(h*0.79), Math.round(w*0.36), Math.round(h*0.04));
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillRect(Math.round(w*0.12), Math.round(h*0.66), Math.round(w*0.08), Math.round(h*0.04));
+  }
+}
+
+function renderCutscene() {
+  const frame = document.getElementById('scene-frame');
+  const speaker = document.getElementById('cutscene-speaker');
+  const text = document.getElementById('cutscene-text');
+  const actions = document.getElementById('cutscene-actions');
+  document.getElementById('cutscene-fade').classList.remove('active');
+  document.getElementById('ad-door-team').textContent = selectedTeam || 'BASKETBALL';
+  actions.innerHTML = '';
+
+  if (cutsceneStep === 'door') {
+    frame.dataset.scene = 'door';
+    speaker.textContent = 'ATHLETIC DEPARTMENT';
+    text.textContent = 'A brass nameplate waits at the end of the hall.';
+    actions.appendChild(makeCutsceneButton('ENTER OFFICE', () => {
+      cutsceneStep = 'office';
+      flash(renderCutscene);
+    }));
+  } else if (cutsceneStep === 'office') {
+    frame.dataset.scene = 'office';
+    drawAthleticDirector();
+    drawCoach('cutscene-coach-canvas');
+    speaker.textContent = 'ATHLETIC DIRECTOR';
+    text.textContent = 'Just like every other program in the nation we have a limited number of resources. Would you rather spend money on scouts or add to the NIL fund?';
+    actions.appendChild(makeCutsceneButton('SCOUTS', () => saveResourceDecision('scouts')));
+    actions.appendChild(makeCutsceneButton('NIL FUND', () => saveResourceDecision('nilFund')));
+  } else if (cutsceneStep === 'press') {
+    frame.dataset.scene = 'office';
+    drawAthleticDirector();
+    drawCoach('cutscene-coach-canvas');
+    speaker.textContent = 'ATHLETIC DIRECTOR';
+    text.textContent = 'You have a press conference in 30 minutes. Be ready.';
+    actions.appendChild(makeCutsceneButton('CONTINUE', finishCutscene));
+  }
+}
+
+function makeCutsceneButton(label, onClick) {
+  const btn = document.createElement('button');
+  btn.className = 'cutscene-btn';
+  btn.type = 'button';
+  btn.textContent = label;
+  btn.addEventListener('click', onClick);
+  return btn;
+}
+
+function saveResourceDecision(decision) {
+  resourceDecision = decision;
+  sessionStorage.setItem('resourceDecision', decision);
+  cutsceneStep = 'press';
+  flash(renderCutscene);
+}
+
+function finishCutscene() {
+  document.getElementById('cutscene-fade').classList.add('active');
+  setTimeout(() => {
+    goToPressConference();
+  }, 950);
+}
+
+function renderPressConference() {
+  document.getElementById('press-eyebrow').textContent = pressPersonality ? '* PRESS CONFERENCE *' : '* CHOOSE YOUR VOICE *';
+  document.getElementById('press-title').textContent = pressPersonality ? 'MEDIA ROOM' : 'SELECT PERSONALITY';
+  if (!pressPersonality) renderPersonalitySelect();
+  else renderPressRoom();
+}
+
+function renderPersonalitySelect() {
+  const stage = document.getElementById('press-stage');
+  stage.innerHTML = `
+    <div class="personality-grid">
+      ${PERSONALITIES.map(p => `
+        <button class="personality-card" type="button" data-personality="${p.id}">
+          <strong>${p.name}</strong>
+          <span>${p.desc}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+  stage.querySelectorAll('.personality-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pressPersonality = btn.dataset.personality;
+      sessionStorage.setItem('pressPersonality', pressPersonality);
+      flash(renderPressConference);
+    });
+  });
+}
+
+function renderPressRoom() {
+  const stage = document.getElementById('press-stage');
+  const current = PRESS_QUESTIONS[pressQuestionIndex];
+  const keys = ['A','B','C','D'];
+
+  stage.innerHTML = `
+    <div class="press-room">
+      <div class="reporter-row" id="reporter-row">
+        ${REPORTERS.map((r, i) => {
+          const answered = pressAnswers.some(a => a.reporterIndex === i);
+          const active = activeReporterIndex === i;
+          return `<button class="reporter-seat${answered ? ' answered' : active ? ' active' : ''}" type="button" data-reporter="${i}">
+            ${answered ? '<span class="reporter-answered-badge">✓ DONE</span>' : ''}
+            <canvas id="rseat-canvas-${i}" width="80" height="90"></canvas>
+            <div class="reporter-name-tag"><strong>${r.name}</strong>${r.outlet}</div>
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="press-dialogue">
+        <div class="press-dialogue-who" id="press-who-area">
+          <canvas id="press-who-canvas" width="44" height="50"></canvas>
+          <div class="press-who-meta">
+            <span class="press-who-name" id="press-who-name">${activeReporterIndex === null ? '— AWAITING —' : REPORTERS[activeReporterIndex].name}</span>
+            <span class="press-who-outlet" id="press-who-outlet">${activeReporterIndex === null ? 'Select a reporter' : REPORTERS[activeReporterIndex].outlet}</span>
+          </div>
+        </div>
+        <div class="press-question-body" id="press-question-area">
+          ${current ? getPressQuestionMarkup(current) : getPressCompleteMarkup()}
+        </div>
+        <div class="answer-grid" id="answer-grid">
+          ${current && activeReporterIndex !== null
+            ? current.answers.map((ans, ai) => `<button class="answer-btn" type="button" data-answer="${escapeAttr(ans)}"><span class="choice-key">${keys[ai]}</span>${ans}</button>`).join('')
+            : ''}
+        </div>
+        <div class="press-progress">
+          ${PRESS_QUESTIONS.map((_, qi) => {
+            const done = qi < pressQuestionIndex;
+            const curr = qi === pressQuestionIndex;
+            return `<div class="press-dot${done ? ' done' : curr ? ' current' : ''}"></div>`;
+          }).join('')}
+          <span class="press-dot-label">${Math.min(pressQuestionIndex, PRESS_QUESTIONS.length)} / ${PRESS_QUESTIONS.length}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  REPORTERS.forEach((r, i) => {
+    const c = document.getElementById(`rseat-canvas-${i}`);
+    if (c) drawReporter(c.getContext('2d'), r, 80, 90);
+  });
+  const whoC = document.getElementById('press-who-canvas');
+  if (whoC && activeReporterIndex !== null) {
+    drawReporter(whoC.getContext('2d'), REPORTERS[activeReporterIndex], 44, 50);
+  }
+
+  stage.querySelectorAll('.reporter-seat').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.dataset.reporter);
+      if (pressAnswers.some(a => a.reporterIndex === idx) || pressQuestionIndex >= PRESS_QUESTIONS.length) return;
+      activeReporterIndex = idx;
+      renderPressRoom();
+    });
+  });
+  stage.querySelectorAll('.answer-btn').forEach(btn => {
+    btn.addEventListener('click', () => answerPressQuestion(btn.dataset.answer));
+  });
+}
+
+function getPressQuestionMarkup(current) {
+  if (activeReporterIndex === null) {
+    return 'Pick a reporter from above. The room is waiting.';
+  }
+  return current.question;
+}
+
+function getPressCompleteMarkup() {
+  return `<div>Press conference complete.</div><div class="press-response">Your tone and media answers have been saved.</div>`;
+}
+
+function answerPressQuestion(answer) {
+  const current = PRESS_QUESTIONS[pressQuestionIndex];
+  const response = formulatePressResponse(current, answer);
+  pressAnswers.push({
+    key:current.key,
+    question:current.question,
+    answer,
+    response,
+    reporterIndex:activeReporterIndex,
+    reporter:REPORTERS[activeReporterIndex].name
+  });
+  sessionStorage.setItem('pressAnswers', JSON.stringify(pressAnswers));
+  renderPressAnswer(response);
+}
+
+function renderPressAnswer(response) {
+  const questionArea = document.getElementById('press-question-area');
+  const answerGrid = document.getElementById('answer-grid');
+  questionArea.innerHTML = `<div>${PRESS_QUESTIONS[pressQuestionIndex].question}</div><div class="press-response">${response}</div>`;
+  answerGrid.innerHTML = '';
+  const isLast = pressQuestionIndex >= PRESS_QUESTIONS.length - 1;
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'answer-btn next-btn';
+  nextBtn.type = 'button';
+  nextBtn.textContent = isLast ? '► END PRESSER' : '► NEXT REPORTER';
+  nextBtn.addEventListener('click', () => {
+    pressQuestionIndex += 1;
+    activeReporterIndex = null;
+    if (pressQuestionIndex >= PRESS_QUESTIONS.length) {
+      sessionStorage.setItem('pressAnswers', JSON.stringify(pressAnswers));
+      prepareRosters().then(goToDashboard);
+    } else {
+      flash(renderPressRoom);
+    }
+  });
+  answerGrid.appendChild(nextBtn);
+}
+
+/* ═══════════════════════════════════════════
+   SCHEDULER
+═══════════════════════════════════════════ */
+let seasonNumber = 1;
+let cachedSchedule = null;
+
+function strHash(s) {
+  let h = 0x811c9dc5 >>> 0;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h;
+}
+
+function mulberry32(seed) {
+  let s = seed >>> 0;
+  return function() {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle(arr, rng) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const NC_DATES = [
+  'NOV 4','NOV 8','NOV 11','NOV 15','NOV 18','NOV 22','NOV 25',
+  'DEC 2','DEC 7','DEC 10','DEC 14','DEC 18','DEC 21'
+];
+const CONF_DATES = [
+  'JAN 2','JAN 5','JAN 9','JAN 12','JAN 16','JAN 19',
+  'JAN 23','JAN 26','JAN 30',
+  'FEB 2','FEB 6','FEB 9','FEB 13','FEB 16','FEB 20',
+  'FEB 23','FEB 27','MAR 1'
+];
+
+function generateTeamSchedule(team, conf, season) {
+  const rng = mulberry32(strHash(team + '|' + conf + '|' + season));
+  const confTeams = CONFERENCES[conf].filter(t => t !== team);
+
+  // --- Conference: 18 games ---
+  // Cycle through shuffled passes until we have 18 slots.
+  // Each opponent may appear at most ceil(18 / confTeams.length) + 1 times.
+  const maxPerOpp = Math.ceil(18 / confTeams.length) + 1;
+  const used = {};
+  confTeams.forEach(t => { used[t] = 0; });
+
+  // Build a large pool (multiple shuffled passes) then drain greedily
+  const pool = [];
+  for (let pass = 0; pass < maxPerOpp + 1; pass++) {
+    pool.push(...seededShuffle(confTeams, rng));
+  }
+
+  const confGames = [];
+  for (const opp of pool) {
+    if (confGames.length >= 18) break;
+    if (used[opp] < maxPerOpp) {
+      used[opp]++;
+      confGames.push({ opponent: opp, isConf: true, home: rng() > 0.5 });
+    }
+  }
+
+  // --- Non-conference: 13 unique opponents from outside the conference ---
+  const otherPool = [];
+  for (const [c, teams] of Object.entries(CONFERENCES)) {
+    if (c !== conf) otherPool.push(...teams);
+  }
+  const ncGames = seededShuffle(otherPool, rng).slice(0, 13)
+    .map(opp => ({ opponent: opp, isConf: false, home: rng() > 0.5 }));
+
+  // Assign fixed dates (non-conf first, then conf)
+  ncGames.forEach((g, i) => { g.date = NC_DATES[i] || '---'; });
+  confGames.forEach((g, i) => { g.date = CONF_DATES[i] || '---'; });
+
+  return [...ncGames, ...confGames];
+}
+
+function goToSchedule() {
+  if (!cachedSchedule) {
+    cachedSchedule = generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
+  }
+  flash(() => {
+    showPanel('schedule');
+    renderSchedule();
+  });
+}
+
+function renderSchedule() {
+  document.getElementById('sched-conf-badge').textContent = selectedConf || '';
+  document.getElementById('sched-season-num').textContent = seasonNumber;
+  document.getElementById('sched-title').textContent = (selectedTeam || 'SCHEDULE').toUpperCase();
+
+  const body = document.getElementById('sched-body');
+  body.innerHTML = '';
+
+  const games = cachedSchedule;
+  const ncGames   = games.filter(g => !g.isConf);
+  const confGames = games.filter(g =>  g.isConf);
+  const homeCount = games.filter(g =>  g.home).length;
+
+  function appendSection(label, list) {
+    const sec = document.createElement('div');
+    sec.className = 'sched-section-label';
+    sec.textContent = label;
+    body.appendChild(sec);
+    list.forEach(g => {
+      const row = document.createElement('div');
+      row.className = 'sched-game';
+      row.innerHTML =
+        `<span class="sched-date">${g.date}</span>` +
+        `<span class="sched-ha ${g.home ? 'home' : 'away'}">${g.home ? 'HOME' : 'AWAY'}</span>` +
+        `<span class="sched-opp">${g.opponent}</span>` +
+        `<span class="sched-type">${g.isConf ? 'CONF' : 'NON-CONF'}</span>`;
+      body.appendChild(row);
+    });
+  }
+
+  appendSection(`◆ NON-CONFERENCE  (${ncGames.length} GAMES)`, ncGames);
+  appendSection(`◆ CONFERENCE  (${confGames.length} GAMES)`, confGames);
+
+  // Footnote for small conferences that require rematches
+  const uniqueConfOpps = new Set(confGames.map(g => g.opponent)).size;
+  const confSize = CONFERENCES[selectedConf].length;
+  const hasRematches = uniqueConfOpps < confGames.length;
+
+  const sumDiv = document.createElement('div');
+  sumDiv.className = 'sched-summary';
+  sumDiv.innerHTML =
+    `<div class="sched-summary-item">TOTAL <span>${games.length}</span></div>` +
+    `<div class="sched-summary-item">HOME <span>${homeCount}</span></div>` +
+    `<div class="sched-summary-item">AWAY <span>${games.length - homeCount}</span></div>` +
+    `<div class="sched-summary-item">CONF <span>${confGames.length}</span></div>` +
+    `<div class="sched-summary-item">NON-CONF <span>${ncGames.length}</span></div>`;
+  body.appendChild(sumDiv);
+
+  if (hasRematches) {
+    const note = document.createElement('div');
+    note.className = 'sched-note';
+    note.textContent =
+      `* ${selectedConf.toUpperCase()} HAS ${confSize} TEAMS — SOME OPPONENTS APPEAR MORE THAN ONCE TO FILL 18 CONF GAMES`;
+    body.appendChild(note);
+  }
+}
+
+function formulatePressResponse(question, answer) {
+  const coachName = coachProfile.lastName ? `Coach ${coachProfile.lastName}` : 'Coach';
+  const responseMap = {
+    defense: {
+      "Aggressive": {
+        steady:'We will pressure without gambling. I want our defense to make teams uncomfortable, but it still has to be five guys connected.',
+        fiery:'We are going to pick people up, hit first, and make every catch feel crowded. I want opponents feeling us from the opening tip.',
+        teacher:'Aggressive does not mean reckless. We will teach angles, rotations, and when to attack the ball so pressure becomes discipline.',
+        charmer:'Fans are going to see energy. We want a defense that creates noise, creates turnovers, and gives this building a pulse.'
+      },
+      "Disciplined": {
+        steady:'We are going to be sound. Contest without fouling, finish possessions, and make opponents earn clean looks.',
+        fiery:'Discipline is not passive. It means we are locked in enough to take away what teams want for forty minutes.',
+        teacher:'Our habits have to travel. Stance, talk, help position, rebounding; those details will decide whether we can guard good teams.',
+        charmer:'I think people will appreciate how organized we are. We want a team that looks prepared every time it steps on the floor.'
+      },
+      "Conservative": {
+        steady:'We will protect the paint, keep the ball in front, and avoid giving away easy points. That gives us a stable base.',
+        fiery:'We are not handing teams layups because we chased a highlight. They can try to beat us over the top, but nothing comes cheap.',
+        teacher:'This group needs structure first. If we can shrink the floor and rebound, then we can add pressure as our trust grows.',
+        charmer:'It may not always be flashy, but it can be winning basketball. We want opponents to feel like every trip is a grind.'
+      },
+      "Limit Threes": {
+        steady:'The math matters. We have to run shooters off the line, rotate early, and force teams into tougher twos.',
+        fiery:'We are not watching teams get comfortable from three. Shooters are going to see bodies, hands, and closeouts all night.',
+        teacher:'Closeout technique will be a major teaching point. No fly-bys, no lazy switches, and no confusion about personnel.',
+        charmer:'Modern basketball starts at the arc. If we take away rhythm threes, we give ourselves a chance to control the night.'
+      }
+    },
+    offense: {
+      "Play through our star": {
+        steady:'We have a player who can bend the game, and we should use that. The key is making sure everyone stays involved around him.',
+        fiery:'When you have a matchup problem, you lean on it. We are going to put pressure on defenses until they prove they can stop him.',
+        teacher:'Playing through a star still requires spacing, timing, and reads. His gravity should make the game easier for everyone else.',
+        charmer:'Great players bring confidence to a locker room. We are going to let him lead while still building a complete offense.'
+      },
+      "Shoot threes": {
+        steady:'We want good threes, not rushed threes. If the ball moves and our feet are set, we will trust those shots.',
+        fiery:'We are going to let it fly when the look is there. A team that can shoot puts fear into every scouting report.',
+        teacher:'Shot quality is the lesson. Paint touches, extra passes, and spacing have to create the threes we want.',
+        charmer:'The crowd loves a team that can get hot. We want an offense with rhythm, spacing, and the confidence to punish mistakes.'
+      },
+      "Get to the basket": {
+        steady:'Paint pressure travels. We need to touch the lane, draw help, and create higher-percentage chances.',
+        fiery:'We are going downhill. I want defenses on their heels, bigs in foul trouble, and our guys living at the rim.',
+        teacher:'Driving is about more than speed. We will work on reads, footwork, kickouts, and finishing through contact.',
+        charmer:'There is an edge to a team that attacks the rim. It gets the bench up, it gets the fans involved, and it wears people down.'
+      },
+      "Post up": {
+        steady:'We can settle the game by playing inside. A good post touch forces the defense to make decisions.',
+        fiery:'We are going to put bodies on bodies. If we have strength inside, we are not going to pretend this is a finesse contest.',
+        teacher:'Post play teaches spacing and patience. The entry pass, the cut, the relocation; all of that has to be sharp.',
+        charmer:'There is still room for old-school basketball. If we can score inside, it opens everything else on the floor.'
+      }
+    },
+    tempo: {
+      "Fast": {
+        steady:'We will run with purpose. Early offense is valuable, but the ball still has to find the right shot.',
+        fiery:'We want pace. We want pressure. We want teams tired, scrambling, and asking for a timeout.',
+        teacher:'Fast only works if our decisions are clean. We will drill spacing lanes, advance passes, and when to slow it down.',
+        charmer:'Fast basketball is fun, and it can energize the whole program. We want to give fans a team that plays with life.'
+      },
+      "Normal": {
+        steady:'We will balance pace and control. Some nights we run, some nights we execute, but we cannot be rushed.',
+        fiery:'Normal does not mean comfortable. It means we choose when to push and when to squeeze a defense.',
+        teacher:'This gives us the most teaching flexibility. We can build habits in transition and in the half court.',
+        charmer:'I think balance fits this team. We can adapt to opponents while still keeping our own identity.'
+      },
+      "Slow": {
+        steady:'We will value possessions. Fewer empty trips, better shots, and more control over the game flow.',
+        fiery:'We are going to make teams defend deep into the clock and hate every second of it.',
+        teacher:'Slow tempo demands execution. Screening angles, spacing, and late-clock poise have to become strengths.',
+        charmer:'A patient team can be a dangerous team. If we make opponents guard for long stretches, the arena will feel that tension.'
+      },
+      "Super Slow": {
+        steady:'We are going to shorten games and make each possession matter. That requires toughness and concentration.',
+        fiery:'If teams want track meets, they can find them somewhere else. We are going to drag opponents into our kind of fight.',
+        teacher:'Super slow means every detail is magnified. We have to be comfortable late in the clock and precise with our actions.',
+        charmer:'It is a distinct style, and that can become an advantage. Opponents will have to prepare for something different here.'
+      }
+    },
+    recruiting: {
+      "Experienced": {
+        steady:'We need players who have been through college games and understand the grind. Experience can stabilize a locker room quickly.',
+        fiery:'Give me guys who have been in battles. I want players who walk in ready to compete right now.',
+        teacher:'Older players can model habits for the younger ones. That matters when you are trying to build a daily standard.',
+        charmer:'Experience helps fans believe quickly. It gives the program names, stories, and maturity from day one.'
+      },
+      "Talented": {
+        steady:'Talent raises the ceiling. We still have to fit the pieces together, but we need players who can change games.',
+        fiery:'We are chasing difference-makers. This league is too good to win with safe choices only.',
+        teacher:'Talent has to be developed and challenged. We want players with tools, then we will coach the habits around them.',
+        charmer:'Talent excites people. If we bring in dynamic players, the campus will feel that momentum.'
+      },
+      "Potential": {
+        steady:'We are willing to bet on growth. The right player with the right work ethic can become something special here.',
+        fiery:'I want players with upside and hunger. Give me someone who wants to prove everyone missed on him.',
+        teacher:'Development is the heart of this answer. We will identify traits, build plans, and help players grow year by year.',
+        charmer:'There is something powerful about watching a player blossom. That can become part of the story of this program.'
+      },
+      "Anyone": {
+        steady:'We will stay flexible. The priority is fit, toughness, and finding players who want to be coached.',
+        fiery:'If a player can help us win and embraces the work, we are picking up the phone.',
+        teacher:'Labels matter less than habits. We will evaluate skill, character, role acceptance, and room to improve.',
+        charmer:'We are going to keep every door open. The right player can come from anywhere, and we want to be ready.'
+      }
+    }
+  };
+  return `${coachName}: ${responseMap[question.key][answer][pressPersonality]}`;
+}
+
+function escapeAttr(value) {
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  })[ch]);
+}
+
 function selectTeam() {
   const team = CONFERENCES[selectedConf][teamCursor];
-  // Store selection for the game — replace with actual navigation when game is built
+  selectedTeam = team;
   sessionStorage.setItem('playerConf', selectedConf);
   sessionStorage.setItem('playerTeam', team);
-  flash(() => {
-    // Placeholder: bounce back for now until game screen exists
-    alert(`LOCKED IN:\n${team}\n(${selectedConf})`);
-  });
+  goToCoachBuilder('info');
 }
 
 /* ═══════════════════════════════════════════
@@ -641,6 +3161,44 @@ window.addEventListener('keydown', e => {
       ()  => selectTeam(),
       ()  => { confCursor = CONF_NAMES.indexOf(selectedConf); showPanel('conf'); renderConf(); }
     );
+  } else if (currentScreen === 'coach') {
+    if (e.code === 'Enter' && coachStep === 'info') {
+      e.preventDefault();
+      saveCoachInfoAndContinue();
+    } else if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      if (coachStep === 'info') goToTeam(selectedConf);
+      else {
+        coachStep = 'info';
+        renderCoachBuilder();
+      }
+    }
+  } else if (currentScreen === 'cutscene') {
+    if (e.code === 'Enter' || e.code === 'Space') {
+      const firstAction = document.querySelector('#cutscene-actions .cutscene-btn');
+      if (firstAction) {
+        e.preventDefault();
+        firstAction.click();
+      }
+    }
+  } else if (currentScreen === 'press') {
+    if (e.code === 'Enter' || e.code === 'Space') {
+      const firstAction = document.querySelector('#press-stage button:not(.answered)');
+      if (firstAction) {
+        e.preventDefault();
+        firstAction.click();
+      }
+    }
+  } else if (currentScreen === 'dashboard') {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      goToCoachBuilder('customize');
+    }
+  } else if (currentScreen === 'roster') {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      goToDashboard();
+    }
   }
 });
 
