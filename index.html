@@ -3131,7 +3131,7 @@
               <div class="recruit-hours-badge" id="portal-nil-badge"></div>
               <div class="recruit-hours-badge" id="portal-hours-badge"></div>
               <button class="departures-continue-btn" id="portal-next-week-btn" type="button" onclick="advancePortalWeek()" style="margin:0;">► NEXT WEEK</button>
-              <button class="departures-continue-btn" id="portal-next-season-btn" type="button" onclick="finishPortalGoDashboard()" style="margin:0;display:none;">► NEXT SEASON</button>
+              <button class="departures-continue-btn" id="portal-next-season-btn" type="button" onclick="finishPortalGoDashboard()" style="margin:0;display:none;">► OFFSEASON TRAINING</button>
             </div>
           </div>
           <div class="recruiting-filters" id="portal-filters"></div>
@@ -4356,12 +4356,17 @@ function renderPortalDetailCard(player) {
 }
 
 function finishPortalGoDashboard() {
-  applyPortalCommits();
-  applyRecruitingCommits();
-  const trainingResults = runOffseasonTraining();
-  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
-  renderOffseasonTraining(trainingResults);
-  flash(() => showPanel('offseason-training'));
+  try {
+    applyPortalCommits();
+    applyRecruitingCommits();
+    const trainingResults = runOffseasonTraining();
+    sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+    renderOffseasonTraining(trainingResults);
+    flash(() => showPanel('offseason-training'));
+  } catch (err) {
+    console.error('Could not advance to offseason training:', err);
+    window.alert('Could not advance to offseason training. Check the console for details.');
+  }
 }
 
 function closePortalDetail() {
@@ -4899,7 +4904,8 @@ function applyPortalCommits() {
 }
 
 function applyRecruitingCommits() {
-  const recruits = ensureRecruitingClass() || [];
+  const recruits = recruitingClass || loadRecruitingClass() || [];
+  recruitingClass = recruits;
   recruits.forEach(r => {
     let targetTeam = null, targetConf = null;
     if (r.signed) { targetTeam = selectedTeam; targetConf = selectedConf; }
@@ -4978,16 +4984,17 @@ function trainPlayerTowardOverall(player, targetOverall) {
   });
   const cap = Math.min(99, Math.max(Math.round(Number(player.overall) || 0), Math.round(Number(player.potential) || targetOverall), Math.round(targetOverall || 0)));
   const desired = Math.min(cap, Math.round(targetOverall || player.overall || 0));
-  const startOverall = Math.round(Number(player.overall) || average(keys.map(k => player.attributes[k])));
+  const getTrainingOverall = () => Math.round(sum(keys.map(k => Number(player.attributes[k]) || 0)) / keys.length);
+  const startOverall = Math.round(Number(player.overall) || getTrainingOverall());
   let guard = 0;
-  while (Math.round(average(keys.map(k => player.attributes[k]))) < desired && guard < 500) {
+  while (getTrainingOverall() < desired && guard < 500) {
     const openKeys = keys.filter(key => player.attributes[key] < 99);
     if (!openKeys.length) break;
     const key = randomChoice(openKeys);
     player.attributes[key]++;
     guard++;
   }
-  player.overall = Math.min(99, Math.round(average(keys.map(k => player.attributes[k]))));
+  player.overall = Math.min(99, getTrainingOverall());
   player.potential = Math.max(player.potential || player.overall, player.overall);
   return Math.max(0, player.overall - startOverall);
 }
