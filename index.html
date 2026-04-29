@@ -5017,25 +5017,65 @@ function renderOffseasonTraining(results) {
 }
 
 function finishOffseasonTraining() {
+  resetForNextSeason();
+  goToDashboard();
+}
+
+function resetForNextSeason() {
+  const oldKeys = [
+    getScheduleStateKey(),
+    getLeagueScheduleKey(),
+    getStandingsStateKey(),
+    getPlayerStatsKey(),
+    getRecruitingClassKey(),
+    getRecruitingVersionKey(),
+    getRecruitingHoursKey(),
+    getPortalStateKey(),
+    getPortalHoursKey()
+  ];
+
   clearRecruitedFreshmanFlags();
   seasonNumber++;
+  oldKeys.forEach(key => sessionStorage.removeItem(key));
+  sessionStorage.removeItem('lastBoxScore');
+
+  activeGame = null;
+  lastBoxScore = null;
+  tournamentState = null;
   cachedSchedule = null;
   leagueSchedule = null;
   currentGameIndex = 0;
-  standingsState = buildInitialStandingsState();
-  playerStatsState = buildInitialPlayerStatsState();
-  recruitingClass = null;
   transferPortal = [];
   portalWeek = 1;
   portalHoursState = null;
-  resetRecruitingHoursForNewGame();
+  portalStarFilter = 'all';
+  portalPositionFilter = 'all';
+  portalBookmarksFilter = false;
+  portalSignedFilter = false;
+  recruitingStarFilter = 'all';
+  recruitingPositionFilter = 'all';
+  recruitingBookmarksFilter = false;
+  recruitingSignedFilter = false;
+
   sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+  resetRecruitingHoursForNewGame();
+  recruitingClass = generateRecruitingClass(namePool || getFallbackNamePool());
+  saveRecruitingClass();
+
+  leagueSchedule = generateLeagueSchedule(seasonNumber);
+  saveLeagueSchedule();
+  cachedSchedule = generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
+  saveCachedSchedule();
+
+  standingsState = buildInitialStandingsState();
+  playerStatsState = buildInitialPlayerStatsState();
   sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
   sessionStorage.setItem(getPlayerStatsKey(), JSON.stringify(playerStatsState));
-  sessionStorage.removeItem(getRecruitingClassKey());
-  sessionStorage.removeItem(getRecruitingVersionKey());
   savePortalState();
-  goToDashboard();
+
+  gameplan = null;
+  gameplanKey = null;
+  ensureDefaultGameplanSaved();
 }
 
 function clearRecruitedFreshmanFlags() {
@@ -5048,6 +5088,7 @@ function clearRecruitedFreshmanFlags() {
   });
 }
 
+/* ═══ Portal user actions ═══ */
 /* ═══ Portal user actions ═══ */
 function getNextPortalScoutAction(player, hours) {
   if (!player.potentialRevealed) return { cost: 15, canAfford: hours >= 15 };
