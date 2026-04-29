@@ -5251,7 +5251,7 @@ function formatStatAverage(value) {
 
 function getTeamIndexScore(roster) {
   if (!roster || !roster.length) return 0;
-  return sum(roster.map(p => Math.pow(Number(p.overall) || 0, 2))) / roster.length;
+  return sum(roster.map(p => Math.pow((Number(p.overall) || 0) * 1.5, 2))) / roster.length;
 }
 
 function getStandingsStateKey() {
