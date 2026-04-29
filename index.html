@@ -1622,6 +1622,49 @@
       gap:7px;
       padding-bottom:12px;
     }
+    .crt-row {
+      display:grid;
+      grid-template-columns:36px 1fr repeat(6,42px);
+      gap:0 10px;
+      align-items:center;
+      padding:9px 12px;
+      border:2px solid rgba(237,224,184,0.1);
+      background:rgba(22,18,9,0.28);
+      font-size:clamp(5px,0.66vw,7px);
+      color:rgba(237,224,184,0.72);
+    }
+    .crt-row.crt-header {
+      background:rgba(22,18,9,0.5);
+      border-color:rgba(192,138,24,0.28);
+      color:#c08a18;
+      letter-spacing:0.5px;
+    }
+    .crt-row.crt-you {
+      border-color:rgba(192,138,24,0.45);
+      background:rgba(192,138,24,0.07);
+    }
+    .crt-rank-cell {
+      color:rgba(237,224,184,0.35);
+      text-align:right;
+      font-size:clamp(4px,0.54vw,6px);
+    }
+    .crt-team-cell {
+      color:#ede0b8;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .crt-star-cell {
+      text-align:center;
+      color:rgba(237,224,184,0.72);
+    }
+    .crt-star-cell.crt-zero {
+      color:rgba(237,224,184,0.22);
+    }
+    .crt-star-cell.crt-total {
+      color:#ede0b8;
+      font-size:clamp(5px,0.7vw,8px);
+    }
     .recruit-row {
       display:grid;
       grid-template-columns:54px 1.25fr .36fr .42fr .42fr 1fr 28px;
@@ -1739,6 +1782,48 @@
       width:92%;
       display:grid;
       gap:16px;
+    }
+    .class-rankings-card {
+      max-width:560px;
+      max-height:82vh;
+      overflow-y:auto;
+      gap:0;
+    }
+    .class-rankings-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding-bottom:12px;
+      border-bottom:2px solid rgba(192,138,24,0.22);
+      margin-bottom:2px;
+    }
+    .class-rankings-row {
+      display:grid;
+      grid-template-columns:28px 1fr auto;
+      gap:8px 12px;
+      align-items:center;
+      padding:7px 0;
+      border-bottom:1px solid rgba(237,224,184,0.06);
+      font-size:clamp(4px,0.54vw,6px);
+    }
+    .class-rankings-row.you {
+      background:rgba(192,138,24,0.08);
+    }
+    .class-rankings-rank {
+      color:rgba(237,224,184,0.38);
+      text-align:right;
+    }
+    .class-rankings-team {
+      color:#ede0b8;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .class-rankings-stars {
+      color:#c08a18;
+      white-space:nowrap;
+      text-align:right;
     }
     .recruit-detail-name {
       color:#ede0b8;
@@ -2786,6 +2871,11 @@
     <div id="recruit-detail-card" class="recruit-detail-card"></div>
   </div>
 
+  <!-- CLASS RANKINGS OVERLAY -->
+  <div id="class-rankings-overlay" class="recruit-detail-overlay hidden" onclick="handleClassRankingsOverlayClick(event)">
+    <div id="class-rankings-card" class="recruit-detail-card class-rankings-card"></div>
+  </div>
+
   <!-- TOURNAMENT -->
   <div id="tournament-screen" class="screen-panel tournament-screen hidden">
     <div class="tournament-shell">
@@ -3026,7 +3116,7 @@ const RECRUIT_MOTIVATIONS = [
   'Exposure','NIL Money','Development','Winning','Location',
   'Culture','Legacy','Teammates','Tradition','Support'
 ];
-const RECRUITING_CLASS_VERSION = 'freshman-recruits-4';
+const RECRUITING_CLASS_VERSION = 'freshman-recruits-5';
 
 /* ═══════════════════════════════════════════
    STATE
@@ -3895,6 +3985,7 @@ function ensureRecruitingClass() {
   if (!recruitingClass) {
     recruitingClass = generateRecruitingClass(namePool || getFallbackNamePool());
     saveRecruitingClass();
+    if (standingsState) { standingsState.cpuRecruitWeeks = {}; sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState)); }
   } else if (recruitingClass.some(recruit => !Array.isArray(recruit.cpuOffers))) {
     recruitingClass.forEach(recruit => { recruit.cpuOffers = []; });
     generateCPURecruitOffers(recruitingClass);
@@ -4069,8 +4160,9 @@ function getOfferValueScore(recruit, amount) {
 }
 
 function getRecruitTopCPUOffers(recruit) {
+  const recruits = recruitingClass || [];
   return (recruit.cpuOffers || [])
-    .slice()
+    .filter(o => getCPUTeamSignedCount(recruits, o.team, o.conf) < 6)
     .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
     .slice(0, 5);
 }
@@ -4089,7 +4181,7 @@ function addRecruitOfferInterest(recruit, percent) {
 function getFilteredRecruits(recruits) {
   return recruits.filter(recruit => {
     if (recruitingSignedFilter) return !!recruit.signed;
-    if (recruit.signed) return false;
+    if (recruit.signed || recruit.committedTo) return false;
     if (recruitingBookmarksFilter) return !!recruit.bookmarked;
     const matchesStars = recruitingStarFilter === 'all' || recruit.stars === Number(recruitingStarFilter);
     const matchesPosition = recruitingPositionFilter === 'all' || recruit.position === recruitingPositionFilter;
@@ -4120,10 +4212,70 @@ function renderRecruiting() {
   bmBtn.innerHTML = `<svg width="9" height="12" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg>${recruitingBookmarksFilter ? 'ALL RECRUITS' : `BOOKMARKS${bmCount ? ` (${bmCount})` : ''}`}`;
   const signedBtn = document.getElementById('recruiting-signed-btn');
   signedBtn.classList.toggle('active', recruitingSignedFilter);
-  signedBtn.textContent = recruitingSignedFilter ? 'ALL RECRUITS' : `SIGNED${signedCount ? ` (${signedCount})` : ''}`;
+  signedBtn.textContent = recruitingSignedFilter ? 'ALL RECRUITS' : `CLASS RANKINGS${signedCount ? ` (${signedCount})` : ''}`;
   document.getElementById('recruiting-nil-badge').textContent = `NIL ${formatDollars(getAvailableNILDollars())}`;
 
   const filters = document.getElementById('recruiting-filters');
+  const grid = document.getElementById('recruiting-grid');
+
+  if (recruitingSignedFilter) {
+    filters.innerHTML = '';
+    filters.style.display = 'none';
+
+    // Build star counts per team
+    const teamStars = {};
+    const addEntry = (key, team, conf, isPlayer) => {
+      if (!teamStars[key]) teamStars[key] = { team, conf, isPlayer, counts: {1:0,2:0,3:0,4:0,5:0} };
+    };
+    addEntry(`${selectedConf}::${selectedTeam}`, selectedTeam, selectedConf, true);
+    recruits.filter(r => r.signed).forEach(r => {
+      const key = `${selectedConf}::${selectedTeam}`;
+      addEntry(key, selectedTeam, selectedConf, true);
+      teamStars[key].counts[Number(r.stars) || 1]++;
+    });
+    recruits.filter(r => r.committedTo && !r.signed).forEach(r => {
+      const { team, conf } = r.committedTo;
+      const key = `${conf}::${team}`;
+      addEntry(key, team, conf, false);
+      teamStars[key].counts[Number(r.stars) || 1]++;
+    });
+
+    const classScore = counts => (counts[5]||0)*100 + (counts[4]||0)*25 + (counts[3]||0)*5 + (counts[2]||0)*1;
+    const totalCount = counts => [5,4,3,2,1].reduce((s,n) => s + (counts[n]||0), 0);
+    const ranked = Object.values(teamStars)
+      .map(t => ({ ...t, score: classScore(t.counts), total: totalCount(t.counts) }))
+      .sort((a, b) => b.score - a.score || b.total - a.total || a.team.localeCompare(b.team));
+
+    const cell = v => v > 0 ? `<div class="crt-star-cell">${v}</div>` : `<div class="crt-star-cell crt-zero">—</div>`;
+
+    grid.innerHTML = `
+      <div class="crt-row crt-header">
+        <div class="crt-rank-cell"></div>
+        <div class="crt-team-cell">TEAM</div>
+        <div class="crt-star-cell">5★</div>
+        <div class="crt-star-cell">4★</div>
+        <div class="crt-star-cell">3★</div>
+        <div class="crt-star-cell">2★</div>
+        <div class="crt-star-cell">1★</div>
+        <div class="crt-star-cell">TOT</div>
+      </div>
+      ${ranked.length > 1 || (ranked.length === 1 && ranked[0].total > 0) ? ranked.map((t, i) => `
+        <div class="crt-row${t.isPlayer ? ' crt-you' : ''}">
+          <div class="crt-rank-cell">#${i + 1}</div>
+          <div class="crt-team-cell">${escapeAttr(t.team)}</div>
+          ${cell(t.counts[5])}
+          ${cell(t.counts[4])}
+          ${cell(t.counts[3])}
+          ${cell(t.counts[2])}
+          ${cell(t.counts[1])}
+          <div class="crt-star-cell crt-total">${t.total}</div>
+        </div>
+      `).join('') : '<div class="crt-row"><span class="recruit-empty" style="grid-column:1/-1">NO CLASSES SIGNED YET</span></div>'}
+    `;
+    return;
+  }
+
+  filters.style.display = '';
   filters.innerHTML = `
     <div class="recruiting-filter-group">
       <span>STARS</span>
@@ -4142,7 +4294,6 @@ function renderRecruiting() {
     <div class="recruiting-filter-count">${filteredRecruits.length} / ${recruits.length} SHOWN</div>
   `;
 
-  const grid = document.getElementById('recruiting-grid');
   grid.innerHTML = `
     <div class="recruit-row header">
       <div>RANK</div><div>PLAYER</div><div>POS</div><div>OVR</div><div>POT</div><div>STARS</div><div></div>
@@ -4198,6 +4349,143 @@ function resetRecruitingHoursForNewGame() {
 
 function getRecruitingHoursRemaining() {
   return ensureRecruitingHoursState().remaining;
+}
+
+function getCPUTeamSignedCount(recruits, team, conf) {
+  return recruits.filter(r => r.committedTo && r.committedTo.team === team && r.committedTo.conf === conf).length;
+}
+
+function simulateCPURecruitingWeek(weekKey) {
+  ensureStandingsState();
+  if (!standingsState.cpuRecruitWeeks) standingsState.cpuRecruitWeeks = {};
+  if (standingsState.cpuRecruitWeeks[weekKey]) return;
+  standingsState.cpuRecruitWeeks[weekKey] = true;
+
+  const recruits = ensureRecruitingClass();
+  const rng = mulberry32(strHash(`cpu-recruit|${seasonNumber || 1}|${weekKey}`));
+
+  // Remove all offers from teams that have already filled their 6-player class
+  const fullTeamKeys = new Set();
+  Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
+    teamNames.forEach(team => {
+      if (getCPUTeamSignedCount(recruits, team, conf) >= 6) fullTeamKeys.add(`${conf}::${team}`);
+    });
+  });
+  if (fullTeamKeys.size > 0) {
+    recruits.forEach(r => {
+      if (!r.committedTo && !r.signed) {
+        r.cpuOffers = (r.cpuOffers || []).filter(o => !fullTeamKeys.has(`${o.conf}::${o.team}`));
+      }
+    });
+  }
+
+  const teams = [];
+  Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
+    teamNames.forEach(team => {
+      if (conf === selectedConf && team === selectedTeam) return;
+      const data = ((TEAM_DATA[conf] || {})[team] || {});
+      teams.push({ conf, team, prestige: Number(data.p) || 0, budget: Math.max(0, Math.round((Number(data.n) || 0) * 1000000)) });
+    });
+  });
+
+  teams.forEach(cpuTeam => {
+    let hoursLeft = 100;
+    const signedCount = getCPUTeamSignedCount(recruits, cpuTeam.team, cpuTeam.conf);
+    if (signedCount >= 6) return;
+    const slotsLeft = 6 - signedCount;
+    const minActiveOffers = Math.min(4, slotsLeft);
+
+    // Gather active offers, auto-pull offers for recruits already gone
+    const myOffers = [];
+    recruits.forEach(r => {
+      const offerIdx = (r.cpuOffers || []).findIndex(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+      if (offerIdx === -1) return;
+      if (r.committedTo || r.signed) {
+        r.cpuOffers.splice(offerIdx, 1);
+        return;
+      }
+      myOffers.push({ recruit: r, offer: r.cpuOffers[offerIdx] });
+    });
+
+    // Boost interest on existing offers
+    for (const { recruit, offer } of myOffers) {
+      if (hoursLeft < 5) break;
+      const boost = (3 + Math.floor(rng() * 6)) / 100;
+      offer.interest = Math.min(1.0, offer.interest + boost);
+      hoursLeft -= 5;
+      if (offer.interest >= 1.0 && !recruit.committedTo && !recruit.signed) {
+        if (getCPUTeamSignedCount(recruits, cpuTeam.team, cpuTeam.conf) < 6) {
+          recruit.committedTo = { team: cpuTeam.team, conf: cpuTeam.conf };
+        }
+      }
+    }
+
+    // Send new offers to maintain at least minActiveOffers (and fill up to 6 total)
+    const activeCount = myOffers.filter(x => !x.recruit.committedTo && !x.recruit.signed).length;
+    const wantMore = activeCount < minActiveOffers || (hoursLeft >= 5 && activeCount < Math.min(slotsLeft + 2, 6));
+    if (hoursLeft >= 5 && wantMore) {
+      const committedAmt = recruits.reduce((sum, r) => {
+        const o = (r.cpuOffers || []).find(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+        return sum + (o ? (Number(o.amount) || 0) : 0);
+      }, 0);
+      let remaining = Math.max(0, cpuTeam.budget - committedAmt);
+      const targeted = new Set(myOffers.map(x => x.recruit.id));
+      const needed = Math.max(minActiveOffers - activeCount, 1);
+      const candidates = recruits
+        .filter(r => !targeted.has(r.id) && !r.committedTo && !r.signed)
+        .map(r => ({ recruit: r, score: (Number(r.stars) || 1) * 100000 + rng() * 50000 + cpuTeam.prestige * 180 }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, needed + 2)
+        .map(x => x.recruit);
+
+      for (const recruit of candidates) {
+        if (hoursLeft < 5) break;
+        const fairValue = getRecruitFairValue(recruit);
+        const mult = 0.82 + rng() * 0.46;
+        const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
+        const amount = fairValue > 0 ? Math.min(desired, remaining) : 0;
+        if (fairValue > 0 && amount <= 0) continue;
+        remaining -= amount;
+        if (!recruit.cpuOffers) recruit.cpuOffers = [];
+        recruit.cpuOffers.push({ conf: cpuTeam.conf, team: cpuTeam.team, amount, interest: getCPUOfferInterest(cpuTeam, recruit, amount) });
+        hoursLeft -= 5;
+      }
+    }
+  });
+
+  recruits.forEach(recruit => {
+    recruit.cpuOffers = (recruit.cpuOffers || [])
+      .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
+      .slice(0, 12);
+  });
+
+  // Signing sweep: after game 20 recruits can sign, at game 30 all sign
+  if (currentGameIndex >= 20) {
+    const signRng = mulberry32(strHash(`cpu-sign|${seasonNumber || 1}|${weekKey}`));
+    const autoSign = currentGameIndex >= 30;
+    recruits.forEach(recruit => {
+      if (recruit.signed || recruit.committedTo) return;
+      const allOffers = [];
+      if (recruit.offer) allOffers.push({ isPlayer: true, interest: Math.min(1, Number(recruit.offer.valueScore) || 0) });
+      (recruit.cpuOffers || []).forEach(o => allOffers.push({ isPlayer: false, team: o.team, conf: o.conf, interest: Math.min(1, Number(o.interest) || 0) }));
+      if (!allOffers.length) return;
+      const best = allOffers.sort((a, b) => b.interest - a.interest)[0];
+      if (best.interest <= 0) return;
+      if (autoSign || signRng() < best.interest) {
+        if (best.isPlayer) {
+          recruit.signed = true;
+          recruit.bookmarked = true;
+        } else {
+          if (getCPUTeamSignedCount(recruits, best.team, best.conf) < 6) {
+            recruit.committedTo = { team: best.team, conf: best.conf };
+          }
+        }
+      }
+    });
+  }
+
+  saveRecruitingClass();
+  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
 }
 
 function spendRecruitingHours(n) {
@@ -4423,6 +4711,8 @@ function renderRecruitDetailCard(recruit) {
   const knownTopMotivations = getKnownTopMotivationCount(recruit);
   const canSoftSell = recruit.offer && !isSigned && knownTopMotivations >= 1 && hours >= 50;
   const canHardSell = recruit.offer && !isSigned && knownTopMotivations >= 2 && hours >= 75;
+  const currentWeekKey = getRecruitingWeekKey();
+  const offerLockedThisWeek = !!recruit.offer && !isSigned && recruit.offer.offerWeek === currentWeekKey;
   document.getElementById('recruit-detail-card').innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:14px;">
       <img class="recruit-headshot" src="${headshotSrc}" alt="">
@@ -4446,7 +4736,7 @@ function renderRecruitDetailCard(recruit) {
           <input id="recruit-offer-slider" class="recruit-offer-slider" type="range" min="0" max="${sliderMax}" step="${sliderStep}" value="${sliderValue}" oninput="updateRecruitOfferPreview(this.value)">
           <span class="recruit-offer-amount" id="recruit-offer-preview">${formatDollars(sliderValue)}</span>
         </div>
-        <button class="recruit-offer-btn" onclick="sendRecruitOffer('${recruit.id}')">${recruit.offer ? 'UPDATE OFFER' : 'SEND OFFER'}</button>
+        <button class="recruit-offer-btn" onclick="${offerLockedThisWeek ? 'void 0' : `sendRecruitOffer('${recruit.id}')`}"${offerLockedThisWeek ? ' disabled style="opacity:0.38;cursor:not-allowed"' : ''}>${recruit.offer ? (offerLockedThisWeek ? 'UPDATE LOCKED · NEXT WEEK' : 'UPDATE OFFER') : 'SEND OFFER'}</button>
       </div>`}
       <div class="recruit-motivations-body">
         <div class="recruit-motivations-list">
@@ -4466,6 +4756,14 @@ function renderRecruitDetailCard(recruit) {
         </div>
       </div>
     </div>
+    ${recruit.offer && !isSigned ? `<div class="recruit-top-offers">
+      <div class="recruit-motivations-label">YOUR OFFER</div>
+      <div class="recruit-top-offer-row">
+        <span class="recruit-top-offer-team">${escapeAttr(selectedTeam)}</span>
+        <span>${formatDollars(currentOffer)}</span>
+        <span class="recruit-top-offer-interest">${offerInterest}%</span>
+      </div>
+    </div>` : ''}
     ${topCPUOffers.length ? `<div class="recruit-top-offers">
       <div class="recruit-motivations-label">TOP OFFERS</div>
       ${topCPUOffers.map(offer => `
@@ -4479,6 +4777,68 @@ function renderRecruitDetailCard(recruit) {
     <div class="recruit-detail-actions">
       <button class="recruit-detail-close-btn" onclick="closeRecruitDetail()">CLOSE</button>
     </div>
+  `;
+}
+
+function openRecruitClassRankings() {
+  renderClassRankings();
+  document.getElementById('class-rankings-overlay').classList.remove('hidden');
+}
+
+function closeClassRankings() {
+  document.getElementById('class-rankings-overlay').classList.add('hidden');
+}
+
+function handleClassRankingsOverlayClick(e) {
+  if (e.target === document.getElementById('class-rankings-overlay')) closeClassRankings();
+}
+
+function getRecruitClassScore(starCounts) {
+  return (starCounts[5] || 0) * 100 + (starCounts[4] || 0) * 25 + (starCounts[3] || 0) * 5 + (starCounts[2] || 0) * 1;
+}
+
+function renderClassRankings() {
+  const recruits = ensureRecruitingClass();
+  const teamStars = {};
+
+  // Player's signed recruits
+  recruits.filter(r => r.signed).forEach(r => {
+    const key = `${selectedConf}::${selectedTeam}`;
+    if (!teamStars[key]) teamStars[key] = { conf: selectedConf, team: selectedTeam, counts: {}, isPlayer: true };
+    const s = Number(r.stars) || 1;
+    teamStars[key].counts[s] = (teamStars[key].counts[s] || 0) + 1;
+  });
+
+  // CPU committed recruits
+  recruits.filter(r => r.committedTo && !r.signed).forEach(r => {
+    const { team, conf } = r.committedTo;
+    const key = `${conf}::${team}`;
+    if (!teamStars[key]) teamStars[key] = { conf, team, counts: {}, isPlayer: false };
+    const s = Number(r.stars) || 1;
+    teamStars[key].counts[s] = (teamStars[key].counts[s] || 0) + 1;
+  });
+
+  const ranked = Object.values(teamStars)
+    .map(t => ({ ...t, score: getRecruitClassScore(t.counts), total: Object.values(t.counts).reduce((a, b) => a + b, 0) }))
+    .sort((a, b) => b.score - a.score || b.total - a.total || a.team.localeCompare(b.team));
+
+  const starBreakdown = counts => [5,4,3,2,1]
+    .filter(s => counts[s])
+    .map(s => `${s}★×${counts[s]}`)
+    .join('  ');
+
+  document.getElementById('class-rankings-card').innerHTML = `
+    <div class="class-rankings-head">
+      <div class="recruit-motivations-label">CLASS RANKINGS</div>
+      <button class="recruit-detail-close-btn" style="padding:5px 10px" onclick="closeClassRankings()">CLOSE</button>
+    </div>
+    ${ranked.length ? ranked.map((t, i) => `
+      <div class="class-rankings-row${t.isPlayer ? ' you' : ''}">
+        <div class="class-rankings-rank">#${i + 1}</div>
+        <div class="class-rankings-team">${escapeAttr(t.team)}${t.isPlayer ? ' ◄' : ''}</div>
+        <div class="class-rankings-stars">${starBreakdown(t.counts)}</div>
+      </div>
+    `).join('') : '<div class="class-rankings-row"><span style="color:rgba(237,224,184,0.38);grid-column:1/-1">NO SIGNED RECRUITS YET</span></div>'}
   `;
 }
 
@@ -4515,6 +4875,8 @@ function sendRecruitOffer(recruitId) {
   const recruits = ensureRecruitingClass();
   const recruit = recruits.find(r => r.id === recruitId);
   if (!recruit || recruit.signed) return;
+  const weekKey = getRecruitingWeekKey();
+  if (recruit.offer && recruit.offer.offerWeek === weekKey) return;
   const currentOffer = recruit.offer ? Math.max(0, Math.round(Number(recruit.offer.amount) || 0)) : 0;
   const fairValue = getRecruitFairValue(recruit);
   const maxOffer = getAvailableNILDollars(currentOffer);
@@ -4529,7 +4891,8 @@ function sendRecruitOffer(recruitId) {
   recruit.offer = {
     amount,
     fairValue,
-    valueScore
+    valueScore,
+    offerWeek: weekKey
   };
   if (valueScore >= 1) recruit.signed = true;
   saveRecruitingClass();

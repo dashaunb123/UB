@@ -539,6 +539,7 @@ function simulateRemainderWeekGames(scheduleGame) {
   standingsState.weeksSimmed[weekKey] = count;
   sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
   saveLeagueSchedule();
+  if (typeof simulateCPURecruitingWeek === 'function') simulateCPURecruitingWeek(weekKey);
   return count;
 }
 
