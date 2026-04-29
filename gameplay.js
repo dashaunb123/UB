@@ -86,7 +86,7 @@ function createGameState(scheduleGame) {
     userSide,
     opponentSide,
     period:1,
-    clock:12 * 60,
+    clock:15 * 60,
     scores:{ home:0, away:0 },
     teams:{},
     feed:[],
@@ -117,7 +117,7 @@ function createLeagueGameState(leagueGame, rng = Math.random) {
     userSide:null,
     opponentSide:null,
     period:1,
-    clock:12 * 60,
+    clock:15 * 60,
     scores:{ home:0, away:0 },
     teams:{},
     feed:[],
@@ -143,7 +143,7 @@ function createTournamentGameState(teamA, teamB, rng = Math.random) {
     userSide:null,
     opponentSide:null,
     period:1,
-    clock:12 * 60,
+    clock:15 * 60,
     scores:{ home:0, away:0 },
     teams:{},
     feed:[],
@@ -404,14 +404,14 @@ function chooseRebounder(team) {
 }
 
 function advanceGamePeriod(state) {
-  if (state.period >= 4 && state.scores.home !== state.scores.away) {
+  if (state.period >= 2 && state.scores.home !== state.scores.away) {
     finishGame(state);
     return;
   }
   state.period++;
-  state.clock = state.period <= 4 ? 12 * 60 : 5 * 60;
-  if (state.period === 5) addGameFeed(state, 'Regulation ends tied. Overtime begins.');
-  else if (state.period > 5) addGameFeed(state, `Still tied. OT${state.period - 4} begins.`);
+  state.clock = state.period <= 2 ? 15 * 60 : 5 * 60;
+  if (state.period === 3) addGameFeed(state, 'Regulation ends tied. Overtime begins.');
+  else if (state.period > 3) addGameFeed(state, `Still tied. OT${state.period - 2} begins.`);
   else addGameFeed(state, `End of period. ${getPeriodLabel(state.period)} begins.`);
 }
 
@@ -650,7 +650,7 @@ function showBoxScore() {
 function renderBoxScore() {
   const box = lastBoxScore;
   document.getElementById('box-title').textContent = 'BOX SCORE';
-  document.getElementById('box-summary').textContent = `${box.awayTeam} ${box.awayScore} - ${box.homeTeam} ${box.homeScore}${box.periods > 4 ? ` (${box.periods - 4}OT)` : ''}`;
+  document.getElementById('box-summary').textContent = `${box.awayTeam} ${box.awayScore} - ${box.homeTeam} ${box.homeScore}${box.periods > 2 ? ` (${box.periods - 2}OT)` : ''}`;
   document.getElementById('box-grid').innerHTML =
     renderBoxTeam(box.awayTeam, box.teams.away) +
     renderBoxTeam(box.homeTeam, box.teams.home);
@@ -677,7 +677,7 @@ function renderBoxTeam(teamName, players) {
 }
 
 function getPeriodLabel(period) {
-  return period <= 4 ? `Q${period}` : `OT${period - 4}`;
+  return period <= 2 ? `H${period}` : `OT${period - 2}`;
 }
 
 function formatClock(seconds) {

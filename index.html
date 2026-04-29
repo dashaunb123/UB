@@ -2093,6 +2093,168 @@
       padding:14px 18px 16px;
       overflow:hidden;
     }
+    .departures-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .departures-screen::-webkit-scrollbar { display:none; }
+    .departures-shell {
+      width:100%;
+      max-width:860px;
+      display:grid;
+      gap:18px;
+    }
+    .departures-title {
+      color:#ede0b8;
+      font-size:clamp(14px,2.4vw,26px);
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .departures-subtitle {
+      color:rgba(237,224,184,0.5);
+      font-size:clamp(6px,0.78vw,8px);
+      margin-top:-8px;
+    }
+    .departures-section-label {
+      color:rgba(192,138,24,0.9);
+      font-size:clamp(6px,0.72vw,8px);
+      letter-spacing:1px;
+      border-bottom:2px solid rgba(192,138,24,0.22);
+      padding-bottom:6px;
+      margin-bottom:4px;
+    }
+    .departure-row {
+      display:grid;
+      grid-template-columns:1.4fr .45fr .45fr 1fr;
+      gap:8px;
+      align-items:center;
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(22,18,9,0.28);
+      padding:9px 10px;
+      color:rgba(237,224,184,0.72);
+      font-size:clamp(5px,0.72vw,8px);
+    }
+    .departure-row .dep-reason {
+      color:rgba(168,36,24,0.9);
+    }
+    .departures-continue-btn {
+      border:2px solid #c08a18;
+      background:rgba(22,18,9,0.56);
+      color:#ede0b8;
+      padding:12px 20px;
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(6px,0.76vw,9px);
+      cursor:pointer;
+      box-shadow:4px 4px 0 #350a04;
+      justify-self:start;
+      margin-top:4px;
+    }
+    .departures-continue-btn:hover,
+    .departures-continue-btn:focus-visible {
+      background:#a82418;
+      border-color:#ede0b8;
+      outline:none;
+    }
+    .tournament-continue-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.64vw,7px);
+      color:#ede0b8;
+      background:rgba(192,138,24,0.35);
+      border:2px solid #c08a18;
+      padding:8px 12px;
+      cursor:pointer;
+      letter-spacing:1px;
+      text-shadow:1px 1px 0 #350a04;
+      box-shadow:3px 3px 0 #350a04;
+    }
+    .tournament-continue-btn:hover,
+    .tournament-continue-btn:focus-visible {
+      background:#c08a18;
+      border-color:#ede0b8;
+      outline:none;
+    }
+    .portal-body {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 280px;
+      gap:14px;
+      align-items:start;
+    }
+    .portal-main {
+      display:grid;
+      gap:14px;
+      min-width:0;
+    }
+    .portal-roster-panel {
+      border:2px solid rgba(192,138,24,0.32);
+      background:rgba(22,18,9,0.4);
+      padding:14px;
+      position:sticky;
+      top:14px;
+    }
+    .portal-roster-title {
+      color:#c08a18;
+      font-size:clamp(7px,0.86vw,9px);
+      letter-spacing:1px;
+      border-bottom:2px solid rgba(192,138,24,0.22);
+      padding-bottom:8px;
+      margin-bottom:10px;
+    }
+    .portal-roster-pos-block {
+      margin-bottom:12px;
+    }
+    .portal-roster-pos-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color:#ede0b8;
+      font-size:clamp(6px,0.78vw,8px);
+      letter-spacing:1px;
+      margin-bottom:4px;
+    }
+    .portal-roster-pos-header.needs .pos-count {
+      color:#a82418;
+    }
+    .portal-roster-pos-header .pos-need-tag {
+      color:#a82418;
+      font-size:clamp(4px,0.55vw,6px);
+      letter-spacing:1px;
+    }
+    .portal-roster-row {
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:6px;
+      font-size:clamp(5px,0.7vw,7px);
+      color:rgba(237,224,184,0.72);
+      padding:3px 6px;
+      border-left:2px solid transparent;
+    }
+    .portal-roster-row .pr-name {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .portal-roster-row .pr-ovr {
+      color:#ede0b8;
+    }
+    .portal-roster-row.incoming {
+      color:#c08a18;
+      border-left-color:#c08a18;
+    }
+    .portal-roster-row.incoming .pr-ovr {
+      color:#c08a18;
+    }
+    .portal-roster-empty {
+      color:rgba(168,36,24,0.7);
+      font-size:clamp(4px,0.6vw,6px);
+      padding:3px 6px;
+      letter-spacing:1px;
+    }
+    @media (max-width: 900px) {
+      .portal-body { grid-template-columns:minmax(0,1fr); }
+      .portal-roster-panel { position:static; }
+    }
     .tournament-shell {
       width:100%;
       height:100%;
@@ -2882,9 +3044,53 @@
       <div class="tournament-actions">
         <button class="tournament-action-btn" type="button" onclick="simulateTournamentRound()">SIMULATE ROUND</button>
         <button class="tournament-action-btn" type="button" onclick="simulateTournament()">SIMULATE TOURNAMENT</button>
+        <button class="tournament-continue-btn" id="tournament-continue-btn" type="button" onclick="goToDepartures()" style="display:none;">► CONTINUE</button>
       </div>
       <div class="bracket-board" id="bracket-board"></div>
     </div>
+  </div>
+
+  <!-- DEPARTURES -->
+  <div id="departures-screen" class="screen-panel departures-screen hidden">
+    <div class="departures-shell">
+      <div class="departures-title">TEAM DEPARTURES</div>
+      <div class="departures-subtitle" id="departures-subtitle"></div>
+      <div id="departures-list"></div>
+      <button class="departures-continue-btn" type="button" onclick="goToTransferPortal()">► TRANSFER PORTAL</button>
+    </div>
+  </div>
+
+  <!-- TRANSFER PORTAL -->
+  <div id="portal-screen" class="screen-panel recruiting-screen hidden">
+    <div class="recruiting-shell">
+      <div class="portal-body">
+        <div class="portal-main">
+          <div class="recruiting-top">
+            <div>
+              <div class="roster-title">TRANSFER PORTAL</div>
+              <div class="recruiting-subtitle" id="portal-subtitle"></div>
+              <button id="portal-bookmarks-btn" class="recruit-bookmarks-toggle" onclick="togglePortalBookmarksFilter()"></button>
+              <button id="portal-signed-btn" class="recruit-bookmarks-toggle" onclick="togglePortalSignedFilter()"></button>
+            </div>
+            <div class="recruit-header-badges">
+              <div class="recruit-hours-badge" id="portal-week-badge"></div>
+              <div class="recruit-hours-badge" id="portal-nil-badge"></div>
+              <div class="recruit-hours-badge" id="portal-hours-badge"></div>
+              <button class="departures-continue-btn" id="portal-next-week-btn" type="button" onclick="advancePortalWeek()" style="margin:0;">► NEXT WEEK</button>
+              <button class="departures-continue-btn" id="portal-next-season-btn" type="button" onclick="finishPortalGoDashboard()" style="margin:0;display:none;">► NEXT SEASON</button>
+            </div>
+          </div>
+          <div class="recruiting-filters" id="portal-filters"></div>
+          <div class="recruiting-grid" id="portal-grid"></div>
+        </div>
+        <div class="portal-roster-panel" id="portal-roster-panel"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PORTAL DETAIL OVERLAY -->
+  <div id="portal-detail-overlay" class="recruit-detail-overlay hidden" onclick="handlePortalOverlayClick(event)">
+    <div id="portal-detail-card" class="recruit-detail-card"></div>
   </div>
 
   <!-- ROSTER -->
@@ -2952,8 +3158,8 @@
           <span class="game-team-score" id="game-away-score">0</span>
         </div>
         <div class="game-clock">
-          <span id="game-period-label">Q1</span>
-          <strong id="game-clock-label">12:00</strong>
+          <span id="game-period-label">H1</span>
+          <strong id="game-clock-label">15:00</strong>
           <span id="game-status-label">SIMULATING</span>
         </div>
         <div class="game-team">
@@ -3152,6 +3358,15 @@ let recruitingHoursState = null;
 let recruitingRunId = sessionStorage.getItem('recruitingRunId') || '';
 let tournamentState = null;
 let tournamentSimInProgress = false;
+let transferPortal = [];
+let portalStarFilter = 'all';
+let portalPositionFilter = 'all';
+let portalBookmarksFilter = false;
+let portalSignedFilter = false;
+let portalWeek = 1;
+let portalHoursState = null;
+const PORTAL_TOTAL_WEEKS = 5;
+const PORTAL_ROSTER_CAP = 13;
 let statsMode = 'team';
 let statsSelectedConf = null;
 let statsSelectedTeam = null;
@@ -3415,6 +3630,8 @@ function renderTournamentBracket() {
   const board = document.getElementById('bracket-board');
   if (!board) return;
   if (!tournamentState) tournamentState = buildTournamentState();
+  const continueBtn = document.getElementById('tournament-continue-btn');
+  if (continueBtn) continueBtn.style.display = tournamentState.champion ? 'inline-block' : 'none';
   board.innerHTML = `
     <div class="bracket-side left">
       ${[0, 2].map(i => `
@@ -3621,6 +3838,892 @@ function advanceTournamentWinner(item, winner) {
   }
   const nextGame = region.rounds[roundIndex + 1][Math.floor(gameIndex / 2)];
   nextGame.teams[gameIndex % 2] = winner;
+}
+
+function processSeasonDepartures() {
+  const userDeparting = [];
+  transferPortal = [];
+  if (!allRosters) return userDeparting;
+
+  let portalId = 0;
+
+  for (const conf of Object.keys(allRosters)) {
+    for (const team of Object.keys(allRosters[conf])) {
+      const entry = allRosters[conf][team];
+      const roster = getRosterFromEntry(entry);
+      const isUserTeam = team === selectedTeam && conf === selectedConf;
+
+      const teamEntry = getTeamStandingEntry(team);
+      const wins = teamEntry ? (teamEntry.wins || 0) : 0;
+      const losses = teamEntry ? (teamEntry.losses || 0) : 0;
+      const total = wins + losses;
+      const winPct = total > 0 ? wins / total : 0;
+
+      // Pass 1: remove draft/graduates
+      const afterFirst = [];
+      for (const player of roster) {
+        const isDraftEligible = player.overall >= 90;
+        const isGraduating = player.grade === 'Senior';
+        if (isDraftEligible || isGraduating) {
+          if (isUserTeam) userDeparting.push({ ...player, reason: isDraftEligible ? 'DRAFT' : 'GRADUATED' });
+        } else {
+          afterFirst.push(player);
+        }
+      }
+
+      // Pass 2: transfers
+      const bestByPos = {};
+      afterFirst.forEach(p => {
+        if (!bestByPos[p.position] || p.overall > bestByPos[p.position]) bestByPos[p.position] = p.overall;
+      });
+
+      const finalRoster = [];
+      for (const player of afterFirst) {
+        const isTopAtPos = player.overall >= bestByPos[player.position];
+        const transferChance = isTopAtPos ? Math.min(0.5, 1 - winPct) : 0.9;
+        if (Math.random() < transferChance) {
+          transferPortal.push({
+            ...player,
+            portalId: `portal-${portalId++}`,
+            fromTeam: team,
+            fromConf: conf,
+            stars: overallToStars(player.overall),
+            overallRevealed: true,
+            potentialRevealed: false,
+            cpuOffers: [],
+            ...pickMotivations(),
+            guessedMotivations: {}
+          });
+          if (isUserTeam) userDeparting.push({ ...player, reason: 'TRANSFER' });
+        } else {
+          finalRoster.push(player);
+        }
+      }
+
+      if (Array.isArray(entry)) {
+        allRosters[conf][team] = finalRoster;
+      } else {
+        entry.roster = finalRoster;
+      }
+    }
+  }
+  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+  portalWeek = 1;
+  portalHoursState = null;
+  generateCPUPortalOffers();
+  savePortalState();
+  return userDeparting;
+}
+
+function goToDepartures() {
+  const departing = processSeasonDepartures();
+  const subtitle = document.getElementById('departures-subtitle');
+  const list = document.getElementById('departures-list');
+  if (subtitle) subtitle.textContent = `${selectedTeam} — END OF SEASON ROSTER CHANGES`;
+
+  const draft = departing.filter(p => p.reason === 'DRAFT');
+  const grads = departing.filter(p => p.reason === 'GRADUATED');
+  const transfers = departing.filter(p => p.reason === 'TRANSFER');
+
+  let html = '';
+  const makeRows = (players) => players.map(p => `
+    <div class="departure-row">
+      <div><strong>${escapeAttr(p.name)}</strong></div>
+      <div>${p.position}</div>
+      <div>${p.overall}</div>
+      <div class="dep-reason">${p.reason}</div>
+    </div>
+  `).join('');
+
+  if (draft.length) {
+    html += `<div class="departures-section-label">ENTERING THE DRAFT</div>${makeRows(draft)}`;
+  }
+  if (grads.length) {
+    html += `<div class="departures-section-label" style="margin-top:14px;">GRADUATING SENIORS</div>${makeRows(grads)}`;
+  }
+  if (transfers.length) {
+    html += `<div class="departures-section-label" style="margin-top:14px;">TRANSFERRING</div>${makeRows(transfers)}`;
+  }
+  if (!departing.length) {
+    html = `<div style="color:rgba(237,224,184,0.4);font-size:clamp(6px,0.72vw,8px);">NO DEPARTURES THIS SEASON.</div>`;
+  }
+
+  if (list) list.innerHTML = html;
+  flash(() => showPanel('departures'));
+}
+
+function goToTransferPortal() {
+  if (!transferPortal.length) loadPortalState();
+  portalStarFilter = 'all';
+  portalPositionFilter = 'all';
+  portalBookmarksFilter = false;
+  portalSignedFilter = false;
+  renderTransferPortal();
+  flash(() => showPanel('portal'));
+}
+
+function getFilteredPortal() {
+  return transferPortal.filter(p => {
+    if (portalBookmarksFilter) return !!p.bookmarked;
+    const matchesStar = portalStarFilter === 'all' || p.stars === Number(portalStarFilter);
+    const matchesPos = portalPositionFilter === 'all' || p.position === portalPositionFilter;
+    return matchesStar && matchesPos;
+  });
+}
+
+function togglePortalBookmarksFilter() {
+  portalBookmarksFilter = !portalBookmarksFilter;
+  if (portalBookmarksFilter) portalSignedFilter = false;
+  renderTransferPortal();
+}
+
+function togglePortalSignedFilter() {
+  portalSignedFilter = !portalSignedFilter;
+  if (portalSignedFilter) portalBookmarksFilter = false;
+  renderTransferPortal();
+}
+
+function togglePortalBookmark(portalId, fromDetail) {
+  const player = transferPortal.find(p => p.portalId === portalId);
+  if (!player || player.signed) return;
+  player.bookmarked = !player.bookmarked;
+  if (!player.bookmarked && player.offer) delete player.offer;
+  savePortalState();
+  renderTransferPortal();
+  if (fromDetail) renderPortalDetailCard(player);
+}
+
+function updatePortalStarFilter(val) {
+  portalStarFilter = val === 'all' ? 'all' : String(Number(val));
+  renderTransferPortal();
+}
+
+function updatePortalPositionFilter(val) {
+  portalPositionFilter = ['PG','SG','SF','PF','C'].includes(val) ? val : 'all';
+  renderTransferPortal();
+}
+
+function renderPortalRoster() {
+  const panel = document.getElementById('portal-roster-panel');
+  if (!panel) return;
+  const baseRoster = getTeamRoster(selectedConf, selectedTeam) || [];
+  const incoming = transferPortal.filter(p => p.signed);
+  const positions = ['PG','SG','SF','PF','C'];
+  const groups = {};
+  positions.forEach(pos => { groups[pos] = { current: [], incoming: [] }; });
+  baseRoster.forEach(p => {
+    if (groups[p.position]) groups[p.position].current.push(p);
+  });
+  incoming.forEach(p => {
+    if (groups[p.position]) groups[p.position].incoming.push(p);
+  });
+
+  const blocks = positions.map(pos => {
+    const cur = [...groups[pos].current].sort((a,b) => b.overall - a.overall);
+    const inc = [...groups[pos].incoming].sort((a,b) => b.overall - a.overall);
+    const total = cur.length + inc.length;
+    const isNeed = total < 2;
+    const rows = [];
+    cur.forEach(p => {
+      rows.push(`<div class="portal-roster-row"><span class="pr-name">${escapeAttr(p.name)}</span><span class="pr-ovr">${p.overall}</span></div>`);
+    });
+    inc.forEach(p => {
+      rows.push(`<div class="portal-roster-row incoming"><span class="pr-name">+ ${escapeAttr(p.name)}</span><span class="pr-ovr">${p.overall}</span></div>`);
+    });
+    if (!rows.length) rows.push('<div class="portal-roster-empty">EMPTY</div>');
+    return `
+      <div class="portal-roster-pos-block">
+        <div class="portal-roster-pos-header${isNeed ? ' needs' : ''}">
+          <span>${pos} <span class="pos-count">(${total})</span></span>
+          ${isNeed ? '<span class="pos-need-tag">NEED</span>' : ''}
+        </div>
+        ${rows.join('')}
+      </div>
+    `;
+  }).join('');
+
+  panel.innerHTML = `<div class="portal-roster-title">MY ROSTER</div>${blocks}`;
+}
+
+function renderTransferPortal() {
+  const remainingCount = transferPortal.filter(p => !p.signed && !p.committedTo).length;
+  const subtitle = document.getElementById('portal-subtitle');
+  if (subtitle) subtitle.textContent = `${remainingCount} AVAILABLE / ${transferPortal.length} TOTAL`;
+  renderPortalRoster();
+
+  const weekBadge = document.getElementById('portal-week-badge');
+  if (weekBadge) weekBadge.textContent = portalWeek > PORTAL_TOTAL_WEEKS ? 'PORTAL CLOSED' : `WEEK ${portalWeek} / ${PORTAL_TOTAL_WEEKS}`;
+  const hoursBadge = document.getElementById('portal-hours-badge');
+  if (hoursBadge) hoursBadge.textContent = `${getPortalHoursRemaining()} / 100 HRS`;
+  const nilBadge = document.getElementById('portal-nil-badge');
+  if (nilBadge) nilBadge.textContent = `NIL ${formatDollars(getAvailableNILDollars())}`;
+
+  const nextWeekBtn = document.getElementById('portal-next-week-btn');
+  const nextSeasonBtn = document.getElementById('portal-next-season-btn');
+  const portalDone = portalWeek > PORTAL_TOTAL_WEEKS;
+  if (nextWeekBtn) nextWeekBtn.style.display = portalDone ? 'none' : 'inline-block';
+  if (nextSeasonBtn) nextSeasonBtn.style.display = portalDone ? 'inline-block' : 'none';
+
+  const bmCount = transferPortal.filter(p => p.bookmarked).length;
+  const signedCount = transferPortal.filter(p => p.signed).length;
+  const bmBtn = document.getElementById('portal-bookmarks-btn');
+  if (bmBtn) {
+    bmBtn.classList.toggle('active', portalBookmarksFilter);
+    bmBtn.innerHTML = `<svg width="9" height="12" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg>${portalBookmarksFilter ? 'ALL TRANSFERS' : `BOOKMARKS${bmCount ? ` (${bmCount})` : ''}`}`;
+  }
+  const signedBtn = document.getElementById('portal-signed-btn');
+  if (signedBtn) {
+    signedBtn.classList.toggle('active', portalSignedFilter);
+    signedBtn.textContent = portalSignedFilter ? 'ALL TRANSFERS' : `CLASS RANKINGS${signedCount ? ` (${signedCount})` : ''}`;
+  }
+
+  const filters = document.getElementById('portal-filters');
+  const grid = document.getElementById('portal-grid');
+
+  if (portalSignedFilter) {
+    filters.innerHTML = '';
+    filters.style.display = 'none';
+
+    const teamStars = {};
+    const addEntry = (key, team, conf, isPlayer) => {
+      if (!teamStars[key]) teamStars[key] = { team, conf, isPlayer, counts: {1:0,2:0,3:0,4:0,5:0} };
+    };
+    addEntry(`${selectedConf}::${selectedTeam}`, selectedTeam, selectedConf, true);
+    transferPortal.filter(p => p.signed).forEach(p => {
+      const key = `${selectedConf}::${selectedTeam}`;
+      addEntry(key, selectedTeam, selectedConf, true);
+      teamStars[key].counts[Number(p.stars) || 1]++;
+    });
+    transferPortal.filter(p => p.committedTo && !p.signed).forEach(p => {
+      const { team, conf } = p.committedTo;
+      const key = `${conf}::${team}`;
+      addEntry(key, team, conf, false);
+      teamStars[key].counts[Number(p.stars) || 1]++;
+    });
+
+    const classScore = counts => (counts[5]||0)*100 + (counts[4]||0)*25 + (counts[3]||0)*5 + (counts[2]||0)*1;
+    const totalCount = counts => [5,4,3,2,1].reduce((s,n) => s + (counts[n]||0), 0);
+    const ranked = Object.values(teamStars)
+      .map(t => ({ ...t, score: classScore(t.counts), total: totalCount(t.counts) }))
+      .sort((a, b) => b.score - a.score || b.total - a.total || a.team.localeCompare(b.team));
+
+    const cell = v => v > 0 ? `<div class="crt-star-cell">${v}</div>` : `<div class="crt-star-cell crt-zero">—</div>`;
+
+    grid.innerHTML = `
+      <div class="crt-row crt-header">
+        <div class="crt-rank-cell"></div>
+        <div class="crt-team-cell">TEAM</div>
+        <div class="crt-star-cell">5★</div>
+        <div class="crt-star-cell">4★</div>
+        <div class="crt-star-cell">3★</div>
+        <div class="crt-star-cell">2★</div>
+        <div class="crt-star-cell">1★</div>
+        <div class="crt-star-cell">TOT</div>
+      </div>
+      ${ranked.length > 1 || (ranked.length === 1 && ranked[0].total > 0) ? ranked.map((t, i) => `
+        <div class="crt-row${t.isPlayer ? ' crt-you' : ''}">
+          <div class="crt-rank-cell">#${i + 1}</div>
+          <div class="crt-team-cell">${escapeAttr(t.team)}</div>
+          ${cell(t.counts[5])}
+          ${cell(t.counts[4])}
+          ${cell(t.counts[3])}
+          ${cell(t.counts[2])}
+          ${cell(t.counts[1])}
+          <div class="crt-star-cell crt-total">${t.total}</div>
+        </div>
+      `).join('') : '<div class="crt-row"><span class="recruit-empty" style="grid-column:1/-1">NO TRANSFERS SIGNED YET</span></div>'}
+    `;
+    return;
+  }
+
+  filters.style.display = '';
+  const filtered = getFilteredPortal();
+  const sorted = [...filtered].sort((a, b) => b.overall - a.overall);
+
+  filters.innerHTML = `
+    <div class="recruiting-filter-group">
+      <span>STARS</span>
+      <select class="recruit-filter-select" onchange="updatePortalStarFilter(this.value)">
+        <option value="all"${portalStarFilter === 'all' ? ' selected' : ''}>ALL</option>
+        ${[5,4,3,2,1].map(s => `<option value="${s}"${portalStarFilter === String(s) ? ' selected' : ''}>${s} STAR</option>`).join('')}
+      </select>
+    </div>
+    <div class="recruiting-filter-group">
+      <span>POSITION</span>
+      <select class="recruit-filter-select" onchange="updatePortalPositionFilter(this.value)">
+        <option value="all"${portalPositionFilter === 'all' ? ' selected' : ''}>ALL</option>
+        ${['PG','SG','SF','PF','C'].map(pos => `<option value="${pos}"${portalPositionFilter === pos ? ' selected' : ''}>${pos}</option>`).join('')}
+      </select>
+    </div>
+    <div class="recruiting-filter-count">${sorted.length} / ${transferPortal.length} SHOWN</div>
+  `;
+
+  grid.innerHTML = `
+    <div class="recruit-row header">
+      <div>RANK</div><div>PLAYER</div><div>POS</div><div>OVR</div><div>POT</div><div>STARS</div><div></div>
+    </div>
+    ${sorted.length ? sorted.map((p, i) => {
+      const status = p.signed ? ' <span style="color:#c08a18">· SIGNED</span>' : (p.committedTo ? ` <span style="color:rgba(237,224,184,0.4)">· → ${escapeAttr(p.committedTo.team)}</span>` : '');
+      return `
+      <div class="recruit-row" onclick="openPortalDetail('${p.portalId}')">
+        <div>#${i + 1}</div>
+        <div><strong>${escapeAttr(p.name)}</strong>${status}<br><span class="recruit-home">${escapeAttr(p.fromTeam)}</span></div>
+        <div>${p.position}</div>
+        <div>${p.overall}</div>
+        <div>${p.potentialRevealed ? p.potential : '?'}</div>
+        <div class="recruit-stars">${getStarText(p.stars)}</div>
+        <button class="recruit-bookmark-btn${p.bookmarked ? ' bookmarked' : ''}" onclick="event.stopPropagation();togglePortalBookmark('${p.portalId}')" title="${p.bookmarked ? 'Remove bookmark' : 'Bookmark'}"${p.signed ? ' disabled style="opacity:0.4;cursor:not-allowed"' : ''}><svg width="11" height="15" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg></button>
+      </div>
+    `;}).join('') : '<div class="recruit-row"><span class="recruit-empty">NO PLAYERS MATCH THESE FILTERS</span></div>'}
+  `;
+}
+
+function openPortalDetail(portalId) {
+  const player = transferPortal.find(p => p.portalId === portalId);
+  if (!player) return;
+  renderPortalDetailCard(player);
+  document.getElementById('portal-detail-overlay').classList.remove('hidden');
+}
+
+function renderPortalDetailCard(player) {
+  const hours = getPortalHoursRemaining();
+  const potRevealed = !!player.potentialRevealed;
+  const headshotSrc = generateRecruitHeadshot(player.portalId);
+  const fairValue = getPortalFairValue(player);
+  const currentOffer = player.offer ? Math.max(0, Math.round(Number(player.offer.amount) || 0)) : 0;
+  const availableNIL = getAvailableNILDollars(currentOffer);
+  const sliderMax = Math.max(availableNIL, fairValue, currentOffer, 1000);
+  const sliderStep = sliderMax >= 1000000 ? 50000 : sliderMax >= 100000 ? 10000 : 1000;
+  const sliderValue = currentOffer || Math.min(fairValue, sliderMax);
+  const offerInterest = player.offer ? Math.min(100, Math.round((Number(player.offer.valueScore) || 0) * 100)) : null;
+  const isSigned = !!player.signed;
+  const isCommitted = !!player.committedTo;
+  const topCPUOffers = getPortalTopCPUOffers(player);
+  const knownTops = getPortalKnownTopMotivationCount(player);
+  const canSoftSell = player.offer && !isSigned && knownTops >= 1 && hours >= 50;
+  const canHardSell = player.offer && !isSigned && knownTops >= 2 && hours >= 75;
+  const offerLockedThisWeek = !!player.offer && !isSigned && player.offer.offerWeek === getPortalWeekKey();
+  const sa = isSigned || isCommitted ? null : getNextPortalScoutAction(player, hours);
+
+  document.getElementById('portal-detail-card').innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:14px;">
+      <img class="recruit-headshot" src="${headshotSrc}" alt="">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+          <div class="recruit-detail-name">${escapeAttr(player.name)}</div>
+          <button class="recruit-detail-bookmark-btn${player.bookmarked ? ' bookmarked' : ''}" onclick="togglePortalBookmark('${player.portalId}', true)" title="${player.bookmarked ? 'Remove bookmark' : 'Bookmark'}"${isSigned ? ' disabled style="opacity:0.4;cursor:not-allowed"' : ''}><svg width="16" height="21" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg></button>
+        </div>
+        <div class="recruit-detail-sub">${player.position} &middot; ${escapeAttr(player.hometown)}, ${escapeAttr(player.homeState)} &middot; FROM ${escapeAttr(player.fromTeam)}</div>
+        <div class="recruit-detail-stars">${getStarText(player.stars)}</div>
+        <div class="recruit-quick-ratings">
+          <div class="recruit-quick-rating"><span>OVR</span><span>${player.overall}</span></div>
+          <div class="recruit-quick-rating"><span>POT</span><span class="${potRevealed ? '' : 'unknown'}">${potRevealed ? player.potential : '???'}</span></div>
+          ${sa ? `<button class="recruit-scout-btn" onclick="${sa.canAfford ? `portalScout('${player.portalId}')` : 'void 0'}"${sa.canAfford ? '' : ' disabled'} style="margin-left:auto${sa.canAfford ? '' : ';opacity:0.38;cursor:not-allowed'}">🥽 SCOUT · ${sa.cost} HRS</button>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="recruit-motivations-section">
+      ${isSigned
+        ? '<div class="recruit-offer-panel"><span class="recruit-offer-amount">SIGNED</span></div>'
+        : isCommitted
+        ? `<div class="recruit-offer-panel"><span class="recruit-offer-amount">COMMITTED → ${escapeAttr(player.committedTo.team)}</span></div>`
+        : `<div class="recruit-offer-panel">
+        <div class="recruit-offer-slider-row">
+          <input id="portal-offer-slider" class="recruit-offer-slider" type="range" min="0" max="${sliderMax}" step="${sliderStep}" value="${sliderValue}" oninput="updatePortalOfferPreview(this.value)">
+          <span class="recruit-offer-amount" id="portal-offer-preview">${formatDollars(sliderValue)}</span>
+        </div>
+        <button class="recruit-offer-btn" onclick="${offerLockedThisWeek ? 'void 0' : `sendPortalOffer('${player.portalId}')`}"${offerLockedThisWeek ? ' disabled style="opacity:0.38;cursor:not-allowed"' : ''}>${player.offer ? (offerLockedThisWeek ? 'UPDATE LOCKED · NEXT WEEK' : 'UPDATE OFFER') : 'SEND OFFER'}</button>
+      </div>`}
+      <div class="recruit-motivations-body">
+        <div class="recruit-motivations-list">
+          ${(player.motivations || []).map((m, i) => {
+            const g = (player.guessedMotivations || {})[i];
+            const cls = g === 'correct' ? ' correct' : g === 'wrong' ? ' wrong' : '';
+            return `<div class="recruit-motivation-item">
+              <div class="recruit-motivation-square${cls}"></div>
+              <span class="recruit-motivation-text">${m}</span>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="recruit-sell-actions">
+          <button class="recruit-offer-btn secondary" onclick="portalSoftSell('${player.portalId}')"${!canSoftSell ? ' disabled style="opacity:0.38;cursor:not-allowed"' : ''}>SOFT SELL &middot; 50 HRS</button>
+          <button class="recruit-offer-btn secondary" onclick="portalHardSell('${player.portalId}')"${!canHardSell ? ' disabled style="opacity:0.38;cursor:not-allowed"' : ''}>HARD SELL &middot; 75 HRS</button>
+          ${player.offer && !isSigned ? `<button class="recruit-offer-btn secondary" onclick="pullPortalOffer('${player.portalId}')">PULL OFFER</button>` : ''}
+        </div>
+      </div>
+    </div>
+    ${player.offer && !isSigned ? `<div class="recruit-top-offers">
+      <div class="recruit-motivations-label">YOUR OFFER</div>
+      <div class="recruit-top-offer-row">
+        <span class="recruit-top-offer-team">${escapeAttr(selectedTeam)}</span>
+        <span>${formatDollars(currentOffer)}</span>
+        <span class="recruit-top-offer-interest">${offerInterest}%</span>
+      </div>
+    </div>` : ''}
+    ${topCPUOffers.length ? `<div class="recruit-top-offers">
+      <div class="recruit-motivations-label">TOP OFFERS</div>
+      ${topCPUOffers.map(offer => `
+        <div class="recruit-top-offer-row">
+          <span class="recruit-top-offer-team">${escapeAttr(offer.team)}</span>
+          <span>${formatDollars(offer.amount)}</span>
+          <span class="recruit-top-offer-interest">${Math.min(100, Math.round((Number(offer.interest) || 0) * 100))}%</span>
+        </div>
+      `).join('')}
+    </div>` : ''}
+    <div class="recruit-detail-actions">
+      <button class="recruit-detail-close-btn" onclick="closePortalDetail()">CLOSE</button>
+    </div>
+  `;
+}
+
+function finishPortalGoDashboard() {
+  applyPortalCommits();
+  goToDashboard();
+}
+
+function closePortalDetail() {
+  document.getElementById('portal-detail-overlay').classList.add('hidden');
+}
+
+function handlePortalOverlayClick(event) {
+  if (event.target === document.getElementById('portal-detail-overlay')) closePortalDetail();
+}
+
+/* ═══════════════════════════════════════════
+   TRANSFER PORTAL — RECRUITING ENGINE
+═══════════════════════════════════════════ */
+function getPortalStateKey() {
+  return `transferPortal:${seasonNumber || 1}`;
+}
+
+function savePortalState() {
+  sessionStorage.setItem(getPortalStateKey(), JSON.stringify({
+    portal: transferPortal,
+    week: portalWeek
+  }));
+}
+
+function loadPortalState() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(getPortalStateKey()) || 'null');
+    if (saved && Array.isArray(saved.portal)) {
+      transferPortal = saved.portal;
+      portalWeek = saved.week || 1;
+      return true;
+    }
+  } catch (e) {}
+  return false;
+}
+
+function getPortalHoursKey() {
+  return `portalHours:${seasonNumber || 1}:${selectedTeam || ''}`;
+}
+
+function getPortalWeekKey() {
+  return `portal-${seasonNumber || 1}-w${portalWeek}`;
+}
+
+function ensurePortalHoursState() {
+  if (!portalHoursState) {
+    try { portalHoursState = JSON.parse(sessionStorage.getItem(getPortalHoursKey()) || 'null'); }
+    catch (e) { portalHoursState = null; }
+  }
+  const weekKey = getPortalWeekKey();
+  if (!portalHoursState || portalHoursState.weekKey !== weekKey) {
+    portalHoursState = { weekKey, remaining: 100 };
+    savePortalHoursState();
+  }
+  return portalHoursState;
+}
+
+function savePortalHoursState() {
+  if (portalHoursState) sessionStorage.setItem(getPortalHoursKey(), JSON.stringify(portalHoursState));
+}
+
+function getPortalHoursRemaining() {
+  return ensurePortalHoursState().remaining;
+}
+
+function spendPortalHours(n) {
+  const state = ensurePortalHoursState();
+  if (state.remaining < n) return false;
+  state.remaining -= n;
+  savePortalHoursState();
+  return true;
+}
+
+function getCommittedPortalNIL() {
+  return transferPortal.reduce((sum, p) => sum + Math.max(0, Math.round(Number((p.offer || {}).amount) || 0)), 0);
+}
+
+function getPortalFairValue(player) {
+  return getRecruitFairValue(player);
+}
+
+function getPortalCPUTeamCommittedCount(team, conf) {
+  return transferPortal.filter(p => p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf).length;
+}
+
+function getPortalCPUTeamFinalCount(team, conf) {
+  const roster = getTeamRoster(conf, team);
+  return roster.length + getPortalCPUTeamCommittedCount(team, conf);
+}
+
+function getPortalCPUPositionCounts(team, conf) {
+  const roster = getTeamRoster(conf, team);
+  const counts = { PG:0, SG:0, SF:0, PF:0, C:0 };
+  roster.forEach(p => {
+    if (counts[p.position] !== undefined) counts[p.position]++;
+  });
+  transferPortal.forEach(p => {
+    if (p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf) {
+      if (counts[p.position] !== undefined) counts[p.position]++;
+    }
+  });
+  return counts;
+}
+
+function getPortalCPUBestAtPosition(team, conf, position) {
+  const roster = getTeamRoster(conf, team);
+  let best = 0;
+  roster.forEach(p => { if (p.position === position && p.overall > best) best = p.overall; });
+  transferPortal.forEach(p => {
+    if (p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf && p.position === position && p.overall > best) {
+      best = p.overall;
+    }
+  });
+  return best;
+}
+
+function scorePortalTargetForCPU(player, team, conf, prestige, rng) {
+  const counts = getPortalCPUPositionCounts(team, conf);
+  const need = (counts[player.position] || 0) < 2;
+  const currentBest = getPortalCPUBestAtPosition(team, conf, player.position);
+  const isImprovement = player.overall > currentBest;
+  if (!need && !isImprovement) return -1;
+  const needBonus = need ? 1000000 : 0;
+  const upgradeBonus = isImprovement ? (player.overall - currentBest) * 1500 : 0;
+  return needBonus + upgradeBonus + (Number(player.stars) || 1) * 80000 + (Number(player.overall) || 0) * 200 + rng() * 30000 + prestige * 120;
+}
+
+function generateCPUPortalOffers() {
+  if (!transferPortal.length) return;
+  const teams = [];
+  Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
+    teamNames.forEach(team => {
+      if (conf === selectedConf && team === selectedTeam) return;
+      const data = ((TEAM_DATA[conf] || {})[team] || {});
+      teams.push({ conf, team, prestige: Number(data.p) || 0, budget: Math.max(0, Math.round((Number(data.n) || 0) * 1000000)) });
+    });
+  });
+  const rng = mulberry32(strHash(`cpu-portal-init|${seasonNumber || 1}`));
+
+  teams.forEach(cpuTeam => {
+    if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) >= PORTAL_ROSTER_CAP) return;
+    let remaining = cpuTeam.budget;
+    const scored = transferPortal
+      .map(p => ({ player: p, score: scorePortalTargetForCPU(p, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige, rng) }))
+      .filter(x => x.score >= 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6);
+    scored.forEach(({ player }) => {
+      if (remaining <= 0 && getPortalFairValue(player) > 0) return;
+      const fairValue = getPortalFairValue(player);
+      const mult = 0.82 + rng() * 0.46;
+      const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
+      const amount = Math.min(desired, remaining);
+      if (fairValue > 0 && amount <= 0) return;
+      remaining -= amount;
+      if (!player.cpuOffers) player.cpuOffers = [];
+      player.cpuOffers.push({
+        conf: cpuTeam.conf,
+        team: cpuTeam.team,
+        amount,
+        interest: getCPUOfferInterest(cpuTeam, player, amount)
+      });
+    });
+  });
+
+  transferPortal.forEach(p => {
+    p.cpuOffers = (p.cpuOffers || [])
+      .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
+      .slice(0, 12);
+  });
+}
+
+function simulateCPUPortalWeek() {
+  if (!transferPortal.length) return;
+  const rng = mulberry32(strHash(`cpu-portal|${seasonNumber || 1}|w${portalWeek}`));
+
+  // Prune offers from teams already at cap
+  const fullKeys = new Set();
+  Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
+    teamNames.forEach(team => {
+      if (getPortalCPUTeamFinalCount(team, conf) >= PORTAL_ROSTER_CAP) fullKeys.add(`${conf}::${team}`);
+    });
+  });
+  if (fullKeys.size) {
+    transferPortal.forEach(p => {
+      if (!p.committedTo && !p.signed) {
+        p.cpuOffers = (p.cpuOffers || []).filter(o => !fullKeys.has(`${o.conf}::${o.team}`));
+      }
+    });
+  }
+
+  const teams = [];
+  Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
+    teamNames.forEach(team => {
+      if (conf === selectedConf && team === selectedTeam) return;
+      const data = ((TEAM_DATA[conf] || {})[team] || {});
+      teams.push({ conf, team, prestige: Number(data.p) || 0, budget: Math.max(0, Math.round((Number(data.n) || 0) * 1000000)) });
+    });
+  });
+
+  teams.forEach(cpuTeam => {
+    let hoursLeft = 100;
+    if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) >= PORTAL_ROSTER_CAP) return;
+
+    const myOffers = [];
+    transferPortal.forEach(p => {
+      const idx = (p.cpuOffers || []).findIndex(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+      if (idx === -1) return;
+      if (p.committedTo || p.signed) {
+        p.cpuOffers.splice(idx, 1);
+        return;
+      }
+      myOffers.push({ player: p, offer: p.cpuOffers[idx] });
+    });
+
+    // Boost interest on existing offers
+    for (const { player, offer } of myOffers) {
+      if (hoursLeft < 5) break;
+      const boost = (3 + Math.floor(rng() * 6)) / 100;
+      offer.interest = Math.min(1.0, offer.interest + boost);
+      hoursLeft -= 5;
+      if (offer.interest >= 1.0 && !player.committedTo && !player.signed) {
+        if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) < PORTAL_ROSTER_CAP) {
+          player.committedTo = { team: cpuTeam.team, conf: cpuTeam.conf };
+        }
+      }
+    }
+
+    // Send new offers based on positional need / improvement
+    if (hoursLeft >= 5) {
+      const committedAmt = transferPortal.reduce((sum, p) => {
+        const o = (p.cpuOffers || []).find(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+        return sum + (o ? (Number(o.amount) || 0) : 0);
+      }, 0);
+      let remaining = Math.max(0, cpuTeam.budget - committedAmt);
+      const targeted = new Set(myOffers.map(x => x.player.portalId));
+      const candidates = transferPortal
+        .filter(p => !targeted.has(p.portalId) && !p.committedTo && !p.signed)
+        .map(p => ({ player: p, score: scorePortalTargetForCPU(p, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige, rng) }))
+        .filter(x => x.score >= 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4);
+
+      for (const { player } of candidates) {
+        if (hoursLeft < 5) break;
+        const fairValue = getPortalFairValue(player);
+        const mult = 0.82 + rng() * 0.46;
+        const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
+        const amount = fairValue > 0 ? Math.min(desired, remaining) : 0;
+        if (fairValue > 0 && amount <= 0) continue;
+        remaining -= amount;
+        if (!player.cpuOffers) player.cpuOffers = [];
+        player.cpuOffers.push({ conf: cpuTeam.conf, team: cpuTeam.team, amount, interest: getCPUOfferInterest(cpuTeam, player, amount) });
+        hoursLeft -= 5;
+      }
+    }
+  });
+
+  transferPortal.forEach(p => {
+    p.cpuOffers = (p.cpuOffers || [])
+      .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
+      .slice(0, 12);
+  });
+}
+
+function advancePortalWeek() {
+  if (!transferPortal.length) return;
+  // Signing sweep: each unsigned player rolls best-offer interest
+  const signRng = mulberry32(strHash(`portal-sign|${seasonNumber || 1}|w${portalWeek}`));
+  transferPortal.forEach(player => {
+    if (player.signed || player.committedTo) return;
+    const offers = [];
+    if (player.offer) offers.push({ isPlayer: true, interest: Math.min(1, Number(player.offer.valueScore) || 0) });
+    (player.cpuOffers || []).forEach(o => offers.push({ isPlayer: false, team: o.team, conf: o.conf, interest: Math.min(1, Number(o.interest) || 0) }));
+    if (!offers.length) return;
+    const best = offers.sort((a, b) => b.interest - a.interest)[0];
+    if (best.interest <= 0) return;
+    if (signRng() < best.interest) {
+      if (best.isPlayer) {
+        player.signed = true;
+        player.bookmarked = true;
+      } else if (getPortalCPUTeamFinalCount(best.team, best.conf) < PORTAL_ROSTER_CAP) {
+        player.committedTo = { team: best.team, conf: best.conf };
+      }
+    }
+  });
+
+  portalWeek++;
+  portalHoursState = null;
+  if (portalWeek > PORTAL_TOTAL_WEEKS) {
+    finalizePortal();
+  } else {
+    simulateCPUPortalWeek();
+  }
+  savePortalState();
+  renderTransferPortal();
+}
+
+function finalizePortal() {
+  // Force-sign anyone with offers to their best offer
+  transferPortal.forEach(player => {
+    if (player.signed || player.committedTo) return;
+    const offers = [];
+    if (player.offer) offers.push({ isPlayer: true, interest: Math.min(1, Number(player.offer.valueScore) || 0) });
+    (player.cpuOffers || []).forEach(o => offers.push({ isPlayer: false, team: o.team, conf: o.conf, interest: Math.min(1, Number(o.interest) || 0) }));
+    if (!offers.length) return;
+    const best = offers.sort((a, b) => b.interest - a.interest)[0];
+    if (best.isPlayer) {
+      player.signed = true;
+      player.bookmarked = true;
+    } else if (getPortalCPUTeamFinalCount(best.team, best.conf) < PORTAL_ROSTER_CAP) {
+      player.committedTo = { team: best.team, conf: best.conf };
+    }
+  });
+}
+
+function applyPortalCommits() {
+  if (!transferPortal.length) return;
+  const stillUnsigned = [];
+  transferPortal.forEach(p => {
+    let targetTeam = null, targetConf = null;
+    if (p.signed) { targetTeam = selectedTeam; targetConf = selectedConf; }
+    else if (p.committedTo) { targetTeam = p.committedTo.team; targetConf = p.committedTo.conf; }
+    if (!targetTeam) {
+      stillUnsigned.push(p);
+      return;
+    }
+    const entry = ((allRosters || {})[targetConf] || {})[targetTeam];
+    if (!entry) { stillUnsigned.push(p); return; }
+    const roster = getRosterFromEntry(entry);
+    if (roster.length >= PORTAL_ROSTER_CAP) { stillUnsigned.push(p); return; }
+    roster.push({
+      name: p.name,
+      position: p.position,
+      grade: p.grade || 'Sophomore',
+      overall: p.overall,
+      potential: p.potential || p.overall,
+      attributes: p.attributes || {},
+      homeState: p.homeState,
+      hometown: p.hometown,
+      tendencies: p.tendencies || makeTendencies(p.position)
+    });
+    if (Array.isArray(entry)) allRosters[targetConf][targetTeam] = roster;
+    else entry.roster = roster;
+  });
+  transferPortal = stillUnsigned;
+  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+  savePortalState();
+}
+
+/* ═══ Portal user actions ═══ */
+function getNextPortalScoutAction(player, hours) {
+  if (!player.potentialRevealed) return { cost: 15, canAfford: hours >= 15 };
+  const guessed = player.guessedMotivations || {};
+  const correctCount = Object.values(guessed).filter(v => v === 'correct').length;
+  if (correctCount >= 2) return null;
+  if (Object.keys(guessed).length >= (player.motivations || []).length) return null;
+  return { cost: 25, canAfford: hours >= 25 };
+}
+
+function portalScout(portalId) {
+  const player = transferPortal.find(p => p.portalId === portalId);
+  if (!player) return;
+  if (!player.potentialRevealed) {
+    if (!spendPortalHours(15)) return;
+    player.potentialRevealed = true;
+  } else {
+    if (!spendPortalHours(25)) return;
+    if (!player.guessedMotivations) player.guessedMotivations = {};
+    const unguessed = [];
+    for (let i = 0; i < (player.motivations || []).length; i++) {
+      if (player.guessedMotivations[i] === undefined) unguessed.push(i);
+    }
+    if (!unguessed.length) return;
+    const idx = unguessed[Math.floor(Math.random() * unguessed.length)];
+    player.guessedMotivations[idx] = (player.topMotivations || []).includes(idx) ? 'correct' : 'wrong';
+  }
+  savePortalState();
+  renderPortalDetailCard(player);
+  renderTransferPortal();
+}
+
+function getPortalKnownTopMotivationCount(player) {
+  const guesses = player.guessedMotivations || {};
+  return (player.topMotivations || []).filter(idx => guesses[idx] === 'correct').length;
+}
+
+function sendPortalOffer(portalId) {
+  const player = transferPortal.find(p => p.portalId === portalId);
+  if (!player || player.signed) return;
+  const weekKey = getPortalWeekKey();
+  if (player.offer && player.offer.offerWeek === weekKey) return;
+  const currentOffer = player.offer ? Math.max(0, Math.round(Number(player.offer.amount) || 0)) : 0;
+  const fairValue = getPortalFairValue(player);
+  const maxOffer = getAvailableNILDollars(currentOffer);
+  const slider = document.getElementById('portal-offer-slider');
+  const amount = Math.max(0, Math.round(Number(slider ? slider.value : fairValue) || 0));
+  if (amount > maxOffer) {
+    window.alert(`Not enough NIL available. Max offer: ${formatDollars(maxOffer)}`);
+    return;
+  }
+  const valueScore = getOfferValueScore(player, amount);
+  player.bookmarked = true;
+  player.offer = { amount, fairValue, valueScore, offerWeek: weekKey };
+  if (valueScore >= 1) player.signed = true;
+  savePortalState();
+  renderTransferPortal();
+  renderPortalDetailCard(player);
+}
+
+function pullPortalOffer(portalId) {
+  const player = transferPortal.find(p => p.portalId === portalId);
+  if (!player || !player.offer || player.signed) return;
+  delete player.offer;
+  savePortalState();
+  renderTransferPortal();
+  renderPortalDetailCard(player);
+}
+
+function portalSoftSell(portalId) { applyPortalSell(portalId, 50, 3, 5, 1); }
+function portalHardSell(portalId) { applyPortalSell(portalId, 75, 7, 10, 2); }
+
+function applyPortalSell(portalId, hoursCost, minBoost, maxBoost, requiredKnownTops) {
+  const player = transferPortal.find(p => p.portalId === portalId);
+  if (!player || !player.offer || player.signed) return;
+  if (getPortalKnownTopMotivationCount(player) < requiredKnownTops) return;
+  if (!spendPortalHours(hoursCost)) return;
+  const boost = randInt(minBoost, maxBoost);
+  player.offer.valueScore = (Number(player.offer.valueScore) || 0) + (boost / 100);
+  if (player.offer.valueScore >= 1) player.signed = true;
+  savePortalState();
+  renderPortalDetailCard(player);
+  renderTransferPortal();
+}
+
+function updatePortalOfferPreview(value) {
+  const preview = document.getElementById('portal-offer-preview');
+  if (preview) preview.textContent = formatDollars(value);
+}
+
+function getPortalTopCPUOffers(player) {
+  return (player.cpuOffers || [])
+    .filter(o => getPortalCPUTeamFinalCount(o.team, o.conf) < PORTAL_ROSTER_CAP)
+    .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
+    .slice(0, 5);
 }
 
 function getScheduleStateKey() {
@@ -3875,7 +4978,7 @@ function generateTeamRoster(teamOverall, names) {
       attributes,
       homeState,
       hometown,
-      tendencies:makeTendencies(attributes)
+      tendencies:makeTendencies(positions[i])
     };
   }).sort((a, b) => b.overall - a.overall);
 }
@@ -3909,20 +5012,25 @@ function makeAttributes(overall, teamMax) {
   return attrs;
 }
 
-function makeTendencies(attributes) {
-  const weights = {
-    pass:Math.max(8, attributes.passing + attributes.iq - 80 + randInt(-10, 10)),
-    drive:Math.max(8, attributes.finishing + attributes.dribbling - 80 + randInt(-10, 10)),
-    iso:Math.max(8, attributes.dribbling + attributes.midRange - 88 + randInt(-10, 10)),
-    shoot:Math.max(8, attributes.threePoint + attributes.midRange - 82 + randInt(-10, 10)),
-    postUp:Math.max(8, attributes.finishing + attributes.iq - 92 + randInt(-10, 10))
-  };
-  const total = sum(Object.values(weights));
+function makeTendencies(position) {
+  const passRange = { PG:[50,95], SG:[50,90], SF:[50,70], PF:[20,70], C:[20,70] };
+  const [passMin, passMax] = passRange[position] || [1, 50];
+  const rest = ['drive', 'iso', 'shoot', 'postUp'];
+  for (let i = rest.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rest[i], rest[j]] = [rest[j], rest[i]];
+  }
+  const keys = ['pass', ...rest];
   const tendencies = {};
-  Object.keys(weights).forEach(key => {
-    tendencies[key] = Math.max(0, Math.round(weights[key] / total * 100));
-  });
-  balanceValues(tendencies, Object.keys(tendencies), 100, 0, 100);
+  let remaining = 100;
+  for (let i = 0; i < keys.length - 1; i++) {
+    const keysLeft = keys.length - 1 - i;
+    const maxVal = i === 0 ? clamp(randInt(passMin, passMax), passMin, remaining - keysLeft) : remaining - keysLeft;
+    const val = i === 0 ? maxVal : randInt(1, Math.max(1, maxVal));
+    tendencies[keys[i]] = val;
+    remaining -= val;
+  }
+  tendencies[keys[keys.length - 1]] = remaining;
   return tendencies;
 }
 
@@ -4020,18 +5128,19 @@ function generateRecruitingClass(names) {
       const attributes = makeAttributes(overall);
       const homeState = randomChoice(Object.keys(STATE_HOMETOWNS));
       const hometown = randomChoice(STATE_HOMETOWNS[homeState]);
+      const position = randomChoice(positions);
       recruits.push({
         id:`S${seasonNumber || 1}-${tier.stars}-${i + 1}`,
         name:makeRecruitName(names, usedNames),
         grade:'Freshman',
         stars:tier.stars,
-        position:randomChoice(positions),
+        position,
         overall,
         potential,
         attributes,
         homeState,
         hometown,
-        tendencies:makeTendencies(attributes),
+        tendencies:makeTendencies(position),
         ...pickMotivations(),
         guessedMotivations:{}
       });
@@ -4128,6 +5237,15 @@ function getStarText(stars) {
   return '★'.repeat(Number(stars) || 1);
 }
 
+function overallToStars(overall) {
+  const o = Number(overall) || 0;
+  if (o >= 90) return 5;
+  if (o >= 85) return 4;
+  if (o >= 75) return 3;
+  if (o >= 67) return 2;
+  return 1;
+}
+
 function getRecruitFairValue(recruit) {
   return ({ 5:2000000, 4:500000, 3:100000, 2:50000, 1:0 })[Number(recruit.stars) || 1] || 0;
 }
@@ -4138,7 +5256,9 @@ function getTeamNILBudgetDollars() {
 }
 
 function getCommittedNILDollars() {
-  return ensureRecruitingClass().reduce((sum, recruit) => sum + Math.max(0, Math.round(Number((recruit.offer || {}).amount) || 0)), 0);
+  const recruitSum = ensureRecruitingClass().reduce((sum, recruit) => sum + Math.max(0, Math.round(Number((recruit.offer || {}).amount) || 0)), 0);
+  const portalSum = (transferPortal || []).reduce((sum, p) => sum + Math.max(0, Math.round(Number((p.offer || {}).amount) || 0)), 0);
+  return recruitSum + portalSum;
 }
 
 function getAvailableNILDollars(extraAvailable = 0) {
@@ -5251,7 +6371,7 @@ function formatStatAverage(value) {
 
 function getTeamIndexScore(roster) {
   if (!roster || !roster.length) return 0;
-  return sum(roster.map(p => Math.pow((Number(p.overall) || 0) * 1.5, 2))) / roster.length;
+  return sum(roster.map(p => Math.pow((Number(p.overall) || 0) * 2, 2))) / roster.length;
 }
 
 function getStandingsStateKey() {
@@ -5449,14 +6569,13 @@ function getStyleOptions(key) {
   return q ? q.answers : [];
 }
 
-function splitMinutes48(count) {
-  const table = { 1:[48], 2:[30,18], 3:[22,16,10], 4:[16,13,10,9], 5:[14,11,10,8,5] };
+function splitMinutes30(count) {
+  const table = { 1:[30], 2:[19,11], 3:[14,10,6], 4:[10,8,6,6], 5:[9,7,6,5,3] };
   if (table[count]) return table[count];
   return (table[5] || []).concat(Array(Math.max(0, count - 5)).fill(0));
 }
 
 function buildRotationDefaults(roster) {
-  // Group players by position, then assign minutes so each position totals 48
   const posGroups = {};
   roster.forEach(p => {
     const pos = p.position || 'G';
@@ -5465,7 +6584,7 @@ function buildRotationDefaults(roster) {
   });
   const posAlloc = {};
   Object.entries(posGroups).forEach(([pos, names]) => {
-    const splits = splitMinutes48(names.length);
+    const splits = splitMinutes30(names.length);
     names.forEach((name, i) => { posAlloc[name] = splits[i] || 0; });
   });
   return roster.map(p => ({ playerName: p.name, minutes: posAlloc[p.name] || 0 }));
@@ -5542,7 +6661,7 @@ function syncGameplanWithRoster() {
 function renderGameplan() {
   ensureGameplan();
   document.getElementById('gameplan-title').textContent = `${selectedTeam} GAMEPLAN`;
-  document.getElementById('gameplan-note').textContent = 'Each position must total exactly 48 minutes before you can save.';
+  document.getElementById('gameplan-note').textContent = 'Each position must total exactly 30 minutes before you can save.';
   renderGameplanStyles();
   renderGameplanRotation();
 }
@@ -5593,7 +6712,7 @@ function renderGameplanRotation() {
   let rows = '';
   posKeys.forEach(pos => {
     const used = sum(groups[pos].map(e => Number(e.item.minutes) || 0));
-    rows += `<div class="rot-pos-header"><span>${pos}</span><span>${used} / 48 MIN</span></div>`;
+    rows += `<div class="rot-pos-header"><span>${pos}</span><span>${used} / 30 MIN</span></div>`;
     groups[pos].forEach(({ item, idx: gi }) => {
       const player = playerMap.get(item.playerName) || {};
       const mins = Number(item.minutes) || 0;
@@ -5624,7 +6743,7 @@ function updateGameplanStyle(field, value) {
 
 function updateRotationMinutes(index, value) {
   ensureGameplan();
-  const minutes = clamp(parseInt(value, 10) || 0, 0, 48);
+  const minutes = clamp(parseInt(value, 10) || 0, 0, 30);
   if (gameplan.rotation[index]) gameplan.rotation[index].minutes = minutes;
   renderGameplanRotation();
 }
@@ -5672,8 +6791,8 @@ function isRotationValid() {
 function hasValidPositionMinutes(plan) {
   const totals = getPositionMinuteTotalsFor(plan);
   const required = ['PG','SG','SF','PF','C'];
-  if (!required.every(pos => totals[pos] === 48)) return false;
-  return Object.values(totals).every(t => t === 48);
+  if (!required.every(pos => totals[pos] === 30)) return false;
+  return Object.values(totals).every(t => t === 30);
 }
 
 function updateSaveButtonState() {
@@ -5686,9 +6805,9 @@ function saveGameplan() {
   ensureGameplan();
   if (!isRotationValid()) {
     const totals = getPositionMinuteTotals();
-    const bad = Object.entries(totals).filter(([, t]) => t !== 48).map(([p, t]) => `${p}: ${t}`).join(', ');
+    const bad = Object.entries(totals).filter(([, t]) => t !== 30).map(([p, t]) => `${p}: ${t}`).join(', ');
     const note = document.getElementById('gameplan-note');
-    if (note) note.textContent = `Every position must total exactly 48 min. Check: ${bad}`;
+    if (note) note.textContent = `Every position must total exactly 30 min. Check: ${bad}`;
     return;
   }
   gameplan.minutesSaved = true;
