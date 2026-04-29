@@ -2538,6 +2538,60 @@
     .game-week-loading.show {
       display:block;
     }
+    .portal-work-overlay {
+      position:fixed;
+      inset:0;
+      z-index:70;
+      display:none;
+      place-items:center;
+      background:rgba(8,7,4,0.78);
+      backdrop-filter:blur(2px);
+    }
+    .portal-work-overlay.show {
+      display:grid;
+    }
+    .portal-work-card {
+      width:min(520px,86vw);
+      border:3px solid rgba(237,224,184,0.28);
+      background:#1b140b;
+      box-shadow:8px 8px 0 rgba(0,0,0,0.32), inset 0 0 0 4px rgba(168,36,24,0.14);
+      padding:16px;
+      display:grid;
+      gap:10px;
+      text-align:center;
+    }
+    .portal-work-office {
+      position:relative;
+      height:210px;
+      overflow:hidden;
+      border:2px solid rgba(237,224,184,0.16);
+      background:
+        linear-gradient(#352112 0 58%, #6b3d18 58% 100%);
+    }
+    .portal-work-office::before {
+      content:'';
+      position:absolute;
+      left:8%;
+      top:12%;
+      width:25%;
+      height:26%;
+      border:3px solid #3a2400;
+      background:linear-gradient(rgba(29,95,168,0.38), rgba(29,95,168,0.12));
+    }
+    #portal-work-canvas {
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:min(320px,72vw);
+      height:auto;
+      transform:translateX(-50%);
+      image-rendering:pixelated;
+    }
+    .portal-work-label {
+      color:#ede0b8;
+      font-size:clamp(7px,0.9vw,10px);
+      line-height:1.7;
+    }
     .game-finished {
       display:none;
       justify-content:center;
@@ -3196,6 +3250,14 @@
   </div>
 
 </div>
+<div class="portal-work-overlay" id="portal-work-overlay" aria-hidden="true">
+  <div class="portal-work-card">
+    <div class="portal-work-office">
+      <canvas id="portal-work-canvas" width="320" height="210"></canvas>
+    </div>
+    <div class="portal-work-label" id="portal-work-label">WORKING THE PORTAL...</div>
+  </div>
+</div>
 <script src="teams.js"></script>
 <script>
 /* Team and conference data lives in teams.js. */
@@ -3365,6 +3427,7 @@ let portalBookmarksFilter = false;
 let portalSignedFilter = false;
 let portalWeek = 1;
 let portalHoursState = null;
+let portalWorkAnimId = null;
 const PORTAL_TOTAL_WEEKS = 5;
 const PORTAL_ROSTER_CAP = 13;
 let statsMode = 'team';
@@ -3964,6 +4027,7 @@ function goToTransferPortal() {
 
 function getFilteredPortal() {
   return transferPortal.filter(p => {
+    if (p.signed || p.committedTo) return false;
     if (portalBookmarksFilter) return !!p.bookmarked;
     const matchesStar = portalStarFilter === 'all' || p.stars === Number(portalStarFilter);
     const matchesPos = portalPositionFilter === 'all' || p.position === portalPositionFilter;
@@ -4064,7 +4128,7 @@ function renderTransferPortal() {
   if (nextWeekBtn) nextWeekBtn.style.display = portalDone ? 'none' : 'inline-block';
   if (nextSeasonBtn) nextSeasonBtn.style.display = portalDone ? 'inline-block' : 'none';
 
-  const bmCount = transferPortal.filter(p => p.bookmarked).length;
+  const bmCount = transferPortal.filter(p => p.bookmarked && !p.signed && !p.committedTo).length;
   const signedCount = transferPortal.filter(p => p.signed).length;
   const bmBtn = document.getElementById('portal-bookmarks-btn');
   if (bmBtn) {
@@ -4139,6 +4203,7 @@ function renderTransferPortal() {
   filters.style.display = '';
   const filtered = getFilteredPortal();
   const sorted = [...filtered].sort((a, b) => b.overall - a.overall);
+  const availableCount = transferPortal.filter(p => !p.signed && !p.committedTo).length;
 
   filters.innerHTML = `
     <div class="recruiting-filter-group">
@@ -4155,7 +4220,7 @@ function renderTransferPortal() {
         ${['PG','SG','SF','PF','C'].map(pos => `<option value="${pos}"${portalPositionFilter === pos ? ' selected' : ''}>${pos}</option>`).join('')}
       </select>
     </div>
-    <div class="recruiting-filter-count">${sorted.length} / ${transferPortal.length} SHOWN</div>
+    <div class="recruiting-filter-count">${sorted.length} / ${availableCount} SHOWN</div>
   `;
 
   grid.innerHTML = `
@@ -4360,8 +4425,44 @@ function getPortalFairValue(player) {
   return getRecruitFairValue(player);
 }
 
+function getPortalTeamBudget(conf, team) {
+  const data = ((TEAM_DATA[conf] || {})[team] || {});
+  return Math.max(0, Math.round((Number(data.n) || 0) * 1000000));
+}
+
+function getPortalOfferAmountForTeam(player, conf, team) {
+  if (conf === selectedConf && team === selectedTeam) {
+    return Math.max(0, Math.round(Number((player.offer || {}).amount) || 0));
+  }
+  const offer = (player.cpuOffers || []).find(o => o.conf === conf && o.team === team);
+  return Math.max(0, Math.round(Number(offer ? offer.amount : player.committedAmount) || 0));
+}
+
+function getAcceptedPortalSpend(conf, team, ignorePortalId = null) {
+  return transferPortal.reduce((sum, p) => {
+    if (ignorePortalId && p.portalId === ignorePortalId) return sum;
+    const signedForUser = p.signed && conf === selectedConf && team === selectedTeam;
+    const committedHere = p.committedTo && p.committedTo.conf === conf && p.committedTo.team === team;
+    if (!signedForUser && !committedHere) return sum;
+    return sum + getPortalOfferAmountForTeam(p, conf, team);
+  }, 0);
+}
+
+function getPortalTeamRemainingBudget(conf, team, ignorePortalId = null) {
+  if (conf === selectedConf && team === selectedTeam) {
+    const extra = ignorePortalId
+      ? transferPortal.reduce((sum, p) => p.portalId === ignorePortalId ? sum + Math.max(0, Math.round(Number((p.offer || {}).amount) || 0)) : sum, 0)
+      : 0;
+    return getAvailableNILDollars(extra);
+  }
+  return Math.max(0, getPortalTeamBudget(conf, team) - getAcceptedPortalSpend(conf, team, ignorePortalId));
+}
+
 function getPortalCPUTeamCommittedCount(team, conf) {
-  return transferPortal.filter(p => p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf).length;
+  return transferPortal.filter(p => {
+    if (p.signed && conf === selectedConf && team === selectedTeam) return true;
+    return p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf;
+  }).length;
 }
 
 function getPortalCPUTeamFinalCount(team, conf) {
@@ -4376,7 +4477,9 @@ function getPortalCPUPositionCounts(team, conf) {
     if (counts[p.position] !== undefined) counts[p.position]++;
   });
   transferPortal.forEach(p => {
-    if (p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf) {
+    const signedForUser = p.signed && conf === selectedConf && team === selectedTeam;
+    const committedHere = p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf;
+    if (signedForUser || committedHere) {
       if (counts[p.position] !== undefined) counts[p.position]++;
     }
   });
@@ -4388,11 +4491,33 @@ function getPortalCPUBestAtPosition(team, conf, position) {
   let best = 0;
   roster.forEach(p => { if (p.position === position && p.overall > best) best = p.overall; });
   transferPortal.forEach(p => {
-    if (p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf && p.position === position && p.overall > best) {
+    const signedForUser = p.signed && conf === selectedConf && team === selectedTeam;
+    const committedHere = p.committedTo && p.committedTo.team === team && p.committedTo.conf === conf;
+    if ((signedForUser || committedHere) && p.position === position && p.overall > best) {
       best = p.overall;
     }
   });
   return best;
+}
+
+function isPortalOfferFulfillable(player, conf, team, amount) {
+  if (!player || player.signed || player.committedTo) return false;
+  if (getPortalCPUTeamFinalCount(team, conf) >= PORTAL_ROSTER_CAP) return false;
+  if (Math.max(0, Math.round(Number(amount) || 0)) > getPortalTeamRemainingBudget(conf, team, player.portalId)) return false;
+  const counts = getPortalCPUPositionCounts(team, conf);
+  const needsPosition = (counts[player.position] || 0) < 2;
+  const improvesPosition = player.overall > getPortalCPUBestAtPosition(team, conf, player.position);
+  return needsPosition || improvesPosition;
+}
+
+function pruneUnfulfillablePortalOffers() {
+  transferPortal.forEach(player => {
+    if (player.signed || player.committedTo) return;
+    if (player.offer && !isPortalOfferFulfillable(player, selectedConf, selectedTeam, player.offer.amount)) {
+      delete player.offer;
+    }
+    player.cpuOffers = (player.cpuOffers || []).filter(o => isPortalOfferFulfillable(player, o.conf, o.team, o.amount));
+  });
 }
 
 function scorePortalTargetForCPU(player, team, conf, prestige, rng) {
@@ -4544,55 +4669,181 @@ function simulateCPUPortalWeek() {
   });
 }
 
-function advancePortalWeek() {
+async function advancePortalWeek() {
   if (!transferPortal.length) return;
-  // Signing sweep: each unsigned player rolls best-offer interest
-  const signRng = mulberry32(strHash(`portal-sign|${seasonNumber || 1}|w${portalWeek}`));
-  transferPortal.forEach(player => {
-    if (player.signed || player.committedTo) return;
-    const offers = [];
-    if (player.offer) offers.push({ isPlayer: true, interest: Math.min(1, Number(player.offer.valueScore) || 0) });
-    (player.cpuOffers || []).forEach(o => offers.push({ isPlayer: false, team: o.team, conf: o.conf, interest: Math.min(1, Number(o.interest) || 0) }));
-    if (!offers.length) return;
-    const best = offers.sort((a, b) => b.interest - a.interest)[0];
-    if (best.interest <= 0) return;
-    if (signRng() < best.interest) {
-      if (best.isPlayer) {
-        player.signed = true;
-        player.bookmarked = true;
-      } else if (getPortalCPUTeamFinalCount(best.team, best.conf) < PORTAL_ROSTER_CAP) {
-        player.committedTo = { team: best.team, conf: best.conf };
-      }
-    }
-  });
+  await runPortalWorkAnimation(
+    portalWeek >= PORTAL_TOTAL_WEEKS ? 'FINAL PORTAL CHECKS...' : 'WORKING THE TRANSFER PORTAL...',
+    async () => {
+      pruneUnfulfillablePortalOffers();
+      await yieldToPortalAnimation();
+      // Signing sweep: each unsigned player rolls best-offer interest
+      const signRng = mulberry32(strHash(`portal-sign|${seasonNumber || 1}|w${portalWeek}`));
+      transferPortal.forEach(player => {
+        if (player.signed || player.committedTo) return;
+        const offers = getFulfillablePortalOffers(player);
+        if (!offers.length) return;
+        const best = offers.sort((a, b) => b.interest - a.interest)[0];
+        if (best.interest <= 0) return;
+        if (signRng() < best.interest) commitPortalPlayer(player, best);
+      });
 
-  portalWeek++;
-  portalHoursState = null;
-  if (portalWeek > PORTAL_TOTAL_WEEKS) {
-    finalizePortal();
-  } else {
-    simulateCPUPortalWeek();
-  }
-  savePortalState();
-  renderTransferPortal();
+      portalWeek++;
+      portalHoursState = null;
+      pruneUnfulfillablePortalOffers();
+      await yieldToPortalAnimation();
+      if (portalWeek > PORTAL_TOTAL_WEEKS) {
+        await finalizePortal();
+      } else {
+        simulateCPUPortalWeek();
+      }
+      await yieldToPortalAnimation();
+      savePortalState();
+      renderTransferPortal();
+    }
+  );
 }
 
-function finalizePortal() {
-  // Force-sign anyone with offers to their best offer
+async function finalizePortal() {
+  pruneUnfulfillablePortalOffers();
+  await yieldToPortalAnimation();
+  // Force-sign anyone with offers to their best fulfillable offer
   transferPortal.forEach(player => {
     if (player.signed || player.committedTo) return;
-    const offers = [];
-    if (player.offer) offers.push({ isPlayer: true, interest: Math.min(1, Number(player.offer.valueScore) || 0) });
-    (player.cpuOffers || []).forEach(o => offers.push({ isPlayer: false, team: o.team, conf: o.conf, interest: Math.min(1, Number(o.interest) || 0) }));
+    const offers = getFulfillablePortalOffers(player);
     if (!offers.length) return;
     const best = offers.sort((a, b) => b.interest - a.interest)[0];
-    if (best.isPlayer) {
-      player.signed = true;
-      player.bookmarked = true;
-    } else if (getPortalCPUTeamFinalCount(best.team, best.conf) < PORTAL_ROSTER_CAP) {
-      player.committedTo = { team: best.team, conf: best.conf };
+    commitPortalPlayer(player, best);
+  });
+  pruneUnfulfillablePortalOffers();
+  await yieldToPortalAnimation();
+  await auditPortalRosterMinimums();
+  pruneUnfulfillablePortalOffers();
+}
+
+function getFulfillablePortalOffers(player) {
+  const offers = [];
+  if (player.offer && isPortalOfferFulfillable(player, selectedConf, selectedTeam, player.offer.amount)) {
+    offers.push({
+      isPlayer:true,
+      team:selectedTeam,
+      conf:selectedConf,
+      amount:Math.max(0, Math.round(Number(player.offer.amount) || 0)),
+      interest:Math.min(1, Number(player.offer.valueScore) || 0)
+    });
+  }
+  (player.cpuOffers || []).forEach(o => {
+    if (isPortalOfferFulfillable(player, o.conf, o.team, o.amount)) {
+      offers.push({
+        isPlayer:false,
+        team:o.team,
+        conf:o.conf,
+        amount:Math.max(0, Math.round(Number(o.amount) || 0)),
+        interest:Math.min(1, Number(o.interest) || 0)
+      });
     }
   });
+  return offers;
+}
+
+function commitPortalPlayer(player, offer) {
+  if (!player || !offer) return;
+  if (offer.isPlayer) {
+    player.signed = true;
+    player.bookmarked = true;
+    if (!player.offer) player.offer = { amount:offer.amount || 0, fairValue:getPortalFairValue(player), valueScore:1, offerWeek:getPortalWeekKey() };
+  } else {
+    player.committedTo = { team:offer.team, conf:offer.conf };
+    player.committedAmount = Math.max(0, Math.round(Number(offer.amount) || 0));
+  }
+}
+
+function getPortalTeamsByPrestige() {
+  const teams = [];
+  Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
+    teamNames.forEach(team => {
+      const data = ((TEAM_DATA[conf] || {})[team] || {});
+      teams.push({ conf, team, prestige:Number(data.p) || 0 });
+    });
+  });
+  return teams.sort((a, b) => b.prestige - a.prestige || a.team.localeCompare(b.team));
+}
+
+async function auditPortalRosterMinimums() {
+  const teams = getPortalTeamsByPrestige();
+  for (const team of teams) {
+    RECRUIT_POSITIONS.forEach(position => {
+      let guard = 0;
+      while ((getPortalCPUPositionCounts(team.team, team.conf)[position] || 0) < 2 && getPortalCPUTeamFinalCount(team.team, team.conf) < PORTAL_ROSTER_CAP && guard < 3) {
+        const player = pickPortalAuditPlayer(team.conf, team.team, position);
+        if (!player) break;
+        const amount = Math.min(getPortalFairValue(player), getPortalTeamRemainingBudget(team.conf, team.team, player.portalId));
+        if (team.conf === selectedConf && team.team === selectedTeam) {
+          player.offer = { amount, fairValue:getPortalFairValue(player), valueScore:1, offerWeek:getPortalWeekKey() };
+          commitPortalPlayer(player, { isPlayer:true, team:team.team, conf:team.conf, amount, interest:1 });
+        } else {
+          commitPortalPlayer(player, { isPlayer:false, team:team.team, conf:team.conf, amount, interest:1 });
+        }
+        guard++;
+      }
+    });
+    await yieldToPortalAnimation();
+  }
+}
+
+function pickPortalAuditPlayer(conf, team, position) {
+  const remaining = getPortalTeamRemainingBudget(conf, team);
+  let candidates = transferPortal
+    .filter(p => !p.signed && !p.committedTo && p.position === position && getPortalFairValue(p) <= remaining)
+    .sort((a, b) => b.stars - a.stars || b.overall - a.overall);
+  if (!candidates.length) {
+    candidates = transferPortal
+      .filter(p => !p.signed && !p.committedTo && p.position === position && Number(p.stars) === 1)
+      .sort((a, b) => b.overall - a.overall);
+  }
+  if (candidates.length) return candidates[0];
+  return createPortalFallbackPlayer(position);
+}
+
+function createPortalFallbackPlayer(position) {
+  const overall = randInt(45, 58);
+  const homeState = randomChoice(Object.keys(STATE_HOMETOWNS));
+  const hometown = randomChoice(STATE_HOMETOWNS[homeState]);
+  const usedNames = new Set(transferPortal.map(p => p.name));
+  const names = namePool || {
+    first:['Aaron','Caleb','Darius','Elijah','Gavin','Isaiah','Jalen','Marcus'],
+    last:['Anderson','Bennett','Carter','Davis','Evans','Garcia','Harris','Jackson']
+  };
+  const player = {
+    name:makeRecruitName(names, usedNames),
+    position,
+    grade:'Freshman',
+    overall,
+    potential:clamp(overall + randInt(4, 12), overall, 80),
+    attributes:makeAttributes(overall, 60),
+    homeState,
+    hometown,
+    tendencies:makeTendencies(position),
+    portalId:getNextPortalId(),
+    fromTeam:'Walk-On Pool',
+    fromConf:'',
+    stars:1,
+    overallRevealed:true,
+    potentialRevealed:false,
+    cpuOffers:[],
+    ...pickMotivations(),
+    guessedMotivations:{}
+  };
+  transferPortal.push(player);
+  return player;
+}
+
+function getNextPortalId() {
+  let maxId = -1;
+  transferPortal.forEach(p => {
+    const m = String(p.portalId || '').match(/^portal-(\d+)$/);
+    if (m) maxId = Math.max(maxId, Number(m[1]));
+  });
+  return `portal-${maxId + 1}`;
 }
 
 function applyPortalCommits() {
@@ -4721,7 +4972,7 @@ function updatePortalOfferPreview(value) {
 
 function getPortalTopCPUOffers(player) {
   return (player.cpuOffers || [])
-    .filter(o => getPortalCPUTeamFinalCount(o.team, o.conf) < PORTAL_ROSTER_CAP)
+    .filter(o => isPortalOfferFulfillable(player, o.conf, o.team, o.amount))
     .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
     .slice(0, 5);
 }
@@ -7140,6 +7391,132 @@ function drawCoach(canvasId = 'coach-canvas', profile = coachProfile) {
   if (bio && canvasId === 'coach-canvas') {
     bio.textContent = `${profile.firstName || 'Coach'} ${profile.lastName || ''} / ${profile.hometown}, ${profile.homeState}`;
   }
+}
+
+function runPortalWorkAnimation(label, work) {
+  showPortalWorkAnimation(label);
+  return new Promise(resolve => {
+    requestAnimationFrame(() => {
+      setTimeout(async () => {
+        try {
+          await work();
+        } finally {
+          setTimeout(() => {
+            hidePortalWorkAnimation();
+            resolve();
+          }, 180);
+        }
+      }, 80);
+    });
+  });
+}
+
+function yieldToPortalAnimation() {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+function showPortalWorkAnimation(label) {
+  const overlay = document.getElementById('portal-work-overlay');
+  const labelEl = document.getElementById('portal-work-label');
+  if (labelEl) labelEl.textContent = label || 'WORKING THE PORTAL...';
+  if (overlay) {
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+  if (portalWorkAnimId) cancelAnimationFrame(portalWorkAnimId);
+  const start = performance.now();
+  const tick = now => {
+    drawPortalWorkCoach((now - start) / 1000);
+    portalWorkAnimId = requestAnimationFrame(tick);
+  };
+  portalWorkAnimId = requestAnimationFrame(tick);
+}
+
+function hidePortalWorkAnimation() {
+  const overlay = document.getElementById('portal-work-overlay');
+  if (overlay) {
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+  if (portalWorkAnimId) {
+    cancelAnimationFrame(portalWorkAnimId);
+    portalWorkAnimId = null;
+  }
+}
+
+function drawPortalWorkCoach(t) {
+  const canvas = document.getElementById('portal-work-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = false;
+
+  const skin = COACH_PALETTE.skinColor[coachProfile.skinColor] || '#c98952';
+  const hair = COACH_PALETTE.hairColor[coachProfile.hairColor] || '#15100b';
+  const eyes = COACH_PALETTE.eyeColor[coachProfile.eyeColor] || '#3b2412';
+  const outfit = COACH_PALETTE.outfit[coachProfile.outfit] || '#1f2530';
+  const page = Math.floor(t * 4) % 3;
+  const reach = Math.sin(t * 6) * 5;
+
+  ctx.fillStyle = 'rgba(168,36,24,0.3)';
+  ctx.fillRect(42, 164, 236, 34);
+  ctx.fillStyle = '#5c3216';
+  ctx.fillRect(48, 118, 224, 70);
+  ctx.fillStyle = '#3a2400';
+  ctx.fillRect(48, 118, 224, 5);
+  ctx.fillRect(74, 138, 54, 30);
+  ctx.fillRect(192, 138, 54, 30);
+
+  ctx.fillStyle = outfit;
+  ctx.fillRect(126, 78, 68, 66);
+  ctx.fillRect(96, 88, 32, 58);
+  ctx.fillRect(192, 88, 32, 58);
+  ctx.fillStyle = skin;
+  ctx.fillRect(100 + reach, 138, 24, 13);
+  ctx.fillRect(197 - reach, 138, 24, 13);
+  ctx.fillRect(146, 68, 28, 12);
+  ctx.fillRect(128, 26, 64, 48);
+  ctx.fillRect(136, 16, 48, 16);
+  ctx.fillStyle = 'rgba(0,0,0,0.16)';
+  ctx.fillRect(128, 66, 64, 8);
+
+  ctx.fillStyle = hair;
+  if (coachProfile.hair !== 'Bald') {
+    ctx.fillRect(128, 16, 64, 13);
+    if (coachProfile.hair === 'Flat Top') ctx.fillRect(132, 8, 56, 12);
+    if (coachProfile.hair === 'Waves') {
+      ctx.fillRect(134, 8, 10, 7);
+      ctx.fillRect(154, 6, 10, 7);
+      ctx.fillRect(174, 8, 10, 7);
+    }
+  }
+
+  ctx.fillStyle = 'rgba(237,224,184,0.84)';
+  ctx.fillRect(140, 42, 11, 8);
+  ctx.fillRect(169, 42, 11, 8);
+  ctx.fillStyle = eyes;
+  ctx.fillRect(143, 44, 5, 4);
+  ctx.fillRect(172, 44, 5, 4);
+  ctx.fillStyle = '#2b160e';
+  if (coachProfile.facialHair === 'Mustache' || coachProfile.facialHair === 'Goatee' || coachProfile.facialHair === 'Beard') {
+    ctx.fillRect(149, 58, 22, 5);
+  }
+  if (coachProfile.facialHair === 'Goatee' || coachProfile.facialHair === 'Beard') {
+    ctx.fillRect(154, 64, 12, 8);
+  }
+
+  ctx.fillStyle = '#ede0b8';
+  ctx.fillRect(84, 128, 54, 34);
+  ctx.fillRect(142, 126, 50, 34);
+  ctx.fillRect(196, 128, 42, 32);
+  ctx.fillStyle = 'rgba(58,36,0,0.22)';
+  for (let i = 0; i < 4; i++) {
+    ctx.fillRect(91, 135 + i * 6, 36, 2);
+    ctx.fillRect(149, 133 + i * 6, 32, 2);
+    ctx.fillRect(202, 136 + i * 6, 25, 2);
+  }
+  ctx.fillStyle = '#c08a18';
+  ctx.fillRect(138 + page * 20, 121, 38, 5);
 }
 
 function drawAthleticDirector() {
