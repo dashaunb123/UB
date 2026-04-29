@@ -1170,6 +1170,44 @@
       border-color:#ede0b8;
       outline:none;
     }
+    .ng-season-complete {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:14px;
+      padding:18px 22px;
+      min-height:0;
+    }
+    .ng-complete-label {
+      font-size:clamp(6px,0.78vw,8px);
+      color:rgba(237,224,184,0.48);
+      letter-spacing:2px;
+      line-height:1.8;
+    }
+    .ng-complete-title {
+      font-size:clamp(13px,2vw,24px);
+      color:#ede0b8;
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .ng-tournament-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(6px,0.78vw,9px);
+      color:#ede0b8;
+      background:#a82418;
+      border:2px solid rgba(237,224,184,0.65);
+      padding:14px 10px;
+      cursor:pointer;
+      letter-spacing:1px;
+      text-shadow:1px 1px 0 #350a04;
+    }
+    .ng-tournament-btn:hover,
+    .ng-tournament-btn:focus-visible {
+      background:#c42c1e;
+      border-color:#ede0b8;
+      outline:none;
+    }
     .standings-screen {
       justify-content:flex-start;
       padding:28px 46px 30px;
@@ -1502,6 +1540,642 @@
       cursor:not-allowed;
       box-shadow:none;
     }
+    .recruiting-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .recruiting-screen::-webkit-scrollbar { display:none; }
+    .recruiting-shell {
+      width:100%;
+      max-width:1180px;
+      display:grid;
+      gap:14px;
+    }
+    .recruiting-top {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .recruiting-subtitle {
+      color:rgba(237,224,184,0.52);
+      font-size:clamp(5px,0.68vw,7px);
+      line-height:1.7;
+      letter-spacing:1px;
+      margin-top:8px;
+    }
+    .recruit-headshot {
+      image-rendering:pixelated;
+      image-rendering:crisp-edges;
+      width:96px;
+      height:120px;
+      display:block;
+      border:2px solid rgba(192,138,24,0.28);
+    }
+    .recruiting-filters {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(22,18,9,0.28);
+      padding:10px;
+    }
+    .recruiting-filter-group {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .recruiting-filter-group span {
+      color:#c08a18;
+      font-size:clamp(5px,0.62vw,7px);
+      letter-spacing:1px;
+    }
+    .recruit-filter-select {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.66vw,7px);
+      color:#ede0b8;
+      background:#161209;
+      border:2px solid rgba(237,224,184,0.26);
+      outline:none;
+      padding:8px 28px 8px 8px;
+      min-width:112px;
+      cursor:pointer;
+    }
+    .recruit-filter-select:hover,
+    .recruit-filter-select:focus-visible {
+      border-color:#c08a18;
+    }
+    .recruiting-filter-count {
+      color:rgba(237,224,184,0.52);
+      font-size:clamp(5px,0.62vw,7px);
+      line-height:1.5;
+      letter-spacing:1px;
+    }
+    .recruiting-grid {
+      display:grid;
+      gap:7px;
+      padding-bottom:12px;
+    }
+    .recruit-row {
+      display:grid;
+      grid-template-columns:54px 1.25fr .36fr .42fr .42fr 1fr 28px;
+      gap:8px;
+      align-items:center;
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(22,18,9,0.28);
+      padding:10px;
+      color:rgba(237,224,184,0.72);
+      font-size:clamp(5px,0.72vw,8px);
+      line-height:1.6;
+    }
+    .recruit-row.header {
+      color:#c08a18;
+      border-color:rgba(192,138,24,0.32);
+      background:rgba(192,138,24,0.08);
+    }
+    .recruit-row strong {
+      color:#ede0b8;
+      font-weight:400;
+    }
+    .recruit-stars {
+      color:#c08a18;
+      letter-spacing:1px;
+      white-space:nowrap;
+    }
+    .recruit-home {
+      color:rgba(237,224,184,0.44);
+      font-size:clamp(4px,0.58vw,6px);
+    }
+    .recruit-empty {
+      color:rgba(237,224,184,0.48);
+      text-align:center;
+      display:block;
+      grid-column:1 / -1;
+      padding:8px 0;
+    }
+    .recruit-row:not(.header) {
+      cursor:pointer;
+      transition:border-color 0.12s, background 0.12s;
+    }
+    .recruit-row:not(.header):hover {
+      border-color:rgba(192,138,24,0.5);
+      background:rgba(192,138,24,0.06);
+    }
+    .recruit-bookmark-btn {
+      background:none;
+      border:none;
+      cursor:pointer;
+      padding:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .bm-path { fill:none; stroke:rgba(237,224,184,0.22); stroke-width:1.5; }
+    .recruit-bookmark-btn:hover .bm-path { stroke:rgba(180,40,30,0.7); }
+    .recruit-bookmark-btn.bookmarked .bm-path { fill:#c0392b; stroke:#c0392b; }
+    .recruit-bookmark-btn.bookmarked:hover .bm-path { fill:#962d22; stroke:#962d22; }
+    .recruit-detail-bookmark-btn {
+      background:none;
+      border:none;
+      cursor:pointer;
+      padding:2px;
+      display:flex;
+      align-items:center;
+      flex-shrink:0;
+    }
+    .recruit-detail-bookmark-btn .bm-path { stroke-width:1.5; }
+    .recruit-detail-bookmark-btn:hover .bm-path { stroke:rgba(180,40,30,0.75); }
+    .recruit-detail-bookmark-btn.bookmarked .bm-path { fill:#c0392b; stroke:#c0392b; }
+    .recruit-detail-bookmark-btn.bookmarked:hover .bm-path { fill:#962d22; stroke:#962d22; }
+    .recruit-bookmarks-toggle {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.62vw,6px);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:none;
+      border:2px solid rgba(237,224,184,0.18);
+      color:rgba(237,224,184,0.45);
+      padding:5px 9px;
+      cursor:pointer;
+      letter-spacing:1px;
+      margin-top:7px;
+    }
+    .recruit-bookmarks-toggle:hover { border-color:rgba(180,40,30,0.5); color:rgba(237,224,184,0.7); }
+    .recruit-bookmarks-toggle.active { border-color:#c0392b; color:#ede0b8; }
+    .recruit-bookmarks-toggle .bm-path { stroke-width:1.5; }
+    .recruit-bookmarks-toggle.active .bm-path { fill:#c0392b; stroke:#c0392b; }
+    .recruit-hours-badge {
+      color:#c08a18;
+      font-size:clamp(5px,0.66vw,7px);
+      letter-spacing:1px;
+      border:2px solid rgba(192,138,24,0.32);
+      background:rgba(192,138,24,0.08);
+      padding:7px 12px;
+      white-space:nowrap;
+      line-height:1.6;
+    }
+    .recruit-detail-overlay {
+      position:fixed;
+      inset:0;
+      background:rgba(8,6,2,0.84);
+      z-index:900;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .recruit-detail-overlay.hidden { display:none; }
+    .recruit-detail-card {
+      background:#161209;
+      border:2px solid rgba(192,138,24,0.42);
+      padding:24px 28px;
+      max-width:480px;
+      width:92%;
+      display:grid;
+      gap:16px;
+    }
+    .recruit-detail-name {
+      color:#ede0b8;
+      font-size:clamp(8px,1.1vw,13px);
+      letter-spacing:1px;
+    }
+    .recruit-detail-sub {
+      color:rgba(237,224,184,0.44);
+      font-size:clamp(5px,0.62vw,7px);
+      margin-top:5px;
+      letter-spacing:1px;
+      line-height:1.8;
+    }
+    .recruit-detail-stars {
+      color:#c08a18;
+      font-size:clamp(8px,1vw,12px);
+      letter-spacing:2px;
+      margin-top:6px;
+    }
+    .recruit-quick-ratings {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:8px;
+    }
+    .recruit-quick-rating {
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(22,18,9,0.38);
+      padding:5px 7px;
+      display:flex;
+      gap:6px;
+      align-items:center;
+      font-size:clamp(4px,0.54vw,6px);
+      line-height:1.3;
+    }
+    .recruit-quick-rating span:first-child {
+      color:#c08a18;
+    }
+    .recruit-quick-rating span:last-child {
+      color:#ede0b8;
+    }
+    .recruit-quick-rating .unknown {
+      color:rgba(237,224,184,0.28);
+    }
+    .recruit-detail-rows {
+      display:grid;
+      gap:8px;
+    }
+    .recruit-detail-row {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border:2px solid rgba(237,224,184,0.1);
+      background:rgba(22,18,9,0.4);
+      padding:9px 12px;
+    }
+    .recruit-detail-label {
+      color:#c08a18;
+      font-size:clamp(5px,0.64vw,7px);
+      letter-spacing:1px;
+      min-width:36px;
+    }
+    .recruit-detail-value {
+      color:#ede0b8;
+      font-size:clamp(6px,0.78vw,9px);
+      flex:1;
+    }
+    .recruit-detail-value.unknown {
+      color:rgba(237,224,184,0.28);
+    }
+    .recruit-scout-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(4px,0.54vw,6px);
+      color:#ede0b8;
+      background:rgba(192,138,24,0.15);
+      border:2px solid rgba(192,138,24,0.36);
+      padding:6px 10px;
+      cursor:pointer;
+      letter-spacing:0.5px;
+      line-height:1.5;
+      white-space:nowrap;
+    }
+    .recruit-scout-btn:hover { background:rgba(192,138,24,0.3); border-color:#c08a18; }
+    .recruit-scout-btn:disabled { opacity:0.36; cursor:not-allowed; }
+    .recruit-detail-actions {
+      display:grid;
+      gap:8px;
+    }
+    .recruit-detail-action-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.64vw,7px);
+      color:#ede0b8;
+      background:rgba(22,18,9,0.6);
+      border:2px solid rgba(237,224,184,0.18);
+      padding:10px 14px;
+      cursor:pointer;
+      letter-spacing:0.5px;
+      text-align:left;
+      line-height:1.5;
+    }
+    .recruit-detail-action-btn:hover { border-color:rgba(192,138,24,0.55); background:rgba(192,138,24,0.06); }
+    .recruit-detail-close-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.64vw,7px);
+      color:rgba(237,224,184,0.56);
+      background:transparent;
+      border:2px solid rgba(237,224,184,0.18);
+      padding:10px 14px;
+      cursor:pointer;
+      letter-spacing:1px;
+      text-align:center;
+    }
+    .recruit-detail-close-btn:hover { border-color:rgba(237,224,184,0.48); color:#ede0b8; }
+    .recruit-header-badges {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .recruit-motivations-section {
+      border-top:2px solid rgba(237,224,184,0.1);
+      padding-top:12px;
+      display:grid;
+      gap:6px;
+    }
+    .recruit-motivations-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .recruit-motivations-label {
+      color:#c08a18;
+      font-size:clamp(4px,0.58vw,6px);
+      letter-spacing:1px;
+      margin-bottom:2px;
+    }
+    .recruit-offer-actions {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .recruit-sell-actions {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      justify-content:flex-start;
+      min-width:120px;
+    }
+    .recruit-motivations-body {
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .recruit-motivations-list {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .recruit-offer-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(4px,0.52vw,6px);
+      color:#ede0b8;
+      background:rgba(168,36,24,0.42);
+      border:2px solid rgba(237,224,184,0.28);
+      padding:6px 8px;
+      cursor:pointer;
+      letter-spacing:0.5px;
+      line-height:1.35;
+    }
+    .recruit-offer-btn:hover,
+    .recruit-offer-btn:focus-visible {
+      border-color:#ede0b8;
+      background:#a82418;
+      outline:none;
+    }
+    .recruit-offer-btn.secondary {
+      color:rgba(237,224,184,0.58);
+      background:transparent;
+      border-color:rgba(237,224,184,0.18);
+    }
+    .recruit-offer-meta {
+      color:rgba(237,224,184,0.42);
+      font-size:clamp(4px,0.52vw,6px);
+      line-height:1.5;
+      text-align:right;
+    }
+    .recruit-offer-panel {
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(8,7,4,0.18);
+      padding:8px;
+      display:grid;
+      gap:7px;
+    }
+    .recruit-offer-slider-row {
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      align-items:center;
+    }
+    .recruit-offer-slider {
+      width:100%;
+      accent-color:#c08a18;
+    }
+    .recruit-offer-amount {
+      color:#ede0b8;
+      font-size:clamp(5px,0.62vw,7px);
+      white-space:nowrap;
+    }
+    .recruit-top-offers {
+      border-top:2px solid rgba(237,224,184,0.1);
+      padding-top:10px;
+      display:grid;
+      gap:5px;
+    }
+    .recruit-top-offer-row {
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:8px;
+      align-items:center;
+      color:rgba(237,224,184,0.58);
+      font-size:clamp(4px,0.54vw,6px);
+      line-height:1.5;
+    }
+    .recruit-top-offer-team {
+      color:#ede0b8;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .recruit-top-offer-interest {
+      color:#c08a18;
+    }
+    .recruit-motivation-item {
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .recruit-motivation-square {
+      width:9px;
+      height:9px;
+      border:2px solid rgba(192,138,24,0.38);
+      background:rgba(22,18,9,0.7);
+      flex-shrink:0;
+    }
+    .recruit-motivation-square.correct {
+      background:#143d14;
+      border-color:#2ecc71;
+    }
+    .recruit-motivation-square.wrong {
+      background:#3d1414;
+      border-color:#e74c3c;
+    }
+    .recruit-motivation-text {
+      color:rgba(237,224,184,0.58);
+      font-size:clamp(4px,0.58vw,6px);
+      letter-spacing:0.5px;
+      line-height:1.5;
+    }
+
+    .tournament-screen {
+      justify-content:flex-start;
+      padding:14px 18px 16px;
+      overflow:hidden;
+    }
+    .tournament-shell {
+      width:100%;
+      height:100%;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:8px;
+      min-height:0;
+    }
+    .tournament-actions {
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      min-height:0;
+    }
+    .tournament-action-btn {
+      font-family:'Press Start 2P', monospace;
+      font-size:clamp(5px,0.64vw,7px);
+      color:rgba(237,224,184,0.78);
+      background:rgba(168,36,24,0.28);
+      border:2px solid rgba(237,224,184,0.26);
+      padding:8px 12px;
+      cursor:pointer;
+      letter-spacing:1px;
+      text-shadow:1px 1px 0 #350a04;
+    }
+    .tournament-action-btn:hover,
+    .tournament-action-btn:focus-visible {
+      color:#ede0b8;
+      background:#a82418;
+      border-color:#ede0b8;
+      outline:none;
+    }
+    .bracket-board {
+      min-height:0;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(78px,0.28fr) minmax(0,1fr);
+      grid-template-rows:repeat(2, minmax(0,1fr));
+      gap:6px;
+      overflow:hidden;
+    }
+    .bracket-side {
+      min-width:0;
+      min-height:0;
+      display:grid;
+      grid-template-rows:repeat(2, minmax(0,1fr));
+      gap:6px;
+    }
+    .bracket-side.left { grid-column:1; grid-row:1 / span 2; }
+    .bracket-side.right { grid-column:3; grid-row:1 / span 2; }
+    .bracket-region {
+      min-width:0;
+      min-height:0;
+      display:block;
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(22,18,9,0.2);
+      padding:4px;
+    }
+    .bracket-region-grid {
+      height:100%;
+      min-height:0;
+      display:grid;
+      grid-template-columns:1.36fr 0.88fr 0.68fr 0.52fr;
+      gap:4px;
+      align-items:stretch;
+    }
+    .bracket-region.right .bracket-region-grid {
+      grid-template-columns:0.52fr 0.68fr 0.88fr 1.36fr;
+    }
+    .bracket-round {
+      min-width:0;
+      display:grid;
+      gap:4px;
+      align-content:space-around;
+    }
+    .bracket-round.r64 { grid-template-rows:repeat(8, minmax(0,1fr)); }
+    .bracket-round.r32 { grid-template-rows:repeat(4, minmax(0,1fr)); padding:5.5% 0; }
+    .bracket-round.s16 { grid-template-rows:repeat(2, minmax(0,1fr)); padding:18% 0; }
+    .bracket-round.e8 { grid-template-rows:1fr; padding:38% 0; }
+    .bracket-final-board {
+      grid-column:2;
+      grid-row:1 / span 2;
+      min-width:0;
+      min-height:0;
+      display:grid;
+      grid-template-rows:1fr auto 1fr;
+      gap:8px;
+      align-items:center;
+    }
+    .bracket-final-side {
+      min-height:0;
+      display:grid;
+      align-content:center;
+      gap:8px;
+    }
+    .bracket-title-game {
+      min-height:62px;
+    }
+    .bracket-champion-slot {
+      min-height:30px;
+      border:2px solid rgba(192,138,24,0.26);
+      background:rgba(192,138,24,0.08);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:rgba(237,224,184,0.32);
+      font-size:clamp(4px,0.5vw,6px);
+    }
+    .bracket-game {
+      min-height:0;
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(22,18,9,0.36);
+      display:grid;
+      grid-template-rows:1fr 1fr;
+      box-shadow:inset 0 -3px 0 rgba(53,10,4,0.22);
+    }
+    .bracket-slot {
+      min-height:0;
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(8,7,4,0.18);
+      display:flex;
+      align-items:center;
+      padding:0 6px;
+      color:rgba(237,224,184,0.26);
+      font-size:clamp(4px,0.52vw,6px);
+      line-height:1.25;
+      overflow:hidden;
+    }
+    .bracket-team {
+      min-width:0;
+      display:grid;
+      grid-template-columns:18px 1fr 24px;
+      align-items:center;
+      gap:4px;
+      padding:3px 4px;
+      color:rgba(237,224,184,0.78);
+      font-size:clamp(4px,0.48vw,6px);
+      line-height:1.25;
+      border-bottom:1px solid rgba(237,224,184,0.08);
+    }
+    .bracket-team:last-child { border-bottom:none; }
+    .bracket-team.user-team {
+      color:#ede0b8;
+      background:rgba(168,36,24,0.52);
+    }
+    .bracket-team.winner {
+      color:#ede0b8;
+      background:rgba(192,138,24,0.14);
+    }
+    .bracket-team.user-team.winner {
+      background:rgba(168,36,24,0.68);
+    }
+    .bracket-seed {
+      color:#c08a18;
+      font-size:clamp(4px,0.54vw,6px);
+      text-align:center;
+    }
+    .bracket-name {
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .bracket-rank {
+      color:rgba(237,224,184,0.34);
+      font-size:clamp(4px,0.5vw,6px);
+      text-align:right;
+    }
+
     .game-screen,
     .box-screen {
       justify-content:flex-start;
@@ -1692,8 +2366,27 @@
       .press-screen {
         padding:24px 28px 20px;
       }
-      .roster-screen {
+      .roster-screen,
+      .recruiting-screen {
         padding:24px 28px 20px;
+      }
+      .tournament-screen {
+        padding:14px 12px;
+        overflow-y:auto;
+      }
+      .bracket-board {
+        grid-template-columns:1fr;
+        grid-template-rows:none;
+        overflow:visible;
+      }
+      .bracket-side.left,
+      .bracket-side.right,
+      .bracket-final-board {
+        grid-column:auto;
+        grid-row:auto;
+      }
+      .bracket-region-grid {
+        min-height:360px;
       }
       .gameplan-screen {
         padding:24px 28px 20px;
@@ -1720,7 +2413,8 @@
       .player-row {
         grid-template-columns:1fr;
       }
-      .rotation-row {
+      .rotation-row,
+      .recruit-row {
         grid-template-columns:1fr;
       }
       .personality-grid {
@@ -1860,16 +2554,28 @@
       letter-spacing:1px; margin-top:6px;
     }
 
-    /* ── flash ── */
-    #flash {
-      position:fixed; inset:0; background:#ede0b8;
-      opacity:0; pointer-events:none; z-index:300;
+    /* ── page crumple transition ── */
+    #flash { display:none; }
+    #page-peel {
+      position:fixed; inset:0; z-index:500; pointer-events:none;
+      background:linear-gradient(135deg,#181309 0%,#0e0b06 55%,#131008 100%);
+      display:none;
     }
+    @keyframes crumple-off-left {
+      0%   { transform:translateX(0%)    scale(1)    rotate(0deg)   skewX(0deg)   skewY(0deg);  filter:brightness(1); }
+      18%  { transform:translateX(-6%)   scale(0.91) rotate(-2deg)  skewX(-6deg)  skewY(2deg);  filter:brightness(1.15); }
+      40%  { transform:translateX(-22%)  scale(0.68) rotate(-7deg)  skewX(-12deg) skewY(-3deg); filter:brightness(1.4); }
+      65%  { transform:translateX(-55%)  scale(0.32) rotate(-14deg) skewX(-18deg) skewY(5deg);  filter:brightness(1.75); }
+      85%  { transform:translateX(-90%)  scale(0.1)  rotate(-20deg) skewX(-22deg) skewY(-7deg); filter:brightness(2.1); }
+      100% { transform:translateX(-130%) scale(0.04) rotate(-24deg) skewX(-24deg) skewY(9deg);  filter:brightness(2.4); }
+    }
+    #page-peel.peeling { animation:crumple-off-left 0.30s ease-in forwards; }
   </style>
 </head>
 <body>
 <audio id="game-soundtrack" src="soundtrack.mp3" loop preload="auto"></audio>
 <div id="flash"></div>
+<div id="page-peel"></div>
 <div id="screen">
 
   <canvas id="grain"></canvas>
@@ -2043,12 +2749,51 @@
         </div>
         <div class="dash-actions">
           <button class="dash-btn" type="button" onclick="goToRoster()">ROSTER</button>
-          <button class="dash-btn" type="button">RECRUITING</button>
+          <button class="dash-btn" type="button" onclick="goToRecruiting()">RECRUITING</button>
           <button class="dash-btn" type="button" onclick="goToSchedule()">SCHEDULE</button>
           <button class="dash-btn" type="button" onclick="goToStandings()">STANDINGS</button>
           <button class="dash-btn" type="button" onclick="goToStats()">STATS</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- RECRUITING -->
+  <div id="recruiting-screen" class="screen-panel recruiting-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToDashboard()">◄ DASHBOARD</button>
+    </div>
+    <div class="recruiting-shell">
+      <div class="recruiting-top">
+        <div>
+          <div class="roster-title" id="recruiting-title"></div>
+          <div class="recruiting-subtitle" id="recruiting-subtitle"></div>
+          <button id="recruiting-bookmarks-btn" class="recruit-bookmarks-toggle" onclick="toggleBookmarksFilter()"></button>
+          <button id="recruiting-signed-btn" class="recruit-bookmarks-toggle" onclick="toggleSignedFilter()"></button>
+        </div>
+        <div class="recruit-header-badges">
+          <div class="recruit-hours-badge" id="recruiting-nil-badge"></div>
+          <div class="recruit-hours-badge" id="recruiting-hours-badge"></div>
+        </div>
+      </div>
+      <div class="recruiting-filters" id="recruiting-filters"></div>
+      <div class="recruiting-grid" id="recruiting-grid"></div>
+    </div>
+  </div>
+
+  <!-- RECRUIT DETAIL OVERLAY -->
+  <div id="recruit-detail-overlay" class="recruit-detail-overlay hidden" onclick="handleRecruitOverlayClick(event)">
+    <div id="recruit-detail-card" class="recruit-detail-card"></div>
+  </div>
+
+  <!-- TOURNAMENT -->
+  <div id="tournament-screen" class="screen-panel tournament-screen hidden">
+    <div class="tournament-shell">
+      <div class="tournament-actions">
+        <button class="tournament-action-btn" type="button" onclick="simulateTournamentRound()">SIMULATE ROUND</button>
+        <button class="tournament-action-btn" type="button" onclick="simulateTournament()">SIMULATE TOURNAMENT</button>
+      </div>
+      <div class="bracket-board" id="bracket-board"></div>
     </div>
   </div>
 
@@ -2268,6 +3013,21 @@ const PRESS_QUESTIONS = [
   }
 ];
 
+const RECRUIT_TIERS = [
+  { stars:5, count:20,  minPotential:80, maxPotential:99, overallMin:70, overallMax:85 },
+  { stars:4, count:150, minPotential:70, maxPotential:95, overallMin:62, overallMax:78 },
+  { stars:3, count:300, minPotential:60, maxPotential:90, overallMin:54, overallMax:72 },
+  { stars:2, count:500, minPotential:60, maxPotential:85, overallMin:46, overallMax:65 },
+  { stars:1, count:500, minPotential:60, maxPotential:80, overallMin:40, overallMax:60 }
+];
+const RECRUIT_POSITIONS = ['PG','SG','SF','PF','C'];
+const RECRUIT_MOTIVATIONS = [
+  'Playing Time','Coaching','Academics','Family','Loyalty',
+  'Exposure','NIL Money','Development','Winning','Location',
+  'Culture','Legacy','Teammates','Tradition','Support'
+];
+const RECRUITING_CLASS_VERSION = 'freshman-recruits-4';
+
 /* ═══════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════ */
@@ -2293,10 +3053,19 @@ let gameTimer = null;
 let lastBoxScore = null;
 let standingsState = null;
 let playerStatsState = null;
+let recruitingClass = null;
+let recruitingStarFilter = 'all';
+let recruitingPositionFilter = 'all';
+let recruitingBookmarksFilter = false;
+let recruitingSignedFilter = false;
+let recruitingHoursState = null;
+let recruitingRunId = sessionStorage.getItem('recruitingRunId') || '';
+let tournamentState = null;
+let tournamentSimInProgress = false;
 let statsMode = 'team';
 let statsSelectedConf = null;
 let statsSelectedTeam = null;
-const ROSTER_GENERATION_VERSION = 'team-style-3';
+const ROSTER_GENERATION_VERSION = 'team-style-6';
 let coachProfile = {
   firstName:'',
   lastName:'',
@@ -2316,10 +3085,59 @@ let coachProfile = {
 /* ═══════════════════════════════════════════
    SCREEN TRANSITIONS
 ═══════════════════════════════════════════ */
+function playCrumpleSound() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const ctx = new AC();
+    const sr = ctx.sampleRate;
+    const dur = 0.38;
+    const buf = ctx.createBuffer(1, Math.ceil(sr * dur), sr);
+    const d = buf.getChannelData(0);
+    // Multiple short crinkle bursts at random offsets
+    for (let b = 0; b < 14; b++) {
+      const start = Math.floor(Math.random() * 0.28 * sr);
+      const len   = Math.ceil((0.025 + Math.random() * 0.07) * sr);
+      const amp   = 0.12 + Math.random() * 0.28;
+      for (let i = 0; i < len && start + i < d.length; i++) {
+        const env = Math.exp(-(i / sr) * (10 + Math.random() * 14));
+        d[start + i] += (Math.random() * 2 - 1) * env * amp;
+      }
+    }
+    // Continuous crinkle body with irregular modulation
+    for (let i = 0; i < d.length; i++) {
+      const t = i / sr;
+      const env = Math.exp(-t * 6) * (1 - Math.exp(-t * 80));
+      const mod = Math.abs(Math.sin(t * 190 + Math.sin(t * 73) * 9));
+      d[i] += (Math.random() * 2 - 1) * env * mod * 0.18;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass'; hp.frequency.value = 900;
+    const peak = ctx.createBiquadFilter();
+    peak.type = 'peaking'; peak.frequency.value = 3800; peak.gain.value = 7; peak.Q.value = 0.7;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.75;
+    src.connect(hp); hp.connect(peak); peak.connect(gain); gain.connect(ctx.destination);
+    src.start(ctx.currentTime);
+    src.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
 function flash(cb) {
-  const f = document.getElementById('flash');
-  f.style.opacity = '0.75';
-  setTimeout(() => { f.style.opacity = '0'; cb(); }, 90);
+  const peel = document.getElementById('page-peel');
+  peel.classList.remove('peeling');
+  peel.style.display = 'block';
+  peel.offsetWidth; // reflow so display:block registers before animation starts
+  // Switch content immediately — new page is live under the peel from frame 1
+  cb();
+  playCrumpleSound();
+  peel.classList.add('peeling');
+  setTimeout(() => {
+    peel.style.display = 'none';
+    peel.classList.remove('peeling');
+  }, 320);
 }
 
 function showPanel(name) {
@@ -2335,6 +3153,7 @@ function goHome() {
 }
 
 function goToConf() {
+  if (typeof playGameSoundtrack === 'function') playGameSoundtrack();
   const homeBtn = document.getElementById('start-btn');
   if (homeBtn) homeBtn.disabled = false;
   flash(() => {
@@ -2371,6 +3190,7 @@ function goToDashboard() {
   }
   currentGameIndex = getNextUnplayedGameIndex();
   ensureDefaultGameplanSaved();
+  ensureRecruitingClass();
   flash(() => {
     showPanel('dashboard');
     renderNextGame();
@@ -2396,7 +3216,12 @@ function renderNextGame() {
   if (!body) return;
   const game = cachedSchedule ? cachedSchedule[currentGameIndex] : null;
   if (!game) {
-    body.innerHTML = '';
+    body.innerHTML =
+      `<div class="ng-season-complete">` +
+        `<div class="ng-complete-label">REGULAR SEASON COMPLETE</div>` +
+        `<div class="ng-complete-title">POSTSEASON READY</div>` +
+        `<button class="ng-tournament-btn" type="button" onclick="startTournament()">START TOURNAMENT</button>` +
+      `</div>`;
     return;
   }
   const gameNum = currentGameIndex + 1;
@@ -2430,6 +3255,282 @@ function renderNextGame() {
 function playGame()  {
   ensureDefaultGameplanSaved();
   startGameSimulation(false);
+}
+
+function startTournament() {
+  if (!tournamentState) tournamentState = buildTournamentState();
+  renderTournamentBracket();
+  flash(() => showPanel('tournament'));
+}
+
+function getTournamentSeed(rank) {
+  return Math.ceil(rank / 4);
+}
+
+function getTournamentRegions() {
+  const regionNames = ['EAST','SOUTH','MIDWEST','WEST'];
+  const ranked = getRankedTeams('all').slice(0, 64).map((team, i) => ({
+    ...team,
+    overallRank:i + 1,
+    seed:getTournamentSeed(i + 1)
+  }));
+  const bySeed = {};
+  ranked.forEach(team => {
+    if (!bySeed[team.seed]) bySeed[team.seed] = [];
+    bySeed[team.seed].push(team);
+  });
+  const regions = regionNames.map(name => ({ name, seedLines:{} }));
+  for (let seed = 1; seed <= 16; seed++) {
+    (bySeed[seed] || []).forEach((team, i) => {
+      regions[i].seedLines[seed] = team;
+    });
+  }
+  return regions;
+}
+
+function buildTournamentState() {
+  const regions = getTournamentRegions();
+  const matchups = [[1,16],[8,9],[5,12],[4,13],[6,11],[3,14],[7,10],[2,15]];
+  return {
+    roundIndex:0,
+    regions:regions.map(region => ({
+      name:region.name,
+      champion:null,
+      rounds:[
+        matchups.map(pair => makeTournamentGame(region.seedLines[pair[0]], region.seedLines[pair[1]])),
+        Array.from({ length:4 }, () => makeTournamentGame(null, null)),
+        Array.from({ length:2 }, () => makeTournamentGame(null, null)),
+        Array.from({ length:1 }, () => makeTournamentGame(null, null))
+      ]
+    })),
+    finalFour:[
+      makeTournamentGame(null, null),
+      makeTournamentGame(null, null)
+    ],
+    championship:makeTournamentGame(null, null),
+    champion:null
+  };
+}
+
+function makeTournamentGame(teamA, teamB) {
+  return {
+    teams:[teamA || null, teamB || null],
+    scores:null,
+    winner:null,
+    complete:false
+  };
+}
+
+function renderTournamentBracket() {
+  const board = document.getElementById('bracket-board');
+  if (!board) return;
+  if (!tournamentState) tournamentState = buildTournamentState();
+  board.innerHTML = `
+    <div class="bracket-side left">
+      ${[0, 2].map(i => `
+        <div class="bracket-region">
+          ${renderRegionBracket(tournamentState.regions[i], false)}
+        </div>
+      `).join('')}
+    </div>
+    ${renderFinalFourBoard()}
+    <div class="bracket-side right">
+      ${[1, 3].map(i => `
+        <div class="bracket-region right">
+          ${renderRegionBracket(tournamentState.regions[i], true)}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderFinalFourBoard() {
+  return `
+    <div class="bracket-final-board">
+      <div class="bracket-final-side">${renderTournamentGame(tournamentState.finalFour[0])}</div>
+      <div>
+        <div class="bracket-title-game">${renderTournamentGame(tournamentState.championship)}</div>
+        <div class="bracket-champion-slot">${tournamentState.champion ? escapeAttr(tournamentState.champion.team) : ''}</div>
+      </div>
+      <div class="bracket-final-side">${renderTournamentGame(tournamentState.finalFour[1])}</div>
+    </div>
+  `;
+}
+
+function renderRegionBracket(region, mirrored) {
+  const firstRound = `
+    <div class="bracket-round r64">
+      ${region.rounds[0].map(game => renderTournamentGame(game)).join('')}
+    </div>
+  `;
+  const roundTwo = renderTournamentRound('r32', region.rounds[1]);
+  const sweetSixteen = renderTournamentRound('s16', region.rounds[2]);
+  const eliteEight = renderTournamentRound('e8', region.rounds[3]);
+  const columns = mirrored
+    ? [eliteEight, sweetSixteen, roundTwo, firstRound]
+    : [firstRound, roundTwo, sweetSixteen, eliteEight];
+  return `<div class="bracket-region-grid">${columns.join('')}</div>`;
+}
+
+function renderTournamentRound(className, games) {
+  return `
+    <div class="bracket-round ${className}">
+      ${games.map(game => game.teams[0] || game.teams[1] ? renderTournamentGame(game) : '<div class="bracket-slot"></div>').join('')}
+    </div>
+  `;
+}
+
+function renderTournamentGame(game) {
+  return `
+    <div class="bracket-game">
+      ${renderBracketTeam(game.teams[0], game, 0)}
+      ${renderBracketTeam(game.teams[1], game, 1)}
+    </div>
+  `;
+}
+
+function renderBracketTeam(team, game, slot) {
+  if (!team) {
+    return `<div class="bracket-team"><span class="bracket-seed">--</span><span class="bracket-name"></span><span class="bracket-rank"></span></div>`;
+  }
+  const isUserTeam = team.team === selectedTeam && team.conf === selectedConf;
+  const isWinner = game && game.winner && game.winner.team === team.team && game.winner.conf === team.conf;
+  const score = game && game.scores ? game.scores[slot] : null;
+  return `
+    <div class="bracket-team${isUserTeam ? ' user-team' : ''}${isWinner ? ' winner' : ''}">
+      <span class="bracket-seed">${team.seed}</span>
+      <span class="bracket-name">${escapeAttr(team.team)}</span>
+      <span class="bracket-rank">${score == null ? `#${team.overallRank}` : score}</span>
+    </div>
+  `;
+}
+
+function simulateTournamentRound() {
+  if (tournamentSimInProgress) return;
+  if (!tournamentState) tournamentState = buildTournamentState();
+  const roundIndex = getCurrentTournamentRoundIndex();
+  if (roundIndex < 0) return;
+  const games = getPlayableTournamentGames(roundIndex);
+  if (!games.length) return;
+  tournamentSimInProgress = true;
+  simulateTournamentGameQueue(games, () => {
+    tournamentState.roundIndex = getCurrentTournamentRoundIndex();
+    tournamentSimInProgress = false;
+    renderTournamentBracket();
+  });
+}
+
+function simulateTournament() {
+  if (tournamentSimInProgress) return;
+  if (!tournamentState) tournamentState = buildTournamentState();
+  tournamentSimInProgress = true;
+  simulateRemainingTournamentRounds();
+}
+
+function getCurrentTournamentRoundIndex() {
+  for (let roundIndex = 0; roundIndex < 6; roundIndex++) {
+    if (getPlayableTournamentGames(roundIndex).length) return roundIndex;
+  }
+  return -1;
+}
+
+function getPlayableTournamentGames(roundIndex) {
+  const regionOrder = [0, 2, 1, 3];
+  const games = [];
+  if (roundIndex === 4) {
+    tournamentState.finalFour.forEach((game, gameIndex) => {
+      if (!game.complete && game.teams[0] && game.teams[1]) games.push({ roundIndex, gameIndex, game });
+    });
+    return games;
+  }
+  if (roundIndex === 5) {
+    const game = tournamentState.championship;
+    return !game.complete && game.teams[0] && game.teams[1] ? [{ roundIndex, gameIndex:0, game }] : [];
+  }
+  regionOrder.forEach(regionIndex => {
+    const region = tournamentState.regions[regionIndex];
+    (region.rounds[roundIndex] || []).forEach((game, gameIndex) => {
+      if (!game.complete && game.teams[0] && game.teams[1]) {
+        games.push({ regionIndex, roundIndex, gameIndex, game });
+      }
+    });
+  });
+  return games;
+}
+
+function simulateTournamentGameQueue(games, done) {
+  const next = () => {
+    const item = games.shift();
+    if (!item) {
+      done();
+      return;
+    }
+    simulateTournamentGameItem(item);
+    renderTournamentBracket();
+    setTimeout(next, 180);
+  };
+  next();
+}
+
+function simulateRemainingTournamentRounds() {
+  const roundIndex = getCurrentTournamentRoundIndex();
+  if (roundIndex < 0) {
+    tournamentSimInProgress = false;
+    renderTournamentBracket();
+    return;
+  }
+  const games = getPlayableTournamentGames(roundIndex);
+  simulateTournamentGameQueue(games, () => {
+    tournamentState.roundIndex = getCurrentTournamentRoundIndex();
+    setTimeout(simulateRemainingTournamentRounds, 220);
+  });
+}
+
+function simulateTournamentGameItem(item) {
+  const game = item.game;
+  const result = simulateNeutralTournamentGame(game.teams[0], game.teams[1], item);
+  game.scores = result.scores;
+  game.winner = result.winner;
+  game.complete = true;
+  advanceTournamentWinner(item, result.winner);
+}
+
+function simulateNeutralTournamentGame(teamA, teamB, item) {
+  const seed = strHash(`${seasonNumber || 1}|TOURNAMENT|${item.regionIndex}|${item.roundIndex}|${item.gameIndex}|${teamA.team}|${teamB.team}`);
+  const rng = mulberry32(seed);
+  return withRandomSource(rng, () => {
+    const state = createTournamentGameState(teamA, teamB, rng);
+    let guard = 0;
+    while (!state.complete && guard < 5000) {
+      simulatePossession(state);
+      guard++;
+    }
+    const scores = [state.scores.home, state.scores.away];
+    const winner = scores[0] > scores[1] ? teamA : teamB;
+    return { scores, winner };
+  });
+}
+
+function advanceTournamentWinner(item, winner) {
+  const { regionIndex, roundIndex, gameIndex } = item;
+  if (roundIndex === 4) {
+    tournamentState.championship.teams[gameIndex] = winner;
+    return;
+  }
+  if (roundIndex === 5) {
+    tournamentState.champion = winner;
+    return;
+  }
+  const region = tournamentState.regions[regionIndex];
+  if (roundIndex >= 3) {
+    region.champion = winner;
+    const finalFourIndex = regionIndex === 0 || regionIndex === 2 ? 0 : 1;
+    const finalFourSlot = regionIndex === 0 || regionIndex === 1 ? 0 : 1;
+    tournamentState.finalFour[finalFourIndex].teams[finalFourSlot] = winner;
+    return;
+  }
+  const nextGame = region.rounds[roundIndex + 1][Math.floor(gameIndex / 2)];
+  nextGame.teams[gameIndex % 2] = winner;
 }
 
 function getScheduleStateKey() {
@@ -2475,6 +3576,13 @@ function goToRoster() {
   flash(() => showPanel('roster'));
 }
 
+function goToRecruiting() {
+  ensureRosterLoaded();
+  ensureRecruitingClass();
+  renderRecruiting();
+  flash(() => showPanel('recruiting'));
+}
+
 function goToStandings() {
   ensureRosterLoaded();
   renderStandings();
@@ -2499,6 +3607,10 @@ function goToPressConference() {
   currentGameIndex = 0;
   standingsState = null;
   playerStatsState = null;
+  recruitingClass = null;
+  resetRecruitingHoursForNewGame();
+  sessionStorage.removeItem(getRecruitingClassKey());
+  sessionStorage.removeItem(getRecruitingVersionKey());
   sessionStorage.removeItem('pressPersonality');
   sessionStorage.removeItem('pressAnswers');
   sessionStorage.removeItem(getStandingsStateKey());
@@ -2570,8 +3682,10 @@ function renderTeam() {
 async function prepareRosters() {
   namePool = await loadNamePool();
   allRosters = generateAllRosters(namePool);
+  recruitingClass = generateRecruitingClass(namePool);
   sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
   sessionStorage.setItem('rosterGenerationVersion', ROSTER_GENERATION_VERSION);
+  saveRecruitingClass();
   standingsState = buildInitialStandingsState();
   sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
   playerStatsState = buildInitialPlayerStatsState();
@@ -2654,12 +3768,11 @@ function generateTeamRoster(teamOverall, names) {
   const grades = ['Freshman','Freshman','Freshman','Sophomore','Sophomore','Sophomore','Junior','Junior','Senior','Senior'];
   const positions = ['PG','SG','SF','PF','C','PG','SG','SF','PF','C'];
   shuffle(grades);
-  const overalls = makeOverallSet(teamOverall, grades.length);
   const usedNames = new Set();
   return grades.map((grade, i) => {
-    const overall = overalls[i];
+    const attributes = makeTeamPlayerAttributes(teamOverall);
+    const overall = Math.round(average(Object.values(attributes)));
     const potential = makePotentialFromOverall(overall, grade);
-    const attributes = makeAttributes(overall);
     const homeState = randomChoice(Object.keys(STATE_HOMETOWNS));
     const hometown = randomChoice(STATE_HOMETOWNS[homeState]);
     const name = makePlayerName(names, usedNames);
@@ -2677,28 +3790,13 @@ function generateTeamRoster(teamOverall, names) {
   }).sort((a, b) => b.overall - a.overall);
 }
 
-function makeOverallSet(teamOverall, playerCount) {
-  const targetSum = teamOverall * playerCount;
-  const roleOffsets = [10, 7, 5, 3, 1, -1, -3, -5, -7, -10];
-  const values = Array.from({ length:playerCount }, (_, i) => {
-    const offset = roleOffsets[i] || randInt(-10, 10);
-    return clamp(Math.round(teamOverall + offset + randInt(-3, 3)), 25, 99);
-  });
-
-  let guard = 0;
-  while (sum(values) !== targetSum && guard < 600) {
-    const diff = targetSum - sum(values);
-    const order = values
-      .map((value, i) => ({ value, i }))
-      .sort((a, b) => diff > 0 ? a.value - b.value : b.value - a.value)
-      .map(item => item.i);
-    for (const idx of order) {
-      if (diff > 0 && values[idx] < 99) { values[idx]++; break; }
-      if (diff < 0 && values[idx] > 25) { values[idx]--; break; }
-    }
-    guard++;
-  }
-  return values;
+function makeTeamPlayerAttributes(teamOverall) {
+  const keys = ['threePoint','midRange','freeThrow','finishing','iq','dribbling','passing','defense'];
+  const attrMax = clamp(Number(teamOverall) || 60, 60, 99);
+  const attrMin = Math.max(60, attrMax - 20);
+  const attrs = {};
+  keys.forEach(key => { attrs[key] = randInt(attrMin, attrMax); });
+  return attrs;
 }
 
 function makePotentialFromOverall(overall, grade) {
@@ -2711,11 +3809,13 @@ function makePotentialFromOverall(overall, grade) {
   return clamp(overall + growth, overall, 99);
 }
 
-function makeAttributes(overall) {
+function makeAttributes(overall, teamMax) {
   const keys = ['threePoint','midRange','freeThrow','finishing','iq','dribbling','passing','defense'];
+  const attrMax = teamMax != null ? clamp(teamMax, 60, 99) : 99;
+  const attrMin = teamMax != null ? Math.max(60, teamMax - 20) : 25;
   const attrs = {};
-  keys.forEach(key => { attrs[key] = clamp(overall + randInt(-9, 9), 25, 99); });
-  balanceValues(attrs, keys, overall * keys.length, 25, 99);
+  keys.forEach(key => { attrs[key] = randInt(attrMin, attrMax); });
+  balanceValues(attrs, keys, overall * keys.length, attrMin, attrMax);
   return attrs;
 }
 
@@ -2765,6 +3865,746 @@ function renderRoster() {
       </div>
     `).join('')}
   `;
+}
+
+function getRecruitingClassKey() {
+  return `recruitingClass:${seasonNumber || 1}`;
+}
+
+function getRecruitingVersionKey() {
+  return `recruitingClassVersion:${seasonNumber || 1}`;
+}
+
+function saveRecruitingClass() {
+  if (!recruitingClass) return;
+  sessionStorage.setItem(getRecruitingClassKey(), JSON.stringify(recruitingClass));
+  sessionStorage.setItem(getRecruitingVersionKey(), RECRUITING_CLASS_VERSION);
+}
+
+function loadRecruitingClass() {
+  try {
+    const savedVersion = sessionStorage.getItem(getRecruitingVersionKey());
+    const saved = JSON.parse(sessionStorage.getItem(getRecruitingClassKey()) || 'null');
+    if (savedVersion === RECRUITING_CLASS_VERSION && Array.isArray(saved)) return saved;
+  } catch (err) {}
+  return null;
+}
+
+function ensureRecruitingClass() {
+  if (!recruitingClass) recruitingClass = loadRecruitingClass();
+  if (!recruitingClass) {
+    recruitingClass = generateRecruitingClass(namePool || getFallbackNamePool());
+    saveRecruitingClass();
+  } else if (recruitingClass.some(recruit => !Array.isArray(recruit.cpuOffers))) {
+    recruitingClass.forEach(recruit => { recruit.cpuOffers = []; });
+    generateCPURecruitOffers(recruitingClass);
+    saveRecruitingClass();
+  }
+  return recruitingClass;
+}
+
+function pickMotivations() {
+  const pool = [...RECRUIT_MOTIVATIONS];
+  const motivations = [];
+  for (let i = 0; i < 10; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    motivations.push(pool.splice(idx, 1)[0]);
+  }
+  const a = Math.floor(Math.random() * 10);
+  let b;
+  do { b = Math.floor(Math.random() * 10); } while (b === a);
+  return { motivations, topMotivations: [a, b] };
+}
+
+function generateRecruitingClass(names) {
+  const recruits = [];
+  const usedNames = new Set();
+  const positions = ['PG','SG','SF','PF','C'];
+  RECRUIT_TIERS.forEach(tier => {
+    for (let i = 0; i < tier.count; i++) {
+      const potential = randInt(tier.minPotential, tier.maxPotential);
+      const maxOverall = Math.min(tier.overallMax, potential);
+      const minOverall = Math.min(tier.overallMin, maxOverall);
+      const overall = randInt(minOverall, maxOverall);
+      const attributes = makeAttributes(overall);
+      const homeState = randomChoice(Object.keys(STATE_HOMETOWNS));
+      const hometown = randomChoice(STATE_HOMETOWNS[homeState]);
+      recruits.push({
+        id:`S${seasonNumber || 1}-${tier.stars}-${i + 1}`,
+        name:makeRecruitName(names, usedNames),
+        grade:'Freshman',
+        stars:tier.stars,
+        position:randomChoice(positions),
+        overall,
+        potential,
+        attributes,
+        homeState,
+        hometown,
+        tendencies:makeTendencies(attributes),
+        ...pickMotivations(),
+        guessedMotivations:{}
+      });
+    }
+  });
+  const shuffled = [];
+  RECRUIT_TIERS.forEach(tier => {
+    const group = recruits.filter(r => r.stars === tier.stars);
+    for (let i = group.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [group[i], group[j]] = [group[j], group[i]];
+    }
+    shuffled.push(...group);
+  });
+  shuffled.forEach((recruit, i) => { recruit.rank = i + 1; });
+  generateCPURecruitOffers(shuffled);
+  return shuffled;
+}
+
+function generateCPURecruitOffers(recruits) {
+  const budgets = {};
+  const teams = [];
+  Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
+    teamNames.forEach(team => {
+      if (conf === selectedConf && team === selectedTeam) return;
+      const data = ((TEAM_DATA[conf] || {})[team] || {});
+      const budget = Math.max(0, Math.round((Number(data.n) || 0) * 1000000));
+      budgets[`${conf}::${team}`] = budget;
+      teams.push({ conf, team, prestige:Number(data.p) || 0, budget });
+    });
+  });
+  const recruitPool = recruits.slice();
+  teams.forEach(team => {
+    let remaining = team.budget;
+    const targets = seededRecruitTargets(recruitPool, team).slice(0, 8);
+    targets.forEach(recruit => {
+      if (remaining <= 0 && getRecruitFairValue(recruit) > 0) return;
+      const fairValue = getRecruitFairValue(recruit);
+      const multiplier = 0.82 + (Math.random() * 0.46);
+      const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * multiplier / 1000) * 1000);
+      const amount = Math.min(desired, remaining);
+      if (fairValue > 0 && amount <= 0) return;
+      remaining -= amount;
+      if (!recruit.cpuOffers) recruit.cpuOffers = [];
+      recruit.cpuOffers.push({
+        conf:team.conf,
+        team:team.team,
+        amount,
+        interest:getCPUOfferInterest(team, recruit, amount)
+      });
+    });
+  });
+  recruits.forEach(recruit => {
+    recruit.cpuOffers = (recruit.cpuOffers || [])
+      .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
+      .slice(0, 12);
+  });
+}
+
+function seededRecruitTargets(recruits, team) {
+  return recruits
+    .map(recruit => ({
+      recruit,
+      score:(Number(recruit.stars) || 1) * 100000 +
+        (Number(recruit.potential) || 0) * 1000 +
+        (Number(recruit.overall) || 0) * 100 +
+        Math.random() * 50000 +
+        team.prestige * 180
+    }))
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.recruit);
+}
+
+function getCPUOfferInterest(team, recruit, amount) {
+  const fairValue = getRecruitFairValue(recruit);
+  const offerRatio = fairValue > 0 ? (Math.max(0, Number(amount) || 0) / fairValue) : 1;
+  return 0.5 * (((Number(team.prestige) || 0) / 75) * offerRatio);
+}
+
+function makeRecruitName(names, usedNames) {
+  for (let i = 0; i < 80; i++) {
+    const full = `${randomChoice(names.first)} ${randomChoice(names.last)}`;
+    if (!usedNames.has(full)) {
+      usedNames.add(full);
+      return full;
+    }
+  }
+  const full = `${randomChoice(names.first)} ${randomChoice(names.last)} ${usedNames.size + 1}`;
+  usedNames.add(full);
+  return full;
+}
+
+function getStarText(stars) {
+  return '★'.repeat(Number(stars) || 1);
+}
+
+function getRecruitFairValue(recruit) {
+  return ({ 5:2000000, 4:500000, 3:100000, 2:50000, 1:0 })[Number(recruit.stars) || 1] || 0;
+}
+
+function getTeamNILBudgetDollars() {
+  const teamNILVal = ((TEAM_DATA[selectedConf] || {})[selectedTeam] || {}).n;
+  return Math.max(0, Math.round((Number(teamNILVal) || 0) * 1000000));
+}
+
+function getCommittedNILDollars() {
+  return ensureRecruitingClass().reduce((sum, recruit) => sum + Math.max(0, Math.round(Number((recruit.offer || {}).amount) || 0)), 0);
+}
+
+function getAvailableNILDollars(extraAvailable = 0) {
+  return Math.max(0, getTeamNILBudgetDollars() - getCommittedNILDollars() + extraAvailable);
+}
+
+function formatDollars(amount) {
+  const n = Math.max(0, Math.round(Number(amount) || 0));
+  if (n >= 1000000) return `$${Number((n / 1000000).toFixed(2)).toString()}M`;
+  if (n >= 1000) return `$${Math.round(n / 1000)}K`;
+  return `$${n}`;
+}
+
+function getOfferValueScore(recruit, amount) {
+  const prestige = Number(((TEAM_DATA[selectedConf] || {})[selectedTeam] || {}).p) || 0;
+  const fairValue = getRecruitFairValue(recruit);
+  const offerRatio = fairValue > 0 ? (Math.max(0, Number(amount) || 0) / fairValue) : (Number(amount) > 0 ? 2 : 1);
+  return 0.5 * ((prestige / 75) * offerRatio);
+}
+
+function getRecruitTopCPUOffers(recruit) {
+  return (recruit.cpuOffers || [])
+    .slice()
+    .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
+    .slice(0, 5);
+}
+
+function getKnownTopMotivationCount(recruit) {
+  const guesses = recruit.guessedMotivations || {};
+  return (recruit.topMotivations || []).filter(idx => guesses[idx] === 'correct').length;
+}
+
+function addRecruitOfferInterest(recruit, percent) {
+  if (!recruit.offer || recruit.signed) return;
+  recruit.offer.valueScore = (Number(recruit.offer.valueScore) || 0) + (percent / 100);
+  if (recruit.offer.valueScore >= 1) recruit.signed = true;
+}
+
+function getFilteredRecruits(recruits) {
+  return recruits.filter(recruit => {
+    if (recruitingSignedFilter) return !!recruit.signed;
+    if (recruit.signed) return false;
+    if (recruitingBookmarksFilter) return !!recruit.bookmarked;
+    const matchesStars = recruitingStarFilter === 'all' || recruit.stars === Number(recruitingStarFilter);
+    const matchesPosition = recruitingPositionFilter === 'all' || recruit.position === recruitingPositionFilter;
+    return matchesStars && matchesPosition;
+  });
+}
+
+function updateRecruitingStarFilter(value) {
+  recruitingStarFilter = value === 'all' ? 'all' : String(Number(value) || 'all');
+  renderRecruiting();
+}
+
+function updateRecruitingPositionFilter(value) {
+  recruitingPositionFilter = RECRUIT_POSITIONS.includes(value) ? value : 'all';
+  renderRecruiting();
+}
+
+function renderRecruiting() {
+  const recruits = ensureRecruitingClass();
+  const filteredRecruits = getFilteredRecruits(recruits);
+  const hours = getRecruitingHoursRemaining();
+  document.getElementById('recruiting-title').textContent = `RECRUITING`;
+  document.getElementById('recruiting-hours-badge').textContent = `${hours} / 100 HRS`;
+  const bmCount = (ensureRecruitingClass() || []).filter(r => r.bookmarked).length;
+  const signedCount = (ensureRecruitingClass() || []).filter(r => r.signed).length;
+  const bmBtn = document.getElementById('recruiting-bookmarks-btn');
+  bmBtn.classList.toggle('active', recruitingBookmarksFilter);
+  bmBtn.innerHTML = `<svg width="9" height="12" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg>${recruitingBookmarksFilter ? 'ALL RECRUITS' : `BOOKMARKS${bmCount ? ` (${bmCount})` : ''}`}`;
+  const signedBtn = document.getElementById('recruiting-signed-btn');
+  signedBtn.classList.toggle('active', recruitingSignedFilter);
+  signedBtn.textContent = recruitingSignedFilter ? 'ALL RECRUITS' : `SIGNED${signedCount ? ` (${signedCount})` : ''}`;
+  document.getElementById('recruiting-nil-badge').textContent = `NIL ${formatDollars(getAvailableNILDollars())}`;
+
+  const filters = document.getElementById('recruiting-filters');
+  filters.innerHTML = `
+    <div class="recruiting-filter-group">
+      <span>STARS</span>
+      <select class="recruit-filter-select" onchange="updateRecruitingStarFilter(this.value)">
+        <option value="all"${recruitingStarFilter === 'all' ? ' selected' : ''}>ALL</option>
+        ${RECRUIT_TIERS.map(tier => `<option value="${tier.stars}"${recruitingStarFilter === String(tier.stars) ? ' selected' : ''}>${tier.stars} STAR</option>`).join('')}
+      </select>
+    </div>
+    <div class="recruiting-filter-group">
+      <span>POSITION</span>
+      <select class="recruit-filter-select" onchange="updateRecruitingPositionFilter(this.value)">
+        <option value="all"${recruitingPositionFilter === 'all' ? ' selected' : ''}>ALL</option>
+        ${RECRUIT_POSITIONS.map(pos => `<option value="${pos}"${recruitingPositionFilter === pos ? ' selected' : ''}>${pos}</option>`).join('')}
+      </select>
+    </div>
+    <div class="recruiting-filter-count">${filteredRecruits.length} / ${recruits.length} SHOWN</div>
+  `;
+
+  const grid = document.getElementById('recruiting-grid');
+  grid.innerHTML = `
+    <div class="recruit-row header">
+      <div>RANK</div><div>PLAYER</div><div>POS</div><div>OVR</div><div>POT</div><div>STARS</div><div></div>
+    </div>
+    ${filteredRecruits.length ? filteredRecruits.map(r => `
+      <div class="recruit-row" onclick="openRecruitDetail('${r.id}')">
+        <div>#${r.rank}</div>
+        <div><strong>${escapeAttr(r.name)}</strong><br><span class="recruit-home">${escapeAttr(r.hometown)}, ${escapeAttr(r.homeState)}</span></div>
+        <div>${r.position}</div>
+        <div>${r.overallRevealed ? r.overall : '?'}</div>
+        <div>${r.potentialRevealed ? r.potential : '?'}</div>
+        <div class="recruit-stars">${getStarText(r.stars)}</div>
+        <button class="recruit-bookmark-btn${r.bookmarked ? ' bookmarked' : ''}" onclick="event.stopPropagation();toggleRecruitBookmark('${r.id}')" title="${r.bookmarked ? 'Remove bookmark' : 'Bookmark'}"><svg width="11" height="15" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg></button>
+      </div>
+    `).join('') : '<div class="recruit-row"><span class="recruit-empty">NO RECRUITS MATCH THESE FILTERS</span></div>'}
+  `;
+}
+
+function getRecruitingHoursKey() {
+  return `recruitingHours:${recruitingRunId || 'default'}:${seasonNumber || 1}:${selectedTeam || ''}`;
+}
+
+function getRecruitingWeekKey() {
+  const sn = seasonNumber || 1;
+  if (cachedSchedule && currentGameIndex < cachedSchedule.length) {
+    return `${sn}|${cachedSchedule[currentGameIndex].date || `game-${currentGameIndex}`}`;
+  }
+  return `${sn}|offseason`;
+}
+
+function ensureRecruitingHoursState() {
+  if (!recruitingHoursState) {
+    try { recruitingHoursState = JSON.parse(sessionStorage.getItem(getRecruitingHoursKey()) || 'null'); }
+    catch (e) { recruitingHoursState = null; }
+  }
+  const weekKey = getRecruitingWeekKey();
+  if (!recruitingHoursState || recruitingHoursState.weekKey !== weekKey) {
+    recruitingHoursState = { weekKey, remaining: 100 };
+    saveRecruitingHoursState();
+  }
+  return recruitingHoursState;
+}
+
+function saveRecruitingHoursState() {
+  if (recruitingHoursState) sessionStorage.setItem(getRecruitingHoursKey(), JSON.stringify(recruitingHoursState));
+}
+
+function resetRecruitingHoursForNewGame() {
+  recruitingRunId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  sessionStorage.setItem('recruitingRunId', recruitingRunId);
+  recruitingHoursState = null;
+}
+
+function getRecruitingHoursRemaining() {
+  return ensureRecruitingHoursState().remaining;
+}
+
+function spendRecruitingHours(n) {
+  const state = ensureRecruitingHoursState();
+  if (state.remaining < n) return false;
+  state.remaining -= n;
+  saveRecruitingHoursState();
+  return true;
+}
+
+function openRecruitDetail(recruitId) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit) return;
+  renderRecruitDetailCard(recruit);
+  document.getElementById('recruit-detail-overlay').classList.remove('hidden');
+}
+
+function closeRecruitDetail() {
+  document.getElementById('recruit-detail-overlay').classList.add('hidden');
+}
+
+function handleRecruitOverlayClick(event) {
+  if (event.target === document.getElementById('recruit-detail-overlay')) closeRecruitDetail();
+}
+
+function generateRecruitHeadshot(recruitId) {
+  const seed = strHash(recruitId + '|face');
+  const rng = mulberry32(seed);
+  const roll = () => rng();
+  const ri = (a, b) => Math.floor(roll() * (b - a + 1)) + a;
+  const pick = arr => arr[Math.floor(roll() * arr.length)];
+
+  const BP = 4, GW = 16, GH = 20;
+  const canvas = document.createElement('canvas');
+  canvas.width = GW * BP; canvas.height = GH * BP;
+  const ctx = canvas.getContext('2d');
+
+  function shade(hex, pct) {
+    const n = parseInt(hex.replace('#',''), 16);
+    const clamp = v => Math.min(255, Math.max(0, Math.round(v)));
+    const r = clamp(((n>>16)&255)*(1+pct)), g = clamp(((n>>8)&255)*(1+pct)), b = clamp((n&255)*(1+pct));
+    return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }
+  const px = (c, r, color) => {
+    if (c<0||c>=GW||r<0||r>=GH) return;
+    ctx.fillStyle = color; ctx.fillRect(c*BP, r*BP, BP, BP);
+  };
+  const fill = (c1,r1,c2,r2,color) => { for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++) px(c,r,color); };
+
+  const SKINS  = ['#FDDBB4','#F4C68A','#E0A96D','#C68642','#8D5524','#562800','#FFCBA4','#E8955F','#F1C27D','#C68642','#A0522D'];
+  const HAIRS  = ['#111','#2B1300','#3B1F0A','#5C2E00','#8B4513','#B07030','#C8A056','#E8E4C8','#DDD5C8','#EBEBEB','#8B0000','#1C1C8B','#006400','#555','#888','#CC8800','#FF6347','#4B0082'];
+  const SHIRTS = ['#B22222','#1F6FBF','#1A7A40','#6A1A9A','#CC6600','#1A2B3C','#0E8070','#556677','#AA3333','#3355AA','#886600','#445544','#664422'];
+  const IRISES = ['#3B1810','#1A3A6E','#1A5C1A','#7A4500','#4A4A4A','#1A6A6A','#8B0000','#2C2C8B','#556B2F'];
+
+  const skin  = pick(SKINS);
+  const hair  = pick(HAIRS);
+  const shirt = pick(SHIRTS);
+  const iris  = pick(IRISES);
+  const skinDk = shade(skin, -0.22);
+  const hairDk = shade(hair, -0.3);
+  const shirtDk = shade(shirt, -0.22);
+
+  const hairStyle   = ri(0, 6);
+  const eyeType     = ri(0, 2);
+  const noseStyle   = ri(0, 2);
+  const mouthStyle  = ri(0, 4);
+  const browThick   = ri(0, 1);
+  const hasBeard    = roll() > 0.55;
+  const beardDense  = ri(1, 3);
+  const beardCol    = roll() > 0.45 ? hairDk : shade(skin, -0.38);
+  const hasGlasses  = roll() > 0.78;
+  const glassColor  = pick(['#555','#222','#8B4513','#888','#4A7AAA','#AA8800']);
+  const collarStyle = ri(0, 2);
+
+  // background
+  fill(0,0,GW-1,GH-1,'#0e0b06');
+
+  // shirt
+  fill(0,16,GW-1,GH-1,shirt);
+  fill(0,16,1,GH-1,shirtDk); fill(GW-2,16,GW-1,GH-1,shirtDk);
+  if (collarStyle===0) { fill(5,16,10,16,shade(shirt,0.18)); }
+  else if (collarStyle===1) { fill(6,16,9,16,shade(shirt,0.12)); px(7,17,skinDk); px(8,17,skinDk); }
+
+  // neck
+  fill(6,13,9,15,skin);
+  for(let r=13;r<=15;r++){px(6,r,skinDk);px(9,r,skinDk);}
+
+  // face block
+  fill(3,2,12,2,skin);
+  fill(2,3,13,12,skin);
+  fill(4,13,11,13,skin);
+  fill(5,14,10,14,skinDk);
+  px(2,3,'#0e0b06'); px(13,3,'#0e0b06'); px(2,12,'#0e0b06'); px(13,12,'#0e0b06');
+  for(let r=3;r<=12;r++){px(2,r,skinDk);px(13,r,skinDk);}
+
+  // ears
+  for(let r=5;r<=7;r++){px(1,r,skin);px(14,r,skin);}
+  px(1,5,skinDk);px(1,7,skinDk);px(14,5,skinDk);px(14,7,skinDk);
+
+  // eyebrows
+  const browR = 4;
+  const lbStart = 3+ri(0,1), rbEnd = 12-ri(0,1);
+  for(let c=lbStart;c<=lbStart+2;c++) px(c,browR,hair);
+  for(let c=rbEnd-2;c<=rbEnd;c++) px(c,browR,hair);
+  if(browThick){
+    for(let c=lbStart;c<=lbStart+1;c++) px(c,browR+1,hairDk);
+    for(let c=rbEnd-1;c<=rbEnd;c++) px(c,browR+1,hairDk);
+  }
+
+  // eyes
+  const eyeR=5, lE=4, rE=10;
+  if(eyeType===0){
+    px(lE,eyeR,'#E8E8E8');px(lE+1,eyeR,iris);
+    px(rE,eyeR,iris);px(rE+1,eyeR,'#E8E8E8');
+  } else if(eyeType===1){
+    px(lE,eyeR,iris);px(lE+1,eyeR,skinDk);
+    px(rE,eyeR,skinDk);px(rE+1,eyeR,iris);
+  } else {
+    px(lE-1,eyeR,'#E8E8E8');px(lE,eyeR,iris);px(lE+1,eyeR,'#E8E8E8');
+    px(rE-1,eyeR,'#E8E8E8');px(rE,eyeR,iris);px(rE+1,eyeR,'#E8E8E8');
+  }
+
+  // nose
+  const nR=7;
+  if(noseStyle===0){ px(7,nR+1,skinDk);px(8,nR+1,skinDk); }
+  else if(noseStyle===1){ px(7,nR,skinDk);px(8,nR+1,skinDk);px(9,nR+1,skinDk); }
+  else { px(8,nR,skinDk);px(7,nR+1,skinDk);px(9,nR+1,skinDk); }
+
+  // mouth
+  const mR=9, lip=shade(skin,-0.32);
+  if(mouthStyle===0){ for(let c=6;c<=9;c++)px(c,mR,lip); px(5,mR-1,skinDk);px(10,mR-1,skinDk); }
+  else if(mouthStyle===1){ for(let c=6;c<=9;c++)px(c,mR,lip); px(7,mR,'#F0F0F0');px(8,mR,'#F0F0F0'); px(5,mR-1,skinDk);px(10,mR-1,skinDk); }
+  else if(mouthStyle===2){ px(6,mR,skinDk);px(7,mR,lip);px(8,mR,lip);px(9,mR,skinDk); }
+  else if(mouthStyle===3){ px(7,mR,lip);px(8,mR,lip); }
+  else { px(6,mR,skinDk);px(7,mR,lip);px(8,mR,lip);px(9,mR,skinDk); px(5,mR+1,skinDk);px(10,mR+1,skinDk); }
+
+  // beard
+  if(hasBeard){
+    const bDensity = beardDense/3;
+    for(let r=mR+1;r<=13;r++) for(let c=3;c<=12;c++) if(roll()<bDensity) px(c,r,beardCol);
+  }
+
+  // glasses
+  if(hasGlasses){
+    const gr=eyeR;
+    [lE,rE].forEach(e=>{
+      for(let c=e-1;c<=e+2;c++){px(c,gr-1,glassColor);px(c,gr+1,glassColor);}
+      px(e-1,gr,glassColor);px(e+2,gr,glassColor);
+    });
+    px(lE+3,gr,glassColor);px(rE-2,gr,glassColor);
+    px(lE-2,gr,glassColor);px(rE+3,gr,glassColor);
+  }
+
+  // hair
+  if(hairStyle===5){
+    px(7,2,shade(skin,0.22));px(8,2,shade(skin,0.22));px(9,2,shade(skin,0.12));
+  } else if(hairStyle===0){
+    fill(2,0,13,2,hair); fill(3,2,12,3,hairDk); px(2,2,hairDk);px(13,2,hairDk);
+  } else if(hairStyle===1){
+    fill(2,0,13,3,hair);
+    for(let r=3;r<=6;r++){px(1,r,hair);px(14,r,hair);}
+    fill(3,3,12,4,hairDk);
+  } else if(hairStyle===2){
+    fill(1,0,14,3,hair);
+    for(let r=4;r<=10;r++){
+      px(1,r,hair);px(14,r,hair);
+      if(r<=8){px(0,r,hair);px(15,r,hair);}
+    }
+    fill(2,3,13,4,hairDk);
+  } else if(hairStyle===3){
+    fill(2,0,13,1,hair);
+    for(let c=2;c<=13;c++) px(c,2,hairDk);
+  } else if(hairStyle===4){
+    fill(1,0,14,1,hair);fill(0,1,15,3,hair);fill(1,4,14,4,hair);
+    px(0,3,hair);px(15,3,hair);px(0,4,hair);px(15,4,hair);
+    fill(2,4,13,5,hairDk);
+  } else if(hairStyle===6){
+    fill(3,0,12,2,hair);px(2,1,hair);px(13,1,hair);
+    fill(2,2,13,3,hairDk);
+    px(2,3,shade(hair,-0.4));px(13,3,shade(hair,-0.4));
+    px(2,4,shade(hair,-0.6));px(13,4,shade(hair,-0.6));
+  }
+  // hair shadow at forehead
+  if(hairStyle!==5) for(let c=3;c<=12;c++) if(roll()>0.5) px(c,3,hairDk);
+
+  return canvas.toDataURL();
+}
+
+function getNextScoutAction(recruit, hours) {
+  if (!recruit.overallRevealed) return { cost: 5, canAfford: hours >= 5 };
+  if (!recruit.potentialRevealed) return { cost: 15, canAfford: hours >= 15 };
+  const guessed = recruit.guessedMotivations || {};
+  const correctCount = Object.values(guessed).filter(v => v === 'correct').length;
+  if (correctCount >= 2) return null;
+  if (Object.keys(guessed).length >= (recruit.motivations || []).length) return null;
+  return { cost: 25, canAfford: hours >= 25 };
+}
+
+function scoutRecruit(recruitId) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit) return;
+  if (!recruit.overallRevealed) { recruitRevealOverall(recruitId); return; }
+  if (!recruit.potentialRevealed) { recruitRevealPotential(recruitId); return; }
+  recruitLearnAboutPlayer(recruitId);
+}
+
+function renderRecruitDetailCard(recruit) {
+  const hours = getRecruitingHoursRemaining();
+  const ovrRevealed = !!recruit.overallRevealed;
+  const potRevealed = !!recruit.potentialRevealed;
+  const headshotSrc = generateRecruitHeadshot(recruit.id);
+  const fairValue = getRecruitFairValue(recruit);
+  const currentOffer = recruit.offer ? Math.max(0, Math.round(Number(recruit.offer.amount) || 0)) : 0;
+  const availableNIL = getAvailableNILDollars(currentOffer);
+  const sliderMax = Math.max(availableNIL, fairValue, currentOffer, 1000);
+  const sliderStep = sliderMax >= 1000000 ? 50000 : sliderMax >= 100000 ? 10000 : 1000;
+  const sliderValue = currentOffer || Math.min(fairValue, sliderMax);
+  const offerInterest = recruit.offer ? Math.min(100, Math.round((Number(recruit.offer.valueScore) || 0) * 100)) : null;
+  const isSigned = !!recruit.signed;
+  const topCPUOffers = getRecruitTopCPUOffers(recruit);
+  const knownTopMotivations = getKnownTopMotivationCount(recruit);
+  const canSoftSell = recruit.offer && !isSigned && knownTopMotivations >= 1 && hours >= 50;
+  const canHardSell = recruit.offer && !isSigned && knownTopMotivations >= 2 && hours >= 75;
+  document.getElementById('recruit-detail-card').innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:14px;">
+      <img class="recruit-headshot" src="${headshotSrc}" alt="">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+          <div class="recruit-detail-name">${escapeAttr(recruit.name)}</div>
+          <button class="recruit-detail-bookmark-btn${recruit.bookmarked ? ' bookmarked' : ''}" onclick="toggleRecruitBookmark('${recruit.id}', true)" title="${recruit.bookmarked ? 'Remove bookmark' : 'Bookmark'}"><svg width="16" height="21" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg></button>
+        </div>
+        <div class="recruit-detail-sub">#${recruit.rank} &middot; ${recruit.position} &middot; ${escapeAttr(recruit.hometown)}, ${escapeAttr(recruit.homeState)}</div>
+        <div class="recruit-detail-stars">${getStarText(recruit.stars)}</div>
+        <div class="recruit-quick-ratings">
+          <div class="recruit-quick-rating"><span>OVR</span><span class="${ovrRevealed ? '' : 'unknown'}">${ovrRevealed ? recruit.overall : '???'}</span></div>
+          <div class="recruit-quick-rating"><span>POT</span><span class="${potRevealed ? '' : 'unknown'}">${potRevealed ? recruit.potential : '???'}</span></div>
+          ${(sa => sa ? `<button class="recruit-scout-btn" onclick="${sa.canAfford ? `scoutRecruit('${recruit.id}')` : 'void 0'}"${sa.canAfford ? '' : ' disabled'} style="margin-left:auto${sa.canAfford ? '' : ';opacity:0.38;cursor:not-allowed'}">🥽 SCOUT · ${sa.cost} HRS</button>` : '')(getNextScoutAction(recruit, hours))}
+        </div>
+      </div>
+    </div>
+    <div class="recruit-motivations-section">
+      ${isSigned ? '<div class="recruit-offer-panel"><span class="recruit-offer-amount">SIGNED</span></div>' : `<div class="recruit-offer-panel">
+        <div class="recruit-offer-slider-row">
+          <input id="recruit-offer-slider" class="recruit-offer-slider" type="range" min="0" max="${sliderMax}" step="${sliderStep}" value="${sliderValue}" oninput="updateRecruitOfferPreview(this.value)">
+          <span class="recruit-offer-amount" id="recruit-offer-preview">${formatDollars(sliderValue)}</span>
+        </div>
+        <button class="recruit-offer-btn" onclick="sendRecruitOffer('${recruit.id}')">${recruit.offer ? 'UPDATE OFFER' : 'SEND OFFER'}</button>
+      </div>`}
+      <div class="recruit-motivations-body">
+        <div class="recruit-motivations-list">
+          ${(recruit.motivations || []).map((m, i) => {
+            const g = (recruit.guessedMotivations || {})[i];
+            const cls = g === 'correct' ? ' correct' : g === 'wrong' ? ' wrong' : '';
+            return `<div class="recruit-motivation-item">
+              <div class="recruit-motivation-square${cls}"></div>
+              <span class="recruit-motivation-text">${m}</span>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="recruit-sell-actions">
+          <button class="recruit-offer-btn secondary" onclick="recruitSoftSell('${recruit.id}')"${!canSoftSell ? ' disabled style="opacity:0.38;cursor:not-allowed"' : ''}>SOFT SELL &middot; 50 HRS</button>
+          <button class="recruit-offer-btn secondary" onclick="recruitHardSell('${recruit.id}')"${!canHardSell ? ' disabled style="opacity:0.38;cursor:not-allowed"' : ''}>HARD SELL &middot; 75 HRS</button>
+          ${recruit.offer && !isSigned ? `<button class="recruit-offer-btn secondary" onclick="pullRecruitOffer('${recruit.id}')">PULL OFFER</button>` : ''}
+        </div>
+      </div>
+    </div>
+    ${topCPUOffers.length ? `<div class="recruit-top-offers">
+      <div class="recruit-motivations-label">TOP OFFERS</div>
+      ${topCPUOffers.map(offer => `
+        <div class="recruit-top-offer-row">
+          <span class="recruit-top-offer-team">${escapeAttr(offer.team)}</span>
+          <span>${formatDollars(offer.amount)}</span>
+          <span class="recruit-top-offer-interest">${Math.min(100, Math.round((Number(offer.interest) || 0) * 100))}%</span>
+        </div>
+      `).join('')}
+    </div>` : ''}
+    <div class="recruit-detail-actions">
+      <button class="recruit-detail-close-btn" onclick="closeRecruitDetail()">CLOSE</button>
+    </div>
+  `;
+}
+
+function toggleBookmarksFilter() {
+  recruitingBookmarksFilter = !recruitingBookmarksFilter;
+  if (recruitingBookmarksFilter) recruitingSignedFilter = false;
+  renderRecruiting();
+}
+
+function toggleSignedFilter() {
+  recruitingSignedFilter = !recruitingSignedFilter;
+  if (recruitingSignedFilter) recruitingBookmarksFilter = false;
+  renderRecruiting();
+}
+
+function toggleRecruitBookmark(recruitId, fromDetail) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit) return;
+  if (recruit.signed) return;
+  recruit.bookmarked = !recruit.bookmarked;
+  if (!recruit.bookmarked && recruit.offer) delete recruit.offer;
+  saveRecruitingClass();
+  renderRecruiting();
+  if (fromDetail) renderRecruitDetailCard(recruit);
+}
+
+function updateRecruitOfferPreview(value) {
+  const preview = document.getElementById('recruit-offer-preview');
+  if (preview) preview.textContent = formatDollars(value);
+}
+
+function sendRecruitOffer(recruitId) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit || recruit.signed) return;
+  const currentOffer = recruit.offer ? Math.max(0, Math.round(Number(recruit.offer.amount) || 0)) : 0;
+  const fairValue = getRecruitFairValue(recruit);
+  const maxOffer = getAvailableNILDollars(currentOffer);
+  const slider = document.getElementById('recruit-offer-slider');
+  const amount = Math.max(0, Math.round(Number(slider ? slider.value : fairValue) || 0));
+  if (amount > maxOffer) {
+    window.alert(`Not enough NIL available. Max offer: ${formatDollars(maxOffer)}`);
+    return;
+  }
+  const valueScore = getOfferValueScore(recruit, amount);
+  recruit.bookmarked = true;
+  recruit.offer = {
+    amount,
+    fairValue,
+    valueScore
+  };
+  if (valueScore >= 1) recruit.signed = true;
+  saveRecruitingClass();
+  renderRecruiting();
+  renderRecruitDetailCard(recruit);
+}
+
+function pullRecruitOffer(recruitId) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit || !recruit.offer || recruit.signed) return;
+  delete recruit.offer;
+  saveRecruitingClass();
+  renderRecruiting();
+  renderRecruitDetailCard(recruit);
+}
+
+function recruitLearnAboutPlayer(recruitId) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit) return;
+  if (!spendRecruitingHours(25)) return;
+  if (!recruit.guessedMotivations) recruit.guessedMotivations = {};
+  const unguessed = [];
+  for (let i = 0; i < (recruit.motivations || []).length; i++) {
+    if (recruit.guessedMotivations[i] === undefined) unguessed.push(i);
+  }
+  if (!unguessed.length) return;
+  const idx = unguessed[Math.floor(Math.random() * unguessed.length)];
+  recruit.guessedMotivations[idx] = (recruit.topMotivations || []).includes(idx) ? 'correct' : 'wrong';
+  saveRecruitingClass();
+  renderRecruitDetailCard(recruit);
+  renderRecruiting();
+}
+
+function recruitSoftSell(recruitId) {
+  applyRecruitSell(recruitId, 50, 3, 5, 1);
+}
+
+function recruitHardSell(recruitId) {
+  applyRecruitSell(recruitId, 75, 7, 10, 2);
+}
+
+function applyRecruitSell(recruitId, hoursCost, minBoost, maxBoost, requiredKnownTopMotivations) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit || !recruit.offer || recruit.signed) return;
+  if (getKnownTopMotivationCount(recruit) < requiredKnownTopMotivations) return;
+  if (!spendRecruitingHours(hoursCost)) return;
+  addRecruitOfferInterest(recruit, randInt(minBoost, maxBoost));
+  saveRecruitingClass();
+  renderRecruitDetailCard(recruit);
+  renderRecruiting();
+}
+
+function recruitRevealOverall(recruitId) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit || recruit.overallRevealed) return;
+  if (!spendRecruitingHours(5)) return;
+  recruit.overallRevealed = true;
+  saveRecruitingClass();
+  renderRecruitDetailCard(recruit);
+  renderRecruiting();
+}
+
+function recruitRevealPotential(recruitId) {
+  const recruits = ensureRecruitingClass();
+  const recruit = recruits.find(r => r.id === recruitId);
+  if (!recruit || recruit.potentialRevealed) return;
+  if (!spendRecruitingHours(15)) return;
+  recruit.potentialRevealed = true;
+  saveRecruitingClass();
+  renderRecruitDetailCard(recruit);
+  renderRecruiting();
 }
 
 function getPlayerStatsKey() {
@@ -3645,6 +5485,7 @@ async function skipCoachSetup() {
   leagueSchedule = null;
   currentGameIndex = 0;
   playerStatsState = null;
+  resetRecruitingHoursForNewGame();
   sessionStorage.removeItem(getScheduleStateKey());
   sessionStorage.removeItem(getLeagueScheduleKey());
   sessionStorage.removeItem(getPlayerStatsKey());
@@ -4562,6 +6403,7 @@ function escapeAttr(value) {
 function selectTeam() {
   const team = CONFERENCES[selectedConf][teamCursor];
   selectedTeam = team;
+  resetRecruitingHoursForNewGame();
   sessionStorage.setItem('playerConf', selectedConf);
   sessionStorage.setItem('playerTeam', team);
   goToCoachBuilder('info');
@@ -4633,6 +6475,16 @@ window.addEventListener('keydown', e => {
       goToDashboard();
     }
   } else if (currentScreen === 'roster') {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      goToDashboard();
+    }
+  } else if (currentScreen === 'recruiting') {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      goToDashboard();
+    }
+  } else if (currentScreen === 'tournament') {
     if (e.code === 'Escape' || e.code === 'Backspace') {
       e.preventDefault();
       goToDashboard();

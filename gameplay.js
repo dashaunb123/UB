@@ -16,7 +16,6 @@ function startGameSimulation(fastFinish) {
   stopGameTimer();
   activeGame = createGameState(game);
   renderGameScreen();
-  playGameSoundtrack();
   flash(() => {
     showPanel('game');
     renderGameScreen();
@@ -25,13 +24,32 @@ function startGameSimulation(fastFinish) {
   });
 }
 
+function prepareGameSoundtrack(audio) {
+  audio.loop = true;
+  if (audio.dataset.loopFallbackBound) return;
+  audio.addEventListener('ended', () => {
+    audio.currentTime = 0;
+    const replayPromise = audio.play();
+    if (replayPromise && typeof replayPromise.catch === 'function') {
+      replayPromise.catch(err => console.warn('Soundtrack replay failed:', err));
+    }
+  });
+  audio.dataset.loopFallbackBound = 'true';
+}
+
 function playGameSoundtrack() {
   const audio = document.getElementById('game-soundtrack');
   if (!audio) return;
-  audio.loop = true;
-  audio.currentTime = 0;
+  prepareGameSoundtrack(audio);
+  if (!audio.paused && !audio.ended) return;
   const playPromise = audio.play();
-  if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
+  if (playPromise && typeof playPromise.catch === 'function') {
+    playPromise.catch(err => {
+      console.warn('Soundtrack play failed:', err);
+      audio.currentTime = 0;
+      audio.load();
+    });
+  }
 }
 
 function startMultiGameSuperSim(count) {
@@ -43,7 +61,6 @@ function startMultiGameSuperSim(count) {
   activeGame = createGameState(cachedSchedule[currentGameIndex]);
   activeGame.superSimRemaining = gamesToSim;
   renderGameScreen();
-  playGameSoundtrack();
   flash(() => {
     showPanel('game');
     renderGameScreen();
@@ -85,6 +102,63 @@ function createGameState(scheduleGame) {
   return state;
 }
 
+function createLeagueGameState(leagueGame, rng = Math.random) {
+  const homeTeam = leagueGame.home;
+  const awayTeam = leagueGame.away;
+  const homeConf = getTeamConf(homeTeam);
+  const awayConf = getTeamConf(awayTeam);
+  const homeRoster = typeof getTeamRoster === 'function' ? getTeamRoster(homeConf, homeTeam) : [];
+  const awayRoster = typeof getTeamRoster === 'function' ? getTeamRoster(awayConf, awayTeam) : [];
+  const awayPenalty = getAwayGameOverallPenalty(awayTeam, homeTeam, rng);
+  const state = {
+    scheduleGame:leagueGame,
+    homeTeam,
+    awayTeam,
+    userSide:null,
+    opponentSide:null,
+    period:1,
+    clock:12 * 60,
+    scores:{ home:0, away:0 },
+    teams:{},
+    feed:[],
+    paused:false,
+    speedIndex:0,
+    complete:false,
+    backgroundSim:true,
+    homeCourtMultiplier:getConferenceHomeCourtMultiplier(leagueGame, homeTeam, rng),
+    possessionSide:'home'
+  };
+  state.teams.home = buildSimTeam(homeTeam, homeRoster, buildOpponentGameplan(homeTeam, homeConf, homeRoster), false, 0);
+  state.teams.away = buildSimTeam(awayTeam, awayRoster, buildOpponentGameplan(awayTeam, awayConf, awayRoster), false, awayPenalty);
+  return state;
+}
+
+function createTournamentGameState(teamA, teamB, rng = Math.random) {
+  const rosterA = typeof getTeamRoster === 'function' ? getTeamRoster(teamA.conf, teamA.team) : [];
+  const rosterB = typeof getTeamRoster === 'function' ? getTeamRoster(teamB.conf, teamB.team) : [];
+  const state = {
+    scheduleGame:{ date:'TOURNAMENT', home:teamA.team, away:teamB.team, isConf:false },
+    homeTeam:teamA.team,
+    awayTeam:teamB.team,
+    userSide:null,
+    opponentSide:null,
+    period:1,
+    clock:12 * 60,
+    scores:{ home:0, away:0 },
+    teams:{},
+    feed:[],
+    paused:false,
+    speedIndex:0,
+    complete:false,
+    tournamentSim:true,
+    homeCourtMultiplier:1,
+    possessionSide:rng() > 0.5 ? 'home' : 'away'
+  };
+  state.teams.home = buildSimTeam(teamA.team, rosterA, buildOpponentGameplan(teamA.team, teamA.conf, rosterA), false, 0);
+  state.teams.away = buildSimTeam(teamB.team, rosterB, buildOpponentGameplan(teamB.team, teamB.conf, rosterB), false, 0);
+  return state;
+}
+
 function buildSimTeam(teamName, roster, plan, isUser, gameOverallPenalty = 0) {
   const rotation = ((plan || {}).rotation || []).filter(r => Number(r.minutes) > 0);
   const rotationNames = new Set(rotation.map(r => r.playerName));
@@ -109,23 +183,11 @@ function getTeamRatings(teamName) {
 }
 
 function getAwayGameOverallPenalty(awayTeam, homeTeam, rng = Math.random) {
-  const awayRatings = getTeamRatings(awayTeam);
-  const homeRatings = getTeamRatings(homeTeam);
-  const awayOverall = Number(awayRatings.o) || 0;
-  const homeOverall = Number(homeRatings.o) || 0;
-  if (awayOverall <= homeOverall) return 0;
-
-  const safeChance = Math.max(0, Math.min(100, Number(awayRatings.p) || 0)) / 100;
-  if (rng() < safeChance) return 0;
-
-  return awayOverall - homeOverall;
+  return 0;
 }
 
 function getConferenceHomeCourtMultiplier(scheduleGame, homeTeam, rng = Math.random) {
-  if (!scheduleGame || !scheduleGame.isConf) return 1;
-  const prestige = Math.max(0, Math.min(100, Number(getTeamRatings(homeTeam).p) || 0));
-  const boostPercent = rng() * (prestige / 3);
-  return 1 + (boostPercent / 100);
+  return 1.03;
 }
 
 function applyTemporaryOverallPenalty(player, penalty) {
@@ -198,10 +260,10 @@ function simulatePossession(state) {
   const offense = state.teams[state.possessionSide];
   const defenseSide = state.possessionSide === 'home' ? 'away' : 'home';
   const defense = state.teams[defenseSide];
-  const seconds = getPossessionSeconds(offense.plan.tempo, offense.isUser);
+  const seconds = getPossessionSeconds(offense.plan.tempo);
   state.clock = Math.max(0, state.clock - seconds);
   const homeOnOffense = state.possessionSide === 'home';
-  const result = resolvePossession(offense, defense, homeOnOffense);
+  const result = resolvePossession(offense, defense, homeOnOffense, state.homeCourtMultiplier);
   state.scores[state.possessionSide] += result.points;
   if (!result.made) assignRebound(defense, result);
   addGameFeed(state, formatPossessionFeed(state, offense.name, result));
@@ -209,14 +271,14 @@ function simulatePossession(state) {
   state.possessionSide = defenseSide;
 }
 
-function getPossessionSeconds(tempo, isUser) {
-  if (isUser && tempo === 'Fast') return randInt(8, 15);
-  if (isUser && (tempo === 'Slow' || tempo === 'Super Slow')) return randInt(19, 24);
+function getPossessionSeconds(tempo) {
+  if (tempo === 'Fast') return randInt(8, 15);
+  if (tempo === 'Slow' || tempo === 'Super Slow') return randInt(19, 24);
   return randInt(14, 17);
 }
 
-function resolvePossession(offense, defense, homeOnOffense) {
-  const homeBoost = (activeGame && activeGame.homeCourtMultiplier) || 1;
+function resolvePossession(offense, defense, homeOnOffense, homeCourtMultiplier = 1) {
+  const homeBoost = homeCourtMultiplier || 1;
   const ovmBoost = homeOnOffense ? homeBoost : 1;
   const dvmBoost = homeOnOffense ? 1 : homeBoost;
   const initiator = chooseInitiator(offense);
@@ -355,6 +417,14 @@ function advanceGamePeriod(state) {
 
 function finishGame(state) {
   if (state.resultApplied) return;
+  if (state.tournamentSim) {
+    finishTournamentGame(state);
+    return;
+  }
+  if (state.backgroundSim) {
+    finishBackgroundGame(state);
+    return;
+  }
   state.complete = true;
   state.paused = true;
   state.weekSimInProgress = true;
@@ -389,6 +459,33 @@ function finishGame(state) {
   addGameFeed(state, `Final: ${state.awayTeam} ${state.scores.away}, ${state.homeTeam} ${state.scores.home}.`);
   renderGameScreen();
   startRemainderWeekSimulation(state);
+}
+
+function finishTournamentGame(state) {
+  state.complete = true;
+  state.paused = true;
+  state.resultApplied = true;
+  state.scheduleGame.result = {
+    homeScore:state.scores.home,
+    awayScore:state.scores.away
+  };
+}
+
+function finishBackgroundGame(state) {
+  state.complete = true;
+  state.paused = true;
+  const winnerSide = state.scores.home > state.scores.away ? 'home' : 'away';
+  const loserSide = winnerSide === 'home' ? 'away' : 'home';
+  const margin = Math.abs(state.scores.home - state.scores.away);
+  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin);
+  state.resultApplied = true;
+  state.scheduleGame.result = {
+    homeScore:state.scores.home,
+    awayScore:state.scores.away
+  };
+  const statGameId = typeof getStatGameId === 'function' ? getStatGameId(state.scheduleGame.date, state.homeTeam, state.awayTeam) : '';
+  if (typeof addBoxScoreToPlayerStats === 'function') addBoxScoreToPlayerStats(makeBoxScore(state), statGameId);
+  state.scheduleGame.statsRecorded = true;
 }
 
 function startRemainderWeekSimulation(state) {
@@ -436,8 +533,7 @@ function simulateRemainderWeekGames(scheduleGame) {
       }
       continue;
     }
-    g.result = simulateBackgroundGame(g.home, g.away, rng, gameId);
-    g.statsRecorded = true;
+    simulateBackgroundGame(g, rng, gameId);
     count++;
   }
   standingsState.weeksSimmed[weekKey] = count;
@@ -446,31 +542,27 @@ function simulateRemainderWeekGames(scheduleGame) {
   return count;
 }
 
-function simulateBackgroundGame(teamA, teamB, rng, gameId = '') {
-  const a = getTeamStandingEntry(teamA);
-  const b = getTeamStandingEntry(teamB);
-  if (!a || !b) return;
-  const aPower = Math.max(1, Number(a.power) || 1);
-  let bPower = Math.max(1, Number(b.power) || 1);
-  const awayPenalty = getAwayGameOverallPenalty(teamB, teamA, rng);
-  if (awayPenalty > 0 && bPower > aPower) {
-    bPower = aPower;
+function simulateBackgroundGame(leagueGame, rng = Math.random) {
+  if (!leagueGame) return null;
+  return withRandomSource(rng, () => {
+    const state = createLeagueGameState(leagueGame, rng);
+    let guard = 0;
+    while (!state.complete && guard < 5000) {
+      simulatePossession(state);
+      guard++;
+    }
+    return state.scheduleGame.result || null;
+  });
+}
+
+function withRandomSource(rng, fn) {
+  const previousRandom = Math.random;
+  Math.random = rng;
+  try {
+    return fn();
+  } finally {
+    Math.random = previousRandom;
   }
-  const aScore = Math.max(45, Math.round(62 + (aPower - bPower) / 180 + rng() * 24));
-  const bScore = Math.max(45, Math.round(62 + (bPower - aPower) / 180 + rng() * 24));
-  if (aScore === bScore) {
-    const homeWins = rng() > 0.5;
-    const homeScore = homeWins ? aScore + 1 : aScore;
-    const awayScore = homeWins ? bScore : bScore + 1;
-    if (homeWins) applyGameResultToStandings(teamA, teamB, 1);
-    else applyGameResultToStandings(teamB, teamA, 1);
-    if (typeof addSyntheticGameToPlayerStats === 'function') addSyntheticGameToPlayerStats(teamA, teamB, homeScore, awayScore, rng, gameId);
-    return { homeScore, awayScore };
-  }
-  if (aScore > bScore) applyGameResultToStandings(teamA, teamB, aScore - bScore);
-  else applyGameResultToStandings(teamB, teamA, bScore - aScore);
-  if (typeof addSyntheticGameToPlayerStats === 'function') addSyntheticGameToPlayerStats(teamA, teamB, aScore, bScore, rng, gameId);
-  return { homeScore:aScore, awayScore:bScore };
 }
 
 function makeBoxScore(state) {
