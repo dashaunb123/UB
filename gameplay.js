@@ -490,19 +490,36 @@ function finishBackgroundGame(state) {
 
 function startRemainderWeekSimulation(state) {
   setTimeout(() => {
-    const count = simulateRemainderWeekGames(state.scheduleGame);
-    state.weekSimInProgress = false;
-    addGameFeed(state, `Remainder of the week complete: ${count} games simulated.`);
-    if (state.superSimRemaining > 1 && currentGameIndex < (cachedSchedule || []).length) {
+    let count = 0;
+    try {
+      count = simulateRemainderWeekGames(state.scheduleGame);
+      addGameFeed(state, `Remainder of the week complete: ${count} games simulated.`);
+    } catch (err) {
+      console.error('Week simulation failed:', err);
+      addGameFeed(state, 'Remainder of the week could not finish. You can continue from here.');
+    } finally {
+      state.weekSimInProgress = false;
+    }
+    const scheduleLength = (cachedSchedule || []).length;
+    if (state.superSimRemaining > 1 && currentGameIndex < scheduleLength && cachedSchedule[currentGameIndex]) {
       state.superSimRemaining -= 1;
       startNextSuperSimGame(state.superSimRemaining);
       return;
     }
+    state.superSimRemaining = 1;
     renderGameScreen();
   }, 650);
 }
 
 function startNextSuperSimGame(remaining) {
+  if (!cachedSchedule || !cachedSchedule[currentGameIndex]) {
+    if (activeGame) {
+      activeGame.weekSimInProgress = false;
+      activeGame.superSimRemaining = 1;
+      renderGameScreen();
+    }
+    return;
+  }
   activeGame = createGameState(cachedSchedule[currentGameIndex]);
   activeGame.superSimRemaining = remaining;
   addGameFeed(activeGame, `Super sim continues: ${remaining} game${remaining === 1 ? '' : 's'} left including this one.`);

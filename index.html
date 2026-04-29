@@ -3147,6 +3147,20 @@
     <div id="portal-detail-card" class="recruit-detail-card"></div>
   </div>
 
+  <!-- OFFSEASON TRAINING -->
+  <div id="offseason-training-screen" class="screen-panel roster-screen hidden">
+    <div class="roster-shell">
+      <div class="roster-top">
+        <div>
+          <div class="roster-title">OFFSEASON TRAINING</div>
+          <div class="recruiting-subtitle" id="offseason-training-subtitle"></div>
+        </div>
+        <button class="roster-action-btn" type="button" onclick="finishOffseasonTraining()">NEXT SEASON</button>
+      </div>
+      <div class="roster-grid" id="offseason-training-grid"></div>
+    </div>
+  </div>
+
   <!-- ROSTER -->
   <div id="roster-screen" class="screen-panel roster-screen hidden">
     <div class="back-row">
@@ -4343,7 +4357,11 @@ function renderPortalDetailCard(player) {
 
 function finishPortalGoDashboard() {
   applyPortalCommits();
-  goToDashboard();
+  applyRecruitingCommits();
+  const trainingResults = runOffseasonTraining();
+  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+  renderOffseasonTraining(trainingResults);
+  flash(() => showPanel('offseason-training'));
 }
 
 function closePortalDetail() {
@@ -4878,6 +4896,156 @@ function applyPortalCommits() {
   transferPortal = stillUnsigned;
   sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
   savePortalState();
+}
+
+function applyRecruitingCommits() {
+  const recruits = ensureRecruitingClass() || [];
+  recruits.forEach(r => {
+    let targetTeam = null, targetConf = null;
+    if (r.signed) { targetTeam = selectedTeam; targetConf = selectedConf; }
+    else if (r.committedTo) { targetTeam = r.committedTo.team; targetConf = r.committedTo.conf; }
+    if (!targetTeam) return;
+    const entry = ((allRosters || {})[targetConf] || {})[targetTeam];
+    if (!entry) return;
+    const roster = getRosterFromEntry(entry);
+    if (roster.length >= PORTAL_ROSTER_CAP) return;
+    roster.push({
+      name:r.name,
+      position:r.position,
+      grade:'Freshman',
+      overall:r.overall,
+      potential:r.potential || r.overall,
+      attributes:r.attributes || makeAttributes(r.overall || 50),
+      homeState:r.homeState,
+      hometown:r.hometown,
+      tendencies:r.tendencies || makeTendencies(r.position),
+      recruitedFreshman:true
+    });
+    if (Array.isArray(entry)) allRosters[targetConf][targetTeam] = roster;
+    else entry.roster = roster;
+  });
+  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+}
+
+function runOffseasonTraining() {
+  const results = [];
+  if (!allRosters) ensureRosterLoaded();
+  Object.entries(allRosters || {}).forEach(([conf, confTeams]) => {
+    Object.entries(confTeams || {}).forEach(([team, entry]) => {
+      const roster = getRosterFromEntry(entry);
+      roster.forEach(player => {
+        if (player.recruitedFreshman) return;
+        const oldGrade = player.grade || 'Freshman';
+        const oldOverall = Math.round(Number(player.overall) || 0);
+        const oldPotential = Math.max(oldOverall, Math.round(Number(player.potential) || oldOverall));
+        const yearsLeft = getPlayerYearsLeft(oldGrade);
+        const targetGain = Math.max(0, Math.ceil((oldPotential - oldOverall) / Math.max(1, yearsLeft)));
+        const newGrade = advancePlayerGrade(oldGrade);
+        player.grade = newGrade;
+        const gained = trainPlayerTowardOverall(player, oldOverall + targetGain);
+        if (gained > 0 || oldGrade !== newGrade) {
+          results.push({
+            conf,
+            team,
+            name:player.name,
+            position:player.position,
+            oldGrade,
+            newGrade,
+            oldOverall,
+            newOverall:player.overall,
+            gained
+          });
+        }
+      });
+    });
+  });
+  return results;
+}
+
+function getPlayerYearsLeft(grade) {
+  return ({ Freshman:4, Sophomore:3, Junior:2, Senior:1 })[grade] || 1;
+}
+
+function advancePlayerGrade(grade) {
+  return ({ Freshman:'Sophomore', Sophomore:'Junior', Junior:'Senior', Senior:'Senior' })[grade] || 'Sophomore';
+}
+
+function trainPlayerTowardOverall(player, targetOverall) {
+  const keys = ['threePoint','midRange','freeThrow','finishing','iq','dribbling','passing','defense'];
+  if (!player.attributes) player.attributes = makeAttributes(player.overall || 50);
+  keys.forEach(key => {
+    if (typeof player.attributes[key] !== 'number') player.attributes[key] = Math.round(Number(player.overall) || 50);
+  });
+  const cap = Math.min(99, Math.max(Math.round(Number(player.overall) || 0), Math.round(Number(player.potential) || targetOverall), Math.round(targetOverall || 0)));
+  const desired = Math.min(cap, Math.round(targetOverall || player.overall || 0));
+  const startOverall = Math.round(Number(player.overall) || average(keys.map(k => player.attributes[k])));
+  let guard = 0;
+  while (Math.round(average(keys.map(k => player.attributes[k]))) < desired && guard < 500) {
+    const openKeys = keys.filter(key => player.attributes[key] < 99);
+    if (!openKeys.length) break;
+    const key = randomChoice(openKeys);
+    player.attributes[key]++;
+    guard++;
+  }
+  player.overall = Math.min(99, Math.round(average(keys.map(k => player.attributes[k]))));
+  player.potential = Math.max(player.potential || player.overall, player.overall);
+  return Math.max(0, player.overall - startOverall);
+}
+
+function renderOffseasonTraining(results) {
+  const subtitle = document.getElementById('offseason-training-subtitle');
+  if (subtitle) subtitle.textContent = `${selectedTeam} PLAYERS DEVELOPED BEFORE SEASON ${seasonNumber + 1}`;
+  const grid = document.getElementById('offseason-training-grid');
+  const userResults = (results || []).filter(r => r.conf === selectedConf && r.team === selectedTeam);
+  grid.innerHTML = `
+    <div class="player-row header">
+      <div>NAME</div><div>GRADE</div><div>OVR</div><div>POT</div><div>GAIN</div>
+    </div>
+    ${userResults.length ? userResults.map(r => {
+      const player = (getTeamRoster(selectedConf, selectedTeam) || []).find(p => p.name === r.name);
+      return `
+        <div class="player-row">
+          <div><strong>${escapeAttr(r.name)}</strong><br><span class="recruit-home">${r.position}</span></div>
+          <div>${r.oldGrade} → ${r.newGrade}</div>
+          <div>${r.oldOverall} → ${r.newOverall}</div>
+          <div>${player ? player.potential : r.newOverall}</div>
+          <div>+${r.gained}</div>
+        </div>
+      `;
+    }).join('') : '<div class="player-row"><span class="recruit-empty">NO RETURNING PLAYERS TRAINED</span></div>'}
+  `;
+}
+
+function finishOffseasonTraining() {
+  clearRecruitedFreshmanFlags();
+  seasonNumber++;
+  cachedSchedule = null;
+  leagueSchedule = null;
+  currentGameIndex = 0;
+  standingsState = buildInitialStandingsState();
+  playerStatsState = buildInitialPlayerStatsState();
+  recruitingClass = null;
+  transferPortal = [];
+  portalWeek = 1;
+  portalHoursState = null;
+  resetRecruitingHoursForNewGame();
+  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+  sessionStorage.setItem(getPlayerStatsKey(), JSON.stringify(playerStatsState));
+  sessionStorage.removeItem(getRecruitingClassKey());
+  sessionStorage.removeItem(getRecruitingVersionKey());
+  savePortalState();
+  goToDashboard();
+}
+
+function clearRecruitedFreshmanFlags() {
+  Object.values(allRosters || {}).forEach(confTeams => {
+    Object.values(confTeams || {}).forEach(entry => {
+      getRosterFromEntry(entry).forEach(player => {
+        if (player.recruitedFreshman) delete player.recruitedFreshman;
+      });
+    });
+  });
 }
 
 /* ═══ Portal user actions ═══ */
@@ -5733,6 +5901,14 @@ function simulateCPURecruitingWeek(weekKey) {
   standingsState.cpuRecruitWeeks[weekKey] = true;
 
   const recruits = ensureRecruitingClass();
+  const isFinalRegularSeasonWeek = cachedSchedule && currentGameIndex >= cachedSchedule.length;
+  if (isFinalRegularSeasonWeek) {
+    resolveRecruitingSignings(recruits, weekKey, true);
+    saveRecruitingClass();
+    sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+    return;
+  }
+
   const rng = mulberry32(strHash(`cpu-recruit|${seasonNumber || 1}|${weekKey}`));
 
   // Remove all offers from teams that have already filled their 6-player class
@@ -5832,31 +6008,42 @@ function simulateCPURecruitingWeek(weekKey) {
 
   // Signing sweep: after game 20 recruits can sign, at game 30 all sign
   if (currentGameIndex >= 20) {
-    const signRng = mulberry32(strHash(`cpu-sign|${seasonNumber || 1}|${weekKey}`));
-    const autoSign = currentGameIndex >= 30;
-    recruits.forEach(recruit => {
-      if (recruit.signed || recruit.committedTo) return;
-      const allOffers = [];
-      if (recruit.offer) allOffers.push({ isPlayer: true, interest: Math.min(1, Number(recruit.offer.valueScore) || 0) });
-      (recruit.cpuOffers || []).forEach(o => allOffers.push({ isPlayer: false, team: o.team, conf: o.conf, interest: Math.min(1, Number(o.interest) || 0) }));
-      if (!allOffers.length) return;
-      const best = allOffers.sort((a, b) => b.interest - a.interest)[0];
-      if (best.interest <= 0) return;
-      if (autoSign || signRng() < best.interest) {
-        if (best.isPlayer) {
-          recruit.signed = true;
-          recruit.bookmarked = true;
-        } else {
-          if (getCPUTeamSignedCount(recruits, best.team, best.conf) < 6) {
-            recruit.committedTo = { team: best.team, conf: best.conf };
-          }
-        }
-      }
-    });
+    resolveRecruitingSignings(recruits, weekKey, currentGameIndex >= 30);
   }
 
   saveRecruitingClass();
   sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+}
+
+function resolveRecruitingSignings(recruits, weekKey, autoSign) {
+  const signRng = mulberry32(strHash(`cpu-sign|${seasonNumber || 1}|${weekKey}`));
+  const signedCounts = {};
+  recruits.forEach(r => {
+    if (r.committedTo) {
+      const key = `${r.committedTo.conf}::${r.committedTo.team}`;
+      signedCounts[key] = (signedCounts[key] || 0) + 1;
+    }
+  });
+  recruits.forEach(recruit => {
+    if (recruit.signed || recruit.committedTo) return;
+    const allOffers = [];
+    if (recruit.offer) allOffers.push({ isPlayer:true, interest:Math.min(1, Number(recruit.offer.valueScore) || 0) });
+    (recruit.cpuOffers || []).forEach(o => allOffers.push({ isPlayer:false, team:o.team, conf:o.conf, interest:Math.min(1, Number(o.interest) || 0) }));
+    if (!allOffers.length) return;
+    const best = allOffers.sort((a, b) => b.interest - a.interest)[0];
+    if (best.interest <= 0) return;
+    if (!autoSign && signRng() >= best.interest) return;
+    if (best.isPlayer) {
+      recruit.signed = true;
+      recruit.bookmarked = true;
+      return;
+    }
+    const key = `${best.conf}::${best.team}`;
+    if ((signedCounts[key] || 0) < 6) {
+      recruit.committedTo = { team:best.team, conf:best.conf };
+      signedCounts[key] = (signedCounts[key] || 0) + 1;
+    }
+  });
 }
 
 function spendRecruitingHours(n) {
