@@ -9,9 +9,39 @@
   - live game feed and box score output
 */
 
+const SIM_TRACE_ENABLED = false;
+
+function simTrace(label, data = {}) {
+  if (!SIM_TRACE_ENABLED || typeof console === 'undefined') return;
+  const scheduleLength = (cachedSchedule || []).length;
+  console.log('[SIM TRACE]', label, {
+    season:Number(typeof seasonNumber !== 'undefined' ? seasonNumber : 1) || 1,
+    currentGameIndex:typeof currentGameIndex !== 'undefined' ? currentGameIndex : null,
+    scheduleLength,
+    gamesRemaining:scheduleLength - (typeof currentGameIndex !== 'undefined' ? currentGameIndex : 0),
+    activeGameComplete:!!(activeGame && activeGame.complete),
+    activeWeekSim:!!(activeGame && activeGame.weekSimInProgress),
+    activeSuperSimRemaining:activeGame ? activeGame.superSimRemaining : null,
+    ...data
+  });
+}
+
+function simTraceError(label, err, data = {}) {
+  if (typeof console === 'undefined') return;
+  console.error('[SIM TRACE ERROR]', label, {
+    message:err && err.message,
+    stack:err && err.stack,
+    ...data
+  });
+}
+
 function startGameSimulation(fastFinish) {
   const game = cachedSchedule ? cachedSchedule[currentGameIndex] : null;
-  if (!game) return;
+  simTrace('startGameSimulation:enter', { fastFinish:!!fastFinish, game });
+  if (!game) {
+    simTrace('startGameSimulation:no-game');
+    return;
+  }
   ensureDefaultGameplanSaved();
   stopGameTimer();
   activeGame = createGameState(game);
@@ -54,16 +84,22 @@ function playGameSoundtrack() {
 
 function startMultiGameSuperSim(count) {
   const remainingGames = (cachedSchedule || []).length - currentGameIndex;
-  if (remainingGames <= 0) return;
+  simTrace('startMultiGameSuperSim:enter', { requestedCount:count, remainingGames });
+  if (remainingGames <= 0) {
+    simTrace('startMultiGameSuperSim:no-games');
+    return;
+  }
   const gamesToSim = Math.max(1, Math.min(Number(count) || 1, remainingGames));
   ensureDefaultGameplanSaved();
   stopGameTimer();
   activeGame = createGameState(cachedSchedule[currentGameIndex]);
   activeGame.superSimRemaining = gamesToSim;
+  simTrace('startMultiGameSuperSim:activeGame-created', { gamesToSim, scheduleGame:activeGame.scheduleGame });
   renderGameScreen();
   flash(() => {
     showPanel('game');
     renderGameScreen();
+    simTrace('startMultiGameSuperSim:calling-simGameToEnd');
     simGameToEnd();
   });
 }
@@ -246,12 +282,31 @@ function cycleGameSpeed() {
 }
 
 function simGameToEnd() {
-  if (!activeGame || activeGame.complete) return;
+  simTrace('simGameToEnd:enter');
+  if (!activeGame || activeGame.complete) {
+    simTrace('simGameToEnd:skip', { hasActiveGame:!!activeGame });
+    return;
+  }
   activeGame.paused = false;
   let guard = 0;
   while (!activeGame.complete && guard < 5000) {
     simulatePossession(activeGame);
     guard++;
+  }
+  simTrace('simGameToEnd:exit', {
+    guard,
+    complete:!!activeGame.complete,
+    score:activeGame ? { ...activeGame.scores } : null,
+    scheduleGame:activeGame ? activeGame.scheduleGame : null
+  });
+  if (activeGame && !activeGame.complete) {
+    console.warn('[SIM TRACE]', 'simGameToEnd guard exhausted before game completed', {
+      guard,
+      period:activeGame.period,
+      clock:activeGame.clock,
+      score:activeGame.scores,
+      scheduleGame:activeGame.scheduleGame
+    });
   }
   renderGameScreen();
 }
@@ -425,6 +480,13 @@ function finishGame(state) {
     finishBackgroundGame(state);
     return;
   }
+  simTrace('finishGame:enter', {
+    scheduleGame:state.scheduleGame,
+    homeTeam:state.homeTeam,
+    awayTeam:state.awayTeam,
+    score:{ ...state.scores },
+    superSimRemaining:state.superSimRemaining
+  });
   state.complete = true;
   state.paused = true;
   state.weekSimInProgress = true;
@@ -432,7 +494,7 @@ function finishGame(state) {
   const winnerSide = state.scores.home > state.scores.away ? 'home' : 'away';
   const loserSide = winnerSide === 'home' ? 'away' : 'home';
   const margin = Math.abs(state.scores.home - state.scores.away);
-  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin);
+  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin, !!state.scheduleGame.isConf);
   state.resultApplied = true;
   state.scheduleGame.result = {
     homeScore:state.scores.home,
@@ -447,6 +509,7 @@ function finishGame(state) {
     };
     saveLeagueSchedule();
   }
+  simTrace('finishGame:league-result-saved', { hasLeagueGame:!!lgGame, statGameId });
   saveCachedSchedule();
   lastBoxScore = makeBoxScore(state);
   if (typeof addBoxScoreToPlayerStats === 'function') addBoxScoreToPlayerStats(lastBoxScore, statGameId);
@@ -454,10 +517,15 @@ function finishGame(state) {
     lgGame.statsRecorded = true;
     saveLeagueSchedule();
   }
-  sessionStorage.setItem('lastBoxScore', JSON.stringify(lastBoxScore));
+  saveGameJSON('lastBoxScore', lastBoxScore);
   currentGameIndex = Math.min(currentGameIndex + 1, (cachedSchedule || []).length);
+  simTrace('finishGame:index-advanced', {
+    nextGame:cachedSchedule ? cachedSchedule[currentGameIndex] : null,
+    result:state.scheduleGame.result
+  });
   addGameFeed(state, `Final: ${state.awayTeam} ${state.scores.away}, ${state.homeTeam} ${state.scores.home}.`);
   renderGameScreen();
+  simTrace('finishGame:starting-remainder-week');
   startRemainderWeekSimulation(state);
 }
 
@@ -477,7 +545,7 @@ function finishBackgroundGame(state) {
   const winnerSide = state.scores.home > state.scores.away ? 'home' : 'away';
   const loserSide = winnerSide === 'home' ? 'away' : 'home';
   const margin = Math.abs(state.scores.home - state.scores.away);
-  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin);
+  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin, !!state.scheduleGame.isConf);
   state.resultApplied = true;
   state.scheduleGame.result = {
     homeScore:state.scores.home,
@@ -489,86 +557,172 @@ function finishBackgroundGame(state) {
 }
 
 function startRemainderWeekSimulation(state) {
+  simTrace('startRemainderWeekSimulation:scheduled', {
+    completedScheduleGame:state.scheduleGame,
+    superSimRemaining:state.superSimRemaining
+  });
   setTimeout(() => {
-    let count = 0;
     try {
-      count = simulateRemainderWeekGames(state.scheduleGame);
-      addGameFeed(state, `Remainder of the week complete: ${count} games simulated.`);
-    } catch (err) {
-      console.error('Week simulation failed:', err);
-      addGameFeed(state, 'Remainder of the week could not finish. You can continue from here.');
-    } finally {
+      simTrace('startRemainderWeekSimulation:timeout-fired', {
+        completedScheduleGame:state.scheduleGame,
+        superSimRemaining:state.superSimRemaining
+      });
+      const count = simulateRemainderWeekGames(state.scheduleGame);
+      simTrace('startRemainderWeekSimulation:remainder-complete', { count });
       state.weekSimInProgress = false;
+      addGameFeed(state, `Remainder of the week complete: ${count} games simulated.`);
+      if (state.superSimRemaining > 1 && currentGameIndex < (cachedSchedule || []).length) {
+        state.superSimRemaining -= 1;
+        simTrace('startRemainderWeekSimulation:continue-super-sim', {
+          nextRemaining:state.superSimRemaining,
+          nextGame:cachedSchedule ? cachedSchedule[currentGameIndex] : null
+        });
+        startNextSuperSimGame(state.superSimRemaining);
+        return;
+      }
+      simTrace('startRemainderWeekSimulation:render-final-actions');
+      renderGameScreen();
+    } catch (err) {
+      simTraceError('startRemainderWeekSimulation:failed', err, {
+        completedScheduleGame:state.scheduleGame,
+        superSimRemaining:state.superSimRemaining,
+        currentGameIndex,
+        nextGame:cachedSchedule ? cachedSchedule[currentGameIndex] : null
+      });
+      throw err;
     }
-    const scheduleLength = (cachedSchedule || []).length;
-    if (state.superSimRemaining > 1 && currentGameIndex < scheduleLength && cachedSchedule[currentGameIndex]) {
-      state.superSimRemaining -= 1;
-      startNextSuperSimGame(state.superSimRemaining);
-      return;
-    }
-    state.superSimRemaining = 1;
-    renderGameScreen();
   }, 650);
 }
 
 function startNextSuperSimGame(remaining) {
-  if (!cachedSchedule || !cachedSchedule[currentGameIndex]) {
-    if (activeGame) {
-      activeGame.weekSimInProgress = false;
-      activeGame.superSimRemaining = 1;
-      renderGameScreen();
-    }
-    return;
-  }
+  simTrace('startNextSuperSimGame:enter', {
+    remaining,
+    nextGame:cachedSchedule ? cachedSchedule[currentGameIndex] : null
+  });
   activeGame = createGameState(cachedSchedule[currentGameIndex]);
   activeGame.superSimRemaining = remaining;
   addGameFeed(activeGame, `Super sim continues: ${remaining} game${remaining === 1 ? '' : 's'} left including this one.`);
+  simTrace('startNextSuperSimGame:activeGame-created', {
+    scheduleGame:activeGame.scheduleGame,
+    homeTeam:activeGame.homeTeam,
+    awayTeam:activeGame.awayTeam
+  });
   renderGameScreen();
-  setTimeout(simGameToEnd, 250);
+  setTimeout(() => {
+    simTrace('startNextSuperSimGame:calling-simGameToEnd', {
+      scheduleGame:activeGame ? activeGame.scheduleGame : null
+    });
+    simGameToEnd();
+  }, 250);
 }
 
 function simulateRemainderWeekGames(scheduleGame) {
+  simTrace('simulateRemainderWeekGames:enter', { scheduleGame });
   ensureStandingsState();
   ensureLeagueSchedule();
   const date = scheduleGame.date;
   const weekKey = date || `GAME-${currentGameIndex}`;
   if (standingsState.weeksSimmed && standingsState.weeksSimmed[weekKey]) {
+    simTrace('simulateRemainderWeekGames:already-simmed', { weekKey });
     return 0;
   }
   const games = (leagueSchedule && leagueSchedule.byDate && leagueSchedule.byDate[date])
     ? leagueSchedule.byDate[date]
     : [];
+  simTrace('simulateRemainderWeekGames:games-loaded', { date, weekKey, totalGames:games.length });
   const rng = mulberry32(strHash(`${seasonNumber || 1}|${date}|league-week`));
   let count = 0;
   for (const g of games) {
     if (g.home === selectedTeam || g.away === selectedTeam) continue;
     const gameId = typeof getStatGameId === 'function' ? getStatGameId(date, g.home, g.away) : '';
     if (g.result) {
+      simTrace('simulateRemainderWeekGames:existing-result', {
+        date,
+        home:g.home,
+        away:g.away,
+        statsRecorded:!!g.statsRecorded,
+        result:g.result
+      });
       if (!g.statsRecorded && typeof addSyntheticGameToPlayerStats === 'function' && Number.isFinite(g.result.homeScore) && Number.isFinite(g.result.awayScore)) {
         addSyntheticGameToPlayerStats(g.home, g.away, g.result.homeScore, g.result.awayScore, rng, gameId);
         g.statsRecorded = true;
       }
       continue;
     }
-    simulateBackgroundGame(g, rng, gameId);
+    simTrace('simulateRemainderWeekGames:background-start', {
+      date,
+      home:g.home,
+      away:g.away,
+      gameId,
+      countBefore:count
+    });
+    try {
+      simulateBackgroundGame(g, rng, gameId);
+    } catch (err) {
+      simTraceError('simulateRemainderWeekGames:background-failed', err, {
+        date,
+        home:g.home,
+        away:g.away,
+        gameId
+      });
+      throw err;
+    }
+    simTrace('simulateRemainderWeekGames:background-done', {
+      date,
+      home:g.home,
+      away:g.away,
+      result:g.result
+    });
     count++;
   }
   standingsState.weeksSimmed[weekKey] = count;
-  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+  simTrace('simulateRemainderWeekGames:standings-week-marked', { weekKey, count });
+  saveGameJSON(getStandingsStateKey(), standingsState);
   saveLeagueSchedule();
-  if (typeof simulateCPURecruitingWeek === 'function') simulateCPURecruitingWeek(weekKey);
+  const offseasonEnabled = typeof areOffseasonFeaturesEnabled !== 'function' || areOffseasonFeaturesEnabled();
+  simTrace('simulateRemainderWeekGames:cpu-recruiting-check', {
+    offseasonEnabled,
+    hasCPURecruiting:typeof simulateCPURecruitingWeek === 'function',
+    weekKey
+  });
+  if (offseasonEnabled && typeof simulateCPURecruitingWeek === 'function') {
+    try {
+      simulateCPURecruitingWeek(weekKey);
+      simTrace('simulateRemainderWeekGames:cpu-recruiting-done', { weekKey });
+    } catch (err) {
+      simTraceError('simulateRemainderWeekGames:cpu-recruiting-failed', err, { weekKey });
+      throw err;
+    }
+  }
+  simTrace('simulateRemainderWeekGames:exit', { weekKey, count });
   return count;
 }
 
 function simulateBackgroundGame(leagueGame, rng = Math.random) {
   if (!leagueGame) return null;
   return withRandomSource(rng, () => {
+    simTrace('simulateBackgroundGame:enter', { leagueGame });
     const state = createLeagueGameState(leagueGame, rng);
     let guard = 0;
     while (!state.complete && guard < 5000) {
       simulatePossession(state);
       guard++;
     }
+    if (!state.complete) {
+      console.warn('[SIM TRACE]', 'simulateBackgroundGame guard exhausted before game completed', {
+        guard,
+        leagueGame,
+        period:state.period,
+        clock:state.clock,
+        score:state.scores
+      });
+    }
+    simTrace('simulateBackgroundGame:exit', {
+      leagueGame,
+      guard,
+      complete:state.complete,
+      result:state.scheduleGame.result || null
+    });
     return state.scheduleGame.result || null;
   });
 }
@@ -654,7 +808,7 @@ function continueAfterGame() {
 function showBoxScore() {
   if (!lastBoxScore) {
     try {
-      lastBoxScore = JSON.parse(sessionStorage.getItem('lastBoxScore') || 'null');
+      lastBoxScore = loadGameJSON('lastBoxScore');
     } catch (err) {
       lastBoxScore = null;
     }

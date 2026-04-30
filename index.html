@@ -1263,7 +1263,7 @@
     }
     .standing-row {
       display:grid;
-      grid-template-columns:48px 1fr auto auto;
+      grid-template-columns:48px 1fr auto auto auto;
       gap:12px;
       align-items:center;
       border:2px solid rgba(237,224,184,0.12);
@@ -2139,6 +2139,25 @@
     .departure-row .dep-reason {
       color:rgba(168,36,24,0.9);
     }
+    .departure-row.retention-row {
+      grid-template-columns:1.4fr .45fr .45fr .75fr 1.4fr;
+    }
+    .retention-actions {
+      display:flex;
+      gap:8px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .departures-continue-btn.retention-btn {
+      padding:8px 10px;
+      margin:0;
+      font-size:clamp(5px,0.62vw,7px);
+      box-shadow:3px 3px 0 #350a04;
+    }
+    .departures-continue-btn.retention-btn:disabled {
+      opacity:0.35;
+      cursor:not-allowed;
+    }
     .departures-continue-btn {
       border:2px solid #c08a18;
       background:rgba(22,18,9,0.56);
@@ -3005,6 +3024,13 @@
         <span class="standings-eyebrow">* NATIONAL RANKINGS *</span>
         <span class="standings-title">TOP 25 TEAMS</span>
         <div class="standings-controls">
+          <label for="standings-mode">MODE</label>
+          <select class="standings-select" id="standings-mode" onchange="renderStandings()">
+            <option value="national">NATIONAL</option>
+            <option value="conference">CONFERENCE</option>
+          </select>
+          <label for="standings-conf" id="standings-conf-label">CONF</label>
+          <select class="standings-select" id="standings-conf" onchange="renderStandings()"></select>
           <label for="standings-count">SHOW</label>
           <select class="standings-select" id="standings-count" onchange="renderStandings()">
             <option value="25">25</option>
@@ -3110,7 +3136,7 @@
       <div class="departures-title">TEAM DEPARTURES</div>
       <div class="departures-subtitle" id="departures-subtitle"></div>
       <div id="departures-list"></div>
-      <button class="departures-continue-btn" type="button" onclick="goToTransferPortal()">► TRANSFER PORTAL</button>
+      <button class="departures-continue-btn" id="departures-continue-btn" type="button" onclick="continueFromDepartures()">► TRANSFER PORTAL</button>
     </div>
   </div>
 
@@ -3431,7 +3457,7 @@ let recruitingPositionFilter = 'all';
 let recruitingBookmarksFilter = false;
 let recruitingSignedFilter = false;
 let recruitingHoursState = null;
-let recruitingRunId = sessionStorage.getItem('recruitingRunId') || '';
+let recruitingRunId = saveGameGetItem('recruitingRunId') || '';
 let tournamentState = null;
 let tournamentSimInProgress = false;
 let transferPortal = [];
@@ -3442,8 +3468,12 @@ let portalSignedFilter = false;
 let portalWeek = 1;
 let portalHoursState = null;
 let portalWorkAnimId = null;
+let pendingRetentionPlayers = [];
+let retentionNILCommits = [];
+let departuresAwaitingRetention = false;
 const PORTAL_TOTAL_WEEKS = 5;
 const PORTAL_ROSTER_CAP = 13;
+const OFFSEASON_FEATURES_ENABLED = true;
 let statsMode = 'team';
 let statsSelectedConf = null;
 let statsSelectedTeam = null;
@@ -3463,6 +3493,375 @@ let coachProfile = {
   outfit:'Suit',
   shoes:'Black'
 };
+
+window.addEventListener('error', event => {
+  console.error('[SIM TRACE ERROR]', 'window:error', {
+    message:event.message,
+    source:event.filename,
+    line:event.lineno,
+    column:event.colno,
+    stack:event.error && event.error.stack
+  });
+});
+
+window.addEventListener('unhandledrejection', event => {
+  console.error('[SIM TRACE ERROR]', 'window:unhandledrejection', {
+    reason:event.reason,
+    message:event.reason && event.reason.message,
+    stack:event.reason && event.reason.stack
+  });
+});
+
+function getSaveStorage() {
+  try {
+    const key = '__ub_storage_test__';
+    localStorage.setItem(key, '1');
+    localStorage.removeItem(key);
+    return localStorage;
+  } catch (err) {
+    return sessionStorage;
+  }
+}
+
+function saveGameGetItem(key) {
+  const storage = getSaveStorage();
+  let value = null;
+  try { value = storage.getItem(key); } catch (err) { value = null; }
+  if (value == null && storage !== sessionStorage) {
+    try {
+      value = sessionStorage.getItem(key);
+      if (value != null) storage.setItem(key, value);
+    } catch (err) {}
+  }
+  return value;
+}
+
+function saveGameSetItem(key, value) {
+  const storage = getSaveStorage();
+  try { storage.removeItem(key); } catch (err) {}
+  try {
+    storage.setItem(key, value);
+  } catch (err) {
+    if (!isStorageQuotaError(err)) throw err;
+    reclaimSaveStorageSpace(storage, key);
+    try { storage.removeItem(key); } catch (removeErr) {}
+    storage.setItem(key, value);
+  }
+}
+
+function isStorageQuotaError(err) {
+  return !!err && (
+    err.name === 'QuotaExceededError' ||
+    err.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+    err.code === 22 ||
+    err.code === 1014
+  );
+}
+
+function reclaimSaveStorageSpace(storage, targetKey) {
+  const currentSeason = seasonNumber || 1;
+  const keepKeys = new Set([
+    targetKey,
+    'allRosters',
+    'rosterGenerationVersion',
+    `schedule:${currentSeason}:${selectedConf || ''}:${selectedTeam || ''}`,
+    `leagueSchedule:${currentSeason}`,
+    `standings:${currentSeason}`,
+    `playerStats:${currentSeason}`,
+    `recruitingClass:${currentSeason}`,
+    `recruitingClassVersion:${currentSeason}`,
+    `transferPortal:${currentSeason}`,
+    `portalHours:${currentSeason}:${selectedTeam || ''}`,
+    `recruitingHours:${recruitingRunId || 'default'}:${currentSeason}:${selectedTeam || ''}`,
+    getSavedGameplanKey(),
+    'coachProfile',
+    'resourceDecision',
+    'pressPersonality',
+    'pressAnswers',
+    'recruitingRunId',
+    'playerConf',
+    'playerTeam'
+  ]);
+
+  const generatedPrefixes = [
+    'schedule:',
+    'leagueSchedule:',
+    'standings:',
+    'playerStats:',
+    'recruitingClass:',
+    'recruitingClassVersion:',
+    'transferPortal:',
+    'portalHours:',
+    'recruitingHours:'
+  ];
+
+  const keys = [];
+  for (let i = 0; i < storage.length; i++) keys.push(storage.key(i));
+  keys.forEach(key => {
+    if (!key || key === targetKey || keepKeys.has(key)) return;
+    if (generatedPrefixes.some(prefix => key.startsWith(prefix))) {
+      try { storage.removeItem(key); } catch (err) {}
+    }
+  });
+
+  if (targetKey !== 'recruitingClass:' + currentSeason) {
+    try { storage.removeItem(`recruitingClass:${currentSeason}`); } catch (err) {}
+  }
+  if (targetKey !== `transferPortal:${currentSeason}`) {
+    try { storage.removeItem(`transferPortal:${currentSeason}`); } catch (err) {}
+  }
+  if (targetKey !== `playerStats:${currentSeason}`) {
+    try { storage.removeItem(`playerStats:${currentSeason}`); } catch (err) {}
+  }
+  if (targetKey !== `leagueSchedule:${currentSeason}`) {
+    try { storage.removeItem(`leagueSchedule:${currentSeason}`); } catch (err) {}
+  }
+
+  if (targetKey !== 'allRosters' && allRosters) {
+    try {
+      storage.removeItem('allRosters');
+      storage.setItem('allRosters', JSON.stringify(compactAllRosters(allRosters)));
+    } catch (err) {
+      try { storage.removeItem('allRosters'); } catch (removeErr) {}
+    }
+  }
+
+  const currentRecruitingKey = `recruitingClass:${currentSeason}`;
+  if (targetKey !== currentRecruitingKey && recruitingClass) {
+    try {
+      storage.removeItem(currentRecruitingKey);
+      storage.setItem(currentRecruitingKey, JSON.stringify(compactRecruitingClassForStorage(recruitingClass)));
+    } catch (err) {
+      try { storage.removeItem(currentRecruitingKey); } catch (removeErr) {}
+    }
+  }
+
+  const currentLeagueKey = `leagueSchedule:${currentSeason}`;
+  if (targetKey !== currentLeagueKey && leagueSchedule) {
+    try {
+      storage.removeItem(currentLeagueKey);
+      storage.setItem(currentLeagueKey, JSON.stringify(compactLeagueSchedule(leagueSchedule)));
+    } catch (err) {
+      try { storage.removeItem(currentLeagueKey); } catch (removeErr) {}
+    }
+  }
+}
+
+function saveGameRemoveItem(key) {
+  try { getSaveStorage().removeItem(key); } catch (err) {}
+  try { sessionStorage.removeItem(key); } catch (err) {}
+}
+
+function saveGameJSON(key, value) {
+  saveGameSetItem(key, JSON.stringify(value));
+}
+
+function loadGameJSON(key, fallback = null) {
+  try {
+    const raw = saveGameGetItem(key);
+    return raw == null ? fallback : JSON.parse(raw);
+  } catch (err) {
+    return fallback;
+  }
+}
+
+function compactRosterPlayer(player) {
+  const compact = {
+    name:player.name,
+    position:player.position,
+    grade:player.grade,
+    overall:Math.round(Number(player.overall) || 0),
+    potential:Math.round(Number(player.potential) || Number(player.overall) || 0),
+    attributes:player.attributes || {},
+    homeState:player.homeState,
+    hometown:player.hometown,
+    tendencies:player.tendencies || makeTendencies(player.position)
+  };
+  if (player.recruitedFreshman) compact.recruitedFreshman = true;
+  return compact;
+}
+
+function compactAllRosters(rosters) {
+  const compact = {};
+  Object.entries(rosters || {}).forEach(([conf, teams]) => {
+    compact[conf] = {};
+    Object.entries(teams || {}).forEach(([team, entry]) => {
+      const roster = getRosterFromEntry(entry).map(compactRosterPlayer);
+      if (Array.isArray(entry)) {
+        compact[conf][team] = roster;
+      } else {
+        compact[conf][team] = {
+          roster,
+          style:entry && entry.style ? entry.style : generateRandomTeamStyle()
+        };
+      }
+    });
+  });
+  return compact;
+}
+
+function saveAllRosters() {
+  if (allRosters) saveGameJSON('allRosters', compactAllRosters(allRosters));
+}
+
+const PLAYER_ATTR_KEYS = ['threePoint','midRange','freeThrow','finishing','iq','dribbling','passing','defense'];
+const PLAYER_TENDENCY_KEYS = ['pass','drive','iso','shoot','postUp'];
+
+function compactAttributes(attrs) {
+  return PLAYER_ATTR_KEYS.map(key => Math.round(Number((attrs || {})[key]) || 0));
+}
+
+function expandAttributes(values, fallbackOverall = 50) {
+  const attrs = {};
+  PLAYER_ATTR_KEYS.forEach((key, i) => {
+    attrs[key] = Math.round(Number((values || [])[i]) || fallbackOverall);
+  });
+  return attrs;
+}
+
+function compactTendencies(tendencies) {
+  return PLAYER_TENDENCY_KEYS.map(key => Math.round(Number((tendencies || {})[key]) || 0));
+}
+
+function expandTendencies(values, position) {
+  if (!Array.isArray(values)) return makeTendencies(position);
+  const tendencies = {};
+  PLAYER_TENDENCY_KEYS.forEach((key, i) => {
+    tendencies[key] = Math.round(Number(values[i]) || 0);
+  });
+  return tendencies;
+}
+
+function compactUserOffer(offer) {
+  if (!offer) return null;
+  return [
+    Math.round(Number(offer.amount) || 0),
+    Math.round(Number(offer.fairValue) || 0),
+    Number(offer.valueScore) || 0,
+    offer.offerWeek || ''
+  ];
+}
+
+function expandUserOffer(value) {
+  if (!Array.isArray(value)) return value || null;
+  return {
+    amount:value[0] || 0,
+    fairValue:value[1] || 0,
+    valueScore:value[2] || 0,
+    offerWeek:value[3] || ''
+  };
+}
+
+function compactTeamOffer(offer) {
+  if (!offer) return null;
+  return [
+    offer.conf || '',
+    offer.team || '',
+    Math.round(Number(offer.amount) || 0),
+    Number(offer.interest) || 0
+  ];
+}
+
+function expandTeamOffer(value) {
+  if (!Array.isArray(value)) return value || null;
+  return {
+    conf:value[0] || '',
+    team:value[1] || '',
+    amount:value[2] || 0,
+    interest:value[3] || 0
+  };
+}
+
+function compactCommit(value) {
+  return value ? [value.conf || '', value.team || ''] : null;
+}
+
+function expandCommit(value) {
+  if (!Array.isArray(value)) return value || null;
+  return { conf:value[0] || '', team:value[1] || '' };
+}
+
+function compactMotivations(motivations) {
+  return (motivations || []).map(m => Math.max(0, RECRUIT_MOTIVATIONS.indexOf(m)));
+}
+
+function expandMotivations(values) {
+  if (!Array.isArray(values)) return values || [];
+  return values.map(i => RECRUIT_MOTIVATIONS[i] || RECRUIT_MOTIVATIONS[0]);
+}
+
+function compactRecruit(recruit) {
+  const flags =
+    (recruit.overallRevealed ? 1 : 0) |
+    (recruit.potentialRevealed ? 2 : 0) |
+    (recruit.bookmarked ? 4 : 0) |
+    (recruit.signed ? 8 : 0);
+  return [
+    recruit.id,
+    recruit.name,
+    recruit.grade || 'Freshman',
+    Number(recruit.stars) || 1,
+    Number(recruit.rank) || 0,
+    recruit.position,
+    Math.round(Number(recruit.overall) || 0),
+    Math.round(Number(recruit.potential) || Number(recruit.overall) || 0),
+    compactAttributes(recruit.attributes),
+    recruit.homeState || '',
+    recruit.hometown || '',
+    compactTendencies(recruit.tendencies),
+    compactMotivations(recruit.motivations),
+    recruit.topMotivations || [],
+    recruit.guessedMotivations || {},
+    flags,
+    compactUserOffer(recruit.offer),
+    (recruit.cpuOffers || []).map(compactTeamOffer),
+    compactCommit(recruit.committedTo)
+  ];
+}
+
+function expandRecruit(value) {
+  if (!Array.isArray(value)) {
+    if (value && !Array.isArray(value.cpuOffers)) value.cpuOffers = [];
+    return value;
+  }
+  const flags = Number(value[15]) || 0;
+  const position = value[5] || 'PG';
+  const recruit = {
+    id:value[0],
+    name:value[1],
+    grade:value[2] || 'Freshman',
+    stars:Number(value[3]) || 1,
+    rank:Number(value[4]) || 0,
+    position,
+    overall:Number(value[6]) || 0,
+    potential:Number(value[7]) || Number(value[6]) || 0,
+    attributes:expandAttributes(value[8], Number(value[6]) || 50),
+    homeState:value[9] || '',
+    hometown:value[10] || '',
+    tendencies:expandTendencies(value[11], position),
+    motivations:expandMotivations(value[12]),
+    topMotivations:value[13] || [],
+    guessedMotivations:value[14] || {},
+    cpuOffers:(value[17] || []).map(expandTeamOffer).filter(Boolean)
+  };
+  if (flags & 1) recruit.overallRevealed = true;
+  if (flags & 2) recruit.potentialRevealed = true;
+  if (flags & 4) recruit.bookmarked = true;
+  if (flags & 8) recruit.signed = true;
+  const offer = expandUserOffer(value[16]);
+  if (offer) recruit.offer = offer;
+  const committedTo = expandCommit(value[18]);
+  if (committedTo) recruit.committedTo = committedTo;
+  return recruit;
+}
+
+function compactRecruitingClassForStorage(recruits) {
+  return (recruits || []).map(compactRecruit);
+}
+
+function expandRecruitingClassFromStorage(saved) {
+  return Array.isArray(saved) ? saved.map(expandRecruit).filter(Boolean) : null;
+}
 
 /* ═══════════════════════════════════════════
    SCREEN TRANSITIONS
@@ -3920,6 +4319,9 @@ function advanceTournamentWinner(item, winner) {
 function processSeasonDepartures() {
   const userDeparting = [];
   transferPortal = [];
+  pendingRetentionPlayers = [];
+  retentionNILCommits = [];
+  departuresAwaitingRetention = false;
   if (!allRosters) return userDeparting;
 
   let portalId = 0;
@@ -3977,6 +4379,14 @@ function processSeasonDepartures() {
         }
       }
 
+      if (isUserTeam) {
+        pendingRetentionPlayers = finalRoster.map(player => ({
+          player,
+          amount:getPlayerRetentionFairValue(player)
+        }));
+        departuresAwaitingRetention = pendingRetentionPlayers.length > 0;
+      }
+
       if (Array.isArray(entry)) {
         allRosters[conf][team] = finalRoster;
       } else {
@@ -3984,15 +4394,43 @@ function processSeasonDepartures() {
       }
     }
   }
-  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+  saveAllRosters();
   portalWeek = 1;
   portalHoursState = null;
-  generateCPUPortalOffers();
   savePortalState();
   return userDeparting;
 }
 
+function getPlayerRetentionFairValue(player) {
+  return getRecruitFairValue({ stars:overallToStars(player.overall) });
+}
+
+function addPlayerToTransferPortal(player, reason = 'RETENTION') {
+  transferPortal.push({
+    ...player,
+    portalId:getNextPortalId(),
+    fromTeam:selectedTeam,
+    fromConf:selectedConf,
+    stars:overallToStars(player.overall),
+    overallRevealed:true,
+    potentialRevealed:false,
+    cpuOffers:[],
+    retentionReason:reason,
+    ...pickMotivations(),
+    guessedMotivations:{}
+  });
+}
+
+function areOffseasonFeaturesEnabled() {
+  return OFFSEASON_FEATURES_ENABLED;
+}
+
 function goToDepartures() {
+  if (!areOffseasonFeaturesEnabled()) {
+    resetForNextSeason();
+    goToDashboard();
+    return;
+  }
   const departing = processSeasonDepartures();
   const subtitle = document.getElementById('departures-subtitle');
   const list = document.getElementById('departures-list');
@@ -4026,7 +4464,90 @@ function goToDepartures() {
   }
 
   if (list) list.innerHTML = html;
+  const btn = document.getElementById('departures-continue-btn');
+  if (btn) btn.textContent = departuresAwaitingRetention ? '► PLAYER RETENTION' : '► TRANSFER PORTAL';
   flash(() => showPanel('departures'));
+}
+
+function continueFromDepartures() {
+  if (departuresAwaitingRetention) {
+    renderRetentionOffers();
+    return;
+  }
+  openFinalizedTransferPortal();
+}
+
+function renderRetentionOffers() {
+  const subtitle = document.getElementById('departures-subtitle');
+  const list = document.getElementById('departures-list');
+  const btn = document.getElementById('departures-continue-btn');
+  if (subtitle) subtitle.textContent = `${selectedTeam} — RETAIN RETURNING PLAYERS`;
+  if (btn) {
+    btn.textContent = pendingRetentionPlayers.length ? '► FINISH RETENTION' : '► TRANSFER PORTAL';
+  }
+  if (!list) return;
+  const remainingNIL = getAvailableNILDollars();
+  list.innerHTML = `
+    <div class="departures-section-label">RETENTION NIL</div>
+    ${pendingRetentionPlayers.length ? pendingRetentionPlayers.map(({ player, amount }) => {
+      const canPay = amount <= remainingNIL;
+      const playerNameArg = escapeAttr(JSON.stringify(player.name));
+      return `
+        <div class="departure-row retention-row">
+          <div><strong>${escapeAttr(player.name)}</strong></div>
+          <div>${player.position}</div>
+          <div>${player.overall}</div>
+          <div class="dep-reason">${formatDollars(amount)}</div>
+          <div class="retention-actions">
+            <button class="departures-continue-btn retention-btn" type="button" onclick="payRetentionOffer(${playerNameArg})"${canPay ? '' : ' disabled'}>${canPay ? 'PAY' : 'NO NIL'}</button>
+            <button class="departures-continue-btn retention-btn" type="button" onclick="declineRetentionOffer(${playerNameArg})">PORTAL</button>
+          </div>
+        </div>
+      `;
+    }).join('') : '<div style="color:rgba(237,224,184,0.4);font-size:clamp(6px,0.72vw,8px);">ALL RETENTION DECISIONS COMPLETE.</div>'}
+  `;
+}
+
+function getRetentionCandidate(playerName) {
+  return pendingRetentionPlayers.find(item => item.player.name === playerName);
+}
+
+function removeRetentionCandidate(playerName) {
+  pendingRetentionPlayers = pendingRetentionPlayers.filter(item => item.player.name !== playerName);
+  if (!pendingRetentionPlayers.length) departuresAwaitingRetention = false;
+}
+
+function payRetentionOffer(playerName) {
+  const item = getRetentionCandidate(playerName);
+  if (!item) return;
+  if (item.amount > getAvailableNILDollars()) return;
+  retentionNILCommits.push({ name:item.player.name, amount:item.amount });
+  removeRetentionCandidate(playerName);
+  savePortalState();
+  renderRetentionOffers();
+}
+
+function declineRetentionOffer(playerName) {
+  const item = getRetentionCandidate(playerName);
+  if (!item) return;
+  const entry = ((allRosters || {})[selectedConf] || {})[selectedTeam];
+  const roster = getRosterFromEntry(entry).filter(player => player.name !== playerName);
+  if (Array.isArray(entry)) allRosters[selectedConf][selectedTeam] = roster;
+  else if (entry) entry.roster = roster;
+  addPlayerToTransferPortal(item.player, 'RETENTION');
+  removeRetentionCandidate(playerName);
+  saveAllRosters();
+  savePortalState();
+  renderRetentionOffers();
+}
+
+function openFinalizedTransferPortal() {
+  pendingRetentionPlayers = [];
+  departuresAwaitingRetention = false;
+  generateCPUPortalOffers();
+  savePortalState();
+  saveAllRosters();
+  goToTransferPortal();
 }
 
 function goToTransferPortal() {
@@ -4356,17 +4877,13 @@ function renderPortalDetailCard(player) {
 }
 
 function finishPortalGoDashboard() {
-  try {
-    applyPortalCommits();
-    applyRecruitingCommits();
-    const trainingResults = runOffseasonTraining();
-    sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
-    renderOffseasonTraining(trainingResults);
-    flash(() => showPanel('offseason-training'));
-  } catch (err) {
-    console.error('Could not advance to offseason training:', err);
-    window.alert('Could not advance to offseason training. Check the console for details.');
-  }
+  applyPortalCommits();
+  applyRecruitingCommits();
+  clearOffseasonRecruitingStorage();
+  const trainingResults = runOffseasonTraining();
+  saveAllRosters();
+  renderOffseasonTraining(trainingResults);
+  flash(() => showPanel('offseason-training'));
 }
 
 function closePortalDetail() {
@@ -4385,18 +4902,20 @@ function getPortalStateKey() {
 }
 
 function savePortalState() {
-  sessionStorage.setItem(getPortalStateKey(), JSON.stringify({
+  saveGameJSON(getPortalStateKey(), {
     portal: transferPortal,
-    week: portalWeek
-  }));
+    week: portalWeek,
+    retentionNILCommits
+  });
 }
 
 function loadPortalState() {
   try {
-    const saved = JSON.parse(sessionStorage.getItem(getPortalStateKey()) || 'null');
+    const saved = loadGameJSON(getPortalStateKey());
     if (saved && Array.isArray(saved.portal)) {
       transferPortal = saved.portal;
       portalWeek = saved.week || 1;
+      retentionNILCommits = Array.isArray(saved.retentionNILCommits) ? saved.retentionNILCommits : [];
       return true;
     }
   } catch (e) {}
@@ -4413,7 +4932,7 @@ function getPortalWeekKey() {
 
 function ensurePortalHoursState() {
   if (!portalHoursState) {
-    try { portalHoursState = JSON.parse(sessionStorage.getItem(getPortalHoursKey()) || 'null'); }
+    try { portalHoursState = loadGameJSON(getPortalHoursKey()); }
     catch (e) { portalHoursState = null; }
   }
   const weekKey = getPortalWeekKey();
@@ -4425,7 +4944,7 @@ function ensurePortalHoursState() {
 }
 
 function savePortalHoursState() {
-  if (portalHoursState) sessionStorage.setItem(getPortalHoursKey(), JSON.stringify(portalHoursState));
+  if (portalHoursState) saveGameJSON(getPortalHoursKey(), portalHoursState);
 }
 
 function getPortalHoursRemaining() {
@@ -4595,7 +5114,7 @@ function generateCPUPortalOffers() {
   transferPortal.forEach(p => {
     p.cpuOffers = (p.cpuOffers || [])
       .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
-      .slice(0, 12);
+      .slice(0, 6);
   });
 }
 
@@ -4688,7 +5207,7 @@ function simulateCPUPortalWeek() {
   transferPortal.forEach(p => {
     p.cpuOffers = (p.cpuOffers || [])
       .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
-      .slice(0, 12);
+      .slice(0, 6);
   });
 }
 
@@ -4777,6 +5296,7 @@ function commitPortalPlayer(player, offer) {
   } else {
     player.committedTo = { team:offer.team, conf:offer.conf };
     player.committedAmount = Math.max(0, Math.round(Number(offer.amount) || 0));
+    if (player.offer) delete player.offer;
   }
 }
 
@@ -4899,8 +5419,6 @@ function applyPortalCommits() {
     else entry.roster = roster;
   });
   transferPortal = stillUnsigned;
-  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
-  savePortalState();
 }
 
 function applyRecruitingCommits() {
@@ -4930,7 +5448,23 @@ function applyRecruitingCommits() {
     if (Array.isArray(entry)) allRosters[targetConf][targetTeam] = roster;
     else entry.roster = roster;
   });
-  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+}
+
+function clearOffseasonRecruitingStorage() {
+  transferPortal = [];
+  recruitingClass = [];
+  portalHoursState = null;
+  recruitingHoursState = null;
+  saveGameRemoveItem(getPortalStateKey());
+  saveGameRemoveItem(getPortalHoursKey());
+  saveGameRemoveItem(getRecruitingClassKey());
+  saveGameRemoveItem(getRecruitingVersionKey());
+  saveGameRemoveItem(getRecruitingHoursKey());
+  saveGameRemoveItem(getScheduleStateKey());
+  saveGameRemoveItem(getLeagueScheduleKey());
+  saveGameRemoveItem(getStandingsStateKey());
+  saveGameRemoveItem(getPlayerStatsKey());
+  saveGameRemoveItem('lastBoxScore');
 }
 
 function runOffseasonTraining() {
@@ -5043,8 +5577,8 @@ function resetForNextSeason() {
 
   clearRecruitedFreshmanFlags();
   seasonNumber++;
-  oldKeys.forEach(key => sessionStorage.removeItem(key));
-  sessionStorage.removeItem('lastBoxScore');
+  oldKeys.forEach(key => saveGameRemoveItem(key));
+  saveGameRemoveItem('lastBoxScore');
 
   activeGame = null;
   lastBoxScore = null;
@@ -5053,6 +5587,9 @@ function resetForNextSeason() {
   leagueSchedule = null;
   currentGameIndex = 0;
   transferPortal = [];
+  pendingRetentionPlayers = [];
+  retentionNILCommits = [];
+  departuresAwaitingRetention = false;
   portalWeek = 1;
   portalHoursState = null;
   portalStarFilter = 'all';
@@ -5064,7 +5601,7 @@ function resetForNextSeason() {
   recruitingBookmarksFilter = false;
   recruitingSignedFilter = false;
 
-  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
+  saveAllRosters();
   resetRecruitingHoursForNewGame();
   recruitingClass = generateRecruitingClass(namePool || getFallbackNamePool());
   saveRecruitingClass();
@@ -5076,8 +5613,8 @@ function resetForNextSeason() {
 
   standingsState = buildInitialStandingsState();
   playerStatsState = buildInitialPlayerStatsState();
-  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
-  sessionStorage.setItem(getPlayerStatsKey(), JSON.stringify(playerStatsState));
+  saveGameJSON(getStandingsStateKey(), standingsState);
+  saveGameJSON(getPlayerStatsKey(), playerStatsState);
   savePortalState();
 
   gameplan = null;
@@ -5198,14 +5735,12 @@ function getScheduleStateKey() {
 }
 
 function saveCachedSchedule() {
-  if (cachedSchedule) sessionStorage.setItem(getScheduleStateKey(), JSON.stringify(cachedSchedule));
+  if (cachedSchedule) saveGameJSON(getScheduleStateKey(), cachedSchedule);
 }
 
 function loadCachedSchedule() {
-  try {
-    const saved = JSON.parse(sessionStorage.getItem(getScheduleStateKey()) || 'null');
-    if (Array.isArray(saved)) return saved;
-  } catch (err) {}
+  const saved = loadGameJSON(getScheduleStateKey());
+  if (Array.isArray(saved)) return saved;
   return null;
 }
 
@@ -5245,6 +5780,7 @@ function goToRecruiting() {
 
 function goToStandings() {
   ensureRosterLoaded();
+  ensureLeagueSchedule();
   renderStandings();
   flash(() => showPanel('standings'));
 }
@@ -5269,14 +5805,14 @@ function goToPressConference() {
   playerStatsState = null;
   recruitingClass = null;
   resetRecruitingHoursForNewGame();
-  sessionStorage.removeItem(getRecruitingClassKey());
-  sessionStorage.removeItem(getRecruitingVersionKey());
-  sessionStorage.removeItem('pressPersonality');
-  sessionStorage.removeItem('pressAnswers');
-  sessionStorage.removeItem(getStandingsStateKey());
-  sessionStorage.removeItem(getPlayerStatsKey());
-  sessionStorage.removeItem(getScheduleStateKey());
-  sessionStorage.removeItem(getLeagueScheduleKey());
+  saveGameRemoveItem(getRecruitingClassKey());
+  saveGameRemoveItem(getRecruitingVersionKey());
+  saveGameRemoveItem('pressPersonality');
+  saveGameRemoveItem('pressAnswers');
+  saveGameRemoveItem(getStandingsStateKey());
+  saveGameRemoveItem(getPlayerStatsKey());
+  saveGameRemoveItem(getScheduleStateKey());
+  saveGameRemoveItem(getLeagueScheduleKey());
   flash(() => {
     showPanel('press');
     renderPressConference();
@@ -5343,13 +5879,13 @@ async function prepareRosters() {
   namePool = await loadNamePool();
   allRosters = generateAllRosters(namePool);
   recruitingClass = generateRecruitingClass(namePool);
-  sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
-  sessionStorage.setItem('rosterGenerationVersion', ROSTER_GENERATION_VERSION);
+  saveAllRosters();
+  saveGameSetItem('rosterGenerationVersion', ROSTER_GENERATION_VERSION);
   saveRecruitingClass();
   standingsState = buildInitialStandingsState();
-  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+  saveGameJSON(getStandingsStateKey(), standingsState);
   playerStatsState = buildInitialPlayerStatsState();
-  sessionStorage.setItem(getPlayerStatsKey(), JSON.stringify(playerStatsState));
+  saveGameJSON(getPlayerStatsKey(), playerStatsState);
 }
 
 async function loadNamePool() {
@@ -5542,15 +6078,15 @@ function getRecruitingVersionKey() {
 
 function saveRecruitingClass() {
   if (!recruitingClass) return;
-  sessionStorage.setItem(getRecruitingClassKey(), JSON.stringify(recruitingClass));
-  sessionStorage.setItem(getRecruitingVersionKey(), RECRUITING_CLASS_VERSION);
+  saveGameJSON(getRecruitingClassKey(), compactRecruitingClassForStorage(recruitingClass));
+  saveGameSetItem(getRecruitingVersionKey(), RECRUITING_CLASS_VERSION);
 }
 
 function loadRecruitingClass() {
   try {
-    const savedVersion = sessionStorage.getItem(getRecruitingVersionKey());
-    const saved = JSON.parse(sessionStorage.getItem(getRecruitingClassKey()) || 'null');
-    if (savedVersion === RECRUITING_CLASS_VERSION && Array.isArray(saved)) return saved;
+    const savedVersion = saveGameGetItem(getRecruitingVersionKey());
+    const saved = loadGameJSON(getRecruitingClassKey());
+    if (savedVersion === RECRUITING_CLASS_VERSION && Array.isArray(saved)) return expandRecruitingClassFromStorage(saved);
   } catch (err) {}
   return null;
 }
@@ -5560,7 +6096,7 @@ function ensureRecruitingClass() {
   if (!recruitingClass) {
     recruitingClass = generateRecruitingClass(namePool || getFallbackNamePool());
     saveRecruitingClass();
-    if (standingsState) { standingsState.cpuRecruitWeeks = {}; sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState)); }
+    if (standingsState) { standingsState.cpuRecruitWeeks = {}; saveGameJSON(getStandingsStateKey(), standingsState); }
   } else if (recruitingClass.some(recruit => !Array.isArray(recruit.cpuOffers))) {
     recruitingClass.forEach(recruit => { recruit.cpuOffers = []; });
     generateCPURecruitOffers(recruitingClass);
@@ -5663,7 +6199,7 @@ function generateCPURecruitOffers(recruits) {
   recruits.forEach(recruit => {
     recruit.cpuOffers = (recruit.cpuOffers || [])
       .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
-      .slice(0, 12);
+      .slice(0, 6);
   });
 }
 
@@ -5723,9 +6259,20 @@ function getTeamNILBudgetDollars() {
 }
 
 function getCommittedNILDollars() {
-  const recruitSum = ensureRecruitingClass().reduce((sum, recruit) => sum + Math.max(0, Math.round(Number((recruit.offer || {}).amount) || 0)), 0);
-  const portalSum = (transferPortal || []).reduce((sum, p) => sum + Math.max(0, Math.round(Number((p.offer || {}).amount) || 0)), 0);
-  return recruitSum + portalSum;
+  const retentionSum = (retentionNILCommits || []).reduce((sum, item) => {
+    return sum + Math.max(0, Math.round(Number(item.amount) || 0));
+  }, 0);
+  const recruitSum = ensureRecruitingClass().reduce((sum, recruit) => {
+    if (!recruit.offer) return sum;
+    if (recruit.committedTo) return sum;
+    return sum + Math.max(0, Math.round(Number(recruit.offer.amount) || 0));
+  }, 0);
+  const portalSum = (transferPortal || []).reduce((sum, p) => {
+    if (!p.offer) return sum;
+    if (p.committedTo) return sum;
+    return sum + Math.max(0, Math.round(Number(p.offer.amount) || 0));
+  }, 0);
+  return retentionSum + recruitSum + portalSum;
 }
 
 function getAvailableNILDollars(extraAvailable = 0) {
@@ -5913,7 +6460,7 @@ function getRecruitingWeekKey() {
 
 function ensureRecruitingHoursState() {
   if (!recruitingHoursState) {
-    try { recruitingHoursState = JSON.parse(sessionStorage.getItem(getRecruitingHoursKey()) || 'null'); }
+    try { recruitingHoursState = loadGameJSON(getRecruitingHoursKey()); }
     catch (e) { recruitingHoursState = null; }
   }
   const weekKey = getRecruitingWeekKey();
@@ -5925,12 +6472,12 @@ function ensureRecruitingHoursState() {
 }
 
 function saveRecruitingHoursState() {
-  if (recruitingHoursState) sessionStorage.setItem(getRecruitingHoursKey(), JSON.stringify(recruitingHoursState));
+  if (recruitingHoursState) saveGameJSON(getRecruitingHoursKey(), recruitingHoursState);
 }
 
 function resetRecruitingHoursForNewGame() {
   recruitingRunId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  sessionStorage.setItem('recruitingRunId', recruitingRunId);
+  saveGameSetItem('recruitingRunId', recruitingRunId);
   recruitingHoursState = null;
 }
 
@@ -5953,7 +6500,7 @@ function simulateCPURecruitingWeek(weekKey) {
   if (isFinalRegularSeasonWeek) {
     resolveRecruitingSignings(recruits, weekKey, true);
     saveRecruitingClass();
-    sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+    saveGameJSON(getStandingsStateKey(), standingsState);
     return;
   }
 
@@ -6051,7 +6598,7 @@ function simulateCPURecruitingWeek(weekKey) {
   recruits.forEach(recruit => {
     recruit.cpuOffers = (recruit.cpuOffers || [])
       .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
-      .slice(0, 12);
+      .slice(0, 6);
   });
 
   // Signing sweep: after game 20 recruits can sign, at game 30 all sign
@@ -6060,7 +6607,7 @@ function simulateCPURecruitingWeek(weekKey) {
   }
 
   saveRecruitingClass();
-  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+  saveGameJSON(getStandingsStateKey(), standingsState);
 }
 
 function resolveRecruitingSignings(recruits, weekKey, autoSign) {
@@ -6089,6 +6636,7 @@ function resolveRecruitingSignings(recruits, weekKey, autoSign) {
     const key = `${best.conf}::${best.team}`;
     if ((signedCounts[key] || 0) < 6) {
       recruit.committedTo = { team:best.team, conf:best.conf };
+      if (recruit.offer) delete recruit.offer;
       signedCounts[key] = (signedCounts[key] || 0) + 1;
     }
   });
@@ -6587,7 +7135,7 @@ function buildInitialPlayerStatsState() {
 function ensurePlayerStatsState() {
   if (!playerStatsState) {
     try {
-      playerStatsState = JSON.parse(sessionStorage.getItem(getPlayerStatsKey()) || 'null');
+      playerStatsState = loadGameJSON(getPlayerStatsKey());
     } catch (err) {
       playerStatsState = null;
     }
@@ -6598,7 +7146,7 @@ function ensurePlayerStatsState() {
 
 function savePlayerStatsState() {
   ensurePlayerStatsState();
-  sessionStorage.setItem(getPlayerStatsKey(), JSON.stringify(playerStatsState));
+  saveGameJSON(getPlayerStatsKey(), playerStatsState);
 }
 
 function getPlayerStatsId(conf, team, playerName) {
@@ -6878,6 +7426,8 @@ function buildInitialStandingsState() {
         team,
         wins:0,
         losses:0,
+        confWins:0,
+        confLosses:0,
         power:getTeamIndexScore(roster)
       };
     });
@@ -6889,7 +7439,7 @@ function ensureStandingsState() {
   if (!allRosters) ensureRosterLoaded();
   if (!standingsState) {
     try {
-      standingsState = JSON.parse(sessionStorage.getItem(getStandingsStateKey()) || 'null');
+      standingsState = loadGameJSON(getStandingsStateKey());
     } catch (err) {
       standingsState = null;
     }
@@ -6906,12 +7456,51 @@ function ensureStandingsState() {
           team,
           wins:0,
           losses:0,
+          confWins:0,
+          confLosses:0,
           power:getTeamIndexScore(roster)
         };
       }
+      const entryState = standingsState.teams[key];
+      if (typeof entryState.confWins !== 'number') entryState.confWins = 0;
+      if (typeof entryState.confLosses !== 'number') entryState.confLosses = 0;
     });
   });
-  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+  saveGameJSON(getStandingsStateKey(), standingsState);
+}
+
+function syncConferenceRecordsFromLeagueSchedule() {
+  if (!standingsState || !standingsState.teams || !leagueSchedule || leagueSchedule.season !== (seasonNumber || 1)) return;
+  const hasConferenceResults = Object.values(leagueSchedule.byDate || {}).some(games =>
+    (games || []).some(game => game && game.isConf && game.result)
+  );
+  if (!hasConferenceResults) return;
+  Object.values(standingsState.teams).forEach(entry => {
+    entry.confWins = 0;
+    entry.confLosses = 0;
+  });
+  Object.values(leagueSchedule.byDate || {}).forEach(games => {
+    (games || []).forEach(game => {
+      if (!game || !game.isConf || !game.result) return;
+      const home = getTeamStandingEntryNoEnsure(game.home);
+      const away = getTeamStandingEntryNoEnsure(game.away);
+      if (!home || !away) return;
+      const homeWon = Number(game.result.homeScore) > Number(game.result.awayScore);
+      if (homeWon) {
+        home.confWins = (Number(home.confWins) || 0) + 1;
+        away.confLosses = (Number(away.confLosses) || 0) + 1;
+      } else {
+        away.confWins = (Number(away.confWins) || 0) + 1;
+        home.confLosses = (Number(home.confLosses) || 0) + 1;
+      }
+    });
+  });
+}
+
+function getTeamStandingEntryNoEnsure(teamName) {
+  const conf = getTeamConf(teamName) || selectedConf;
+  const key = getTeamKey(conf, teamName);
+  return standingsState && standingsState.teams ? standingsState.teams[key] || null : null;
 }
 
 function getTeamStandingEntry(teamName) {
@@ -6948,7 +7537,7 @@ function getWinPowerIncrease(winnerPower, loserPower) {
   return Math.max(1, Math.round(winnerPower * 0.1));
 }
 
-function applyGameResultToStandings(winnerTeam, loserTeam, margin) {
+function applyGameResultToStandings(winnerTeam, loserTeam, margin, isConferenceGame = false) {
   ensureStandingsState();
   const winner = getTeamStandingEntry(winnerTeam);
   const loser = getTeamStandingEntry(loserTeam);
@@ -6958,31 +7547,87 @@ function applyGameResultToStandings(winnerTeam, loserTeam, margin) {
   const baseDecrease = (loserPower / winnerPower) * (loserPower / 5);
   winner.wins += 1;
   loser.losses += 1;
+  if (isConferenceGame) {
+    winner.confWins = (Number(winner.confWins) || 0) + 1;
+    loser.confLosses = (Number(loser.confLosses) || 0) + 1;
+  }
   winner.power += getWinPowerIncrease(winnerPower, loserPower);
   loser.power = Math.max(1, loser.power - Math.round(baseDecrease * getLossScale(margin) * getOpponentLossScale(winnerPower, loserPower)));
-  sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+  saveGameJSON(getStandingsStateKey(), standingsState);
 }
 
-function getRankedTeams(limit) {
+function getConfWinPct(entry) {
+  const wins = Number(entry.confWins) || 0;
+  const losses = Number(entry.confLosses) || 0;
+  const total = wins + losses;
+  return total ? wins / total : 0;
+}
+
+function getOverallWinPct(entry) {
+  const wins = Number(entry.wins) || 0;
+  const losses = Number(entry.losses) || 0;
+  const total = wins + losses;
+  return total ? wins / total : 0;
+}
+
+function getRankedTeams(limit, mode = 'national', conf = selectedConf) {
   ensureStandingsState();
-  const ranked = Object.values(standingsState.teams || {})
-    .sort((a, b) => b.power - a.power || b.wins - a.wins || a.team.localeCompare(b.team));
+  syncConferenceRecordsFromLeagueSchedule();
+  let ranked = Object.values(standingsState.teams || {});
+  if (mode === 'conference') {
+    ranked = ranked
+      .filter(entry => entry.conf === conf)
+      .sort((a, b) =>
+        (Number(b.confWins) || 0) - (Number(a.confWins) || 0) ||
+        getConfWinPct(b) - getConfWinPct(a) ||
+        (Number(a.confLosses) || 0) - (Number(b.confLosses) || 0) ||
+        b.power - a.power ||
+        a.team.localeCompare(b.team)
+      );
+  } else {
+    ranked = ranked
+      .sort((a, b) => b.power - a.power || b.wins - a.wins || getOverallWinPct(b) - getOverallWinPct(a) || a.team.localeCompare(b.team));
+  }
   return limit === 'all' ? ranked : ranked.slice(0, Number(limit) || 25);
+}
+
+function ensureStandingsConferenceOptions() {
+  const confSelect = document.getElementById('standings-conf');
+  if (!confSelect) return selectedConf;
+  if (!confSelect.options.length) {
+    confSelect.innerHTML = CONF_NAMES.map(conf => `<option value="${escapeAttr(conf)}">${escapeAttr(conf)}</option>`).join('');
+    confSelect.value = selectedConf || CONF_NAMES[0];
+  }
+  return confSelect.value || selectedConf || CONF_NAMES[0];
 }
 
 function renderStandings() {
   const list = document.getElementById('standings-list');
   const countSelect = document.getElementById('standings-count');
+  const modeSelect = document.getElementById('standings-mode');
+  const confSelect = document.getElementById('standings-conf');
+  const confLabel = document.getElementById('standings-conf-label');
+  const mode = modeSelect ? modeSelect.value : 'national';
+  const conf = ensureStandingsConferenceOptions();
+  if (confSelect) confSelect.style.display = mode === 'conference' ? '' : 'none';
+  if (confLabel) confLabel.style.display = mode === 'conference' ? '' : 'none';
   const limit = countSelect ? countSelect.value : '25';
-  const rankedTeams = getRankedTeams(limit);
+  const rankedTeams = getRankedTeams(limit, mode, conf);
+  const eyebrow = document.querySelector('.standings-eyebrow');
   const title = document.querySelector('.standings-title');
-  if (title) title.textContent = limit === 'all' ? 'ALL TEAMS' : `TOP ${limit} TEAMS`;
+  if (eyebrow) eyebrow.textContent = mode === 'conference' ? `* ${conf.toUpperCase()} STANDINGS *` : '* NATIONAL RANKINGS *';
+  if (title) {
+    title.textContent = mode === 'conference'
+      ? `${conf.toUpperCase()}`
+      : (limit === 'all' ? 'ALL TEAMS' : `TOP ${limit} TEAMS`);
+  }
   list.innerHTML = rankedTeams.map((entry, i) => `
     <div class="standing-row${entry.team === selectedTeam && entry.conf === selectedConf ? ' user-team' : ''}">
       <div class="standing-rank">#${i + 1}</div>
       <div class="standing-team">${escapeAttr(entry.team)}</div>
       <div class="standing-conf">${escapeAttr(entry.conf)}</div>
-      <div class="standing-record">${entry.wins}-${entry.losses}</div>
+      <div class="standing-record">CONF ${(Number(entry.confWins) || 0)}-${(Number(entry.confLosses) || 0)}</div>
+      <div class="standing-record">ALL ${entry.wins}-${entry.losses}</div>
     </div>
   `).join('');
 }
@@ -6996,18 +7641,18 @@ function goToGameplan() {
 
 function ensureRosterLoaded() {
   if (!allRosters) {
-    const saved = sessionStorage.getItem('allRosters');
-    const savedVersion = sessionStorage.getItem('rosterGenerationVersion');
+    const saved = saveGameGetItem('allRosters');
+    const savedVersion = saveGameGetItem('rosterGenerationVersion');
     allRosters = saved && savedVersion === ROSTER_GENERATION_VERSION
       ? JSON.parse(saved)
       : generateAllRosters(getFallbackNamePool());
     if (savedVersion !== ROSTER_GENERATION_VERSION) {
-      sessionStorage.setItem('allRosters', JSON.stringify(allRosters));
-      sessionStorage.setItem('rosterGenerationVersion', ROSTER_GENERATION_VERSION);
+      saveAllRosters();
+      saveGameSetItem('rosterGenerationVersion', ROSTER_GENERATION_VERSION);
       standingsState = buildInitialStandingsState();
-      sessionStorage.setItem(getStandingsStateKey(), JSON.stringify(standingsState));
+      saveGameJSON(getStandingsStateKey(), standingsState);
       playerStatsState = buildInitialPlayerStatsState();
-      sessionStorage.setItem(getPlayerStatsKey(), JSON.stringify(playerStatsState));
+      saveGameJSON(getPlayerStatsKey(), playerStatsState);
     }
   }
   hydrateRosterPositions();
@@ -7039,7 +7684,7 @@ function getSavedGameplanKey() {
 function getPressAnswers() {
   if (pressAnswers.length) return pressAnswers;
   try {
-    const saved = JSON.parse(sessionStorage.getItem('pressAnswers') || '[]');
+    const saved = loadGameJSON('pressAnswers', []);
     return Array.isArray(saved) ? saved : [];
   } catch (err) {
     return [];
@@ -7098,7 +7743,7 @@ function ensureGameplan() {
   }
   if (!gameplan) {
     try {
-      gameplan = JSON.parse(sessionStorage.getItem(key) || 'null');
+      gameplan = loadGameJSON(key);
     } catch (err) {
       gameplan = null;
     }
@@ -7125,7 +7770,7 @@ function ensureDefaultGameplanSaved() {
   }
   if (hasValidPositionMinutes(gameplan)) {
     gameplan.minutesSaved = true;
-    sessionStorage.setItem(getSavedGameplanKey(), JSON.stringify(gameplan));
+    saveGameJSON(getSavedGameplanKey(), gameplan);
   }
 }
 
@@ -7297,7 +7942,7 @@ function saveGameplan() {
     return;
   }
   gameplan.minutesSaved = true;
-  sessionStorage.setItem(getSavedGameplanKey(), JSON.stringify(gameplan));
+  saveGameJSON(getSavedGameplanKey(), gameplan);
   const note = document.getElementById('gameplan-note');
   if (note) note.textContent = 'Gameplan saved.';
 }
@@ -7417,7 +8062,7 @@ function saveCoachInfoAndContinue() {
     return;
   }
   Object.assign(coachProfile, { firstName, lastName, homeState, hometown });
-  sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
+  saveGameJSON('coachProfile', coachProfile);
   coachStep = 'customize';
   flash(renderCoachBuilder);
 }
@@ -7454,13 +8099,13 @@ async function skipCoachSetup() {
   currentGameIndex = 0;
   playerStatsState = null;
   resetRecruitingHoursForNewGame();
-  sessionStorage.removeItem(getScheduleStateKey());
-  sessionStorage.removeItem(getLeagueScheduleKey());
-  sessionStorage.removeItem(getPlayerStatsKey());
-  sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
-  sessionStorage.setItem('resourceDecision', resourceDecision);
-  sessionStorage.setItem('pressPersonality', pressPersonality);
-  sessionStorage.setItem('pressAnswers', JSON.stringify(pressAnswers));
+  saveGameRemoveItem(getScheduleStateKey());
+  saveGameRemoveItem(getLeagueScheduleKey());
+  saveGameRemoveItem(getPlayerStatsKey());
+  saveGameJSON('coachProfile', coachProfile);
+  saveGameSetItem('resourceDecision', resourceDecision);
+  saveGameSetItem('pressPersonality', pressPersonality);
+  saveGameJSON('pressAnswers', pressAnswers);
   await prepareRosters();
   goToDashboard();
 }
@@ -7516,7 +8161,7 @@ function renderCoachControls() {
   controls.querySelectorAll('.option-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       coachProfile[btn.dataset.key] = btn.dataset.value;
-      sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
+      saveGameJSON('coachProfile', coachProfile);
       renderCoachControls();
       drawCoach();
     });
@@ -7524,7 +8169,7 @@ function renderCoachControls() {
 }
 
 function finishCoachBuilder() {
-  sessionStorage.setItem('coachProfile', JSON.stringify(coachProfile));
+  saveGameJSON('coachProfile', coachProfile);
   goToCutscene();
 }
 
@@ -7937,7 +8582,7 @@ function makeCutsceneButton(label, onClick) {
 
 function saveResourceDecision(decision) {
   resourceDecision = decision;
-  sessionStorage.setItem('resourceDecision', decision);
+  saveGameSetItem('resourceDecision', decision);
   cutsceneStep = 'press';
   flash(renderCutscene);
 }
@@ -7971,7 +8616,7 @@ function renderPersonalitySelect() {
   stage.querySelectorAll('.personality-card').forEach(btn => {
     btn.addEventListener('click', () => {
       pressPersonality = btn.dataset.personality;
-      sessionStorage.setItem('pressPersonality', pressPersonality);
+      saveGameSetItem('pressPersonality', pressPersonality);
       flash(renderPressConference);
     });
   });
@@ -8067,7 +8712,7 @@ function answerPressQuestion(answer) {
     reporterIndex:activeReporterIndex,
     reporter:REPORTERS[activeReporterIndex].name
   });
-  sessionStorage.setItem('pressAnswers', JSON.stringify(pressAnswers));
+  saveGameJSON('pressAnswers', pressAnswers);
   renderPressAnswer(response);
 }
 
@@ -8085,7 +8730,7 @@ function renderPressAnswer(response) {
     pressQuestionIndex += 1;
     activeReporterIndex = null;
     if (pressQuestionIndex >= PRESS_QUESTIONS.length) {
-      sessionStorage.setItem('pressAnswers', JSON.stringify(pressAnswers));
+      saveGameJSON('pressAnswers', pressAnswers);
       prepareRosters().then(goToDashboard);
     } else {
       flash(renderPressRoom);
@@ -8144,15 +8789,37 @@ function getLeagueScheduleKey() {
   return `leagueSchedule:${seasonNumber || 1}`;
 }
 
+function compactLeagueSchedule(schedule) {
+  if (!schedule || !schedule.byDate) return schedule;
+  const byDate = {};
+  Object.entries(schedule.byDate).forEach(([date, games]) => {
+    byDate[date] = (games || []).map(g => {
+      const compact = {
+        home:g.home,
+        away:g.away,
+        isConf:!!g.isConf
+      };
+      if (g.conf) compact.conf = g.conf;
+      if (g.result) {
+        compact.result = {
+          homeScore:Number(g.result.homeScore) || 0,
+          awayScore:Number(g.result.awayScore) || 0
+        };
+      }
+      if (g.statsRecorded) compact.statsRecorded = true;
+      return compact;
+    });
+  });
+  return { season:schedule.season, byDate };
+}
+
 function saveLeagueSchedule() {
-  if (leagueSchedule) sessionStorage.setItem(getLeagueScheduleKey(), JSON.stringify(leagueSchedule));
+  if (leagueSchedule) saveGameJSON(getLeagueScheduleKey(), compactLeagueSchedule(leagueSchedule));
 }
 
 function loadLeagueSchedule() {
-  try {
-    const saved = JSON.parse(sessionStorage.getItem(getLeagueScheduleKey()) || 'null');
-    if (saved && saved.season === (seasonNumber || 1) && saved.byDate) return saved;
-  } catch (err) {}
+  const saved = loadGameJSON(getLeagueScheduleKey());
+  if (saved && saved.season === (seasonNumber || 1) && saved.byDate) return saved;
   return null;
 }
 
@@ -8498,8 +9165,8 @@ function selectTeam() {
   const team = CONFERENCES[selectedConf][teamCursor];
   selectedTeam = team;
   resetRecruitingHoursForNewGame();
-  sessionStorage.setItem('playerConf', selectedConf);
-  sessionStorage.setItem('playerTeam', team);
+  saveGameSetItem('playerConf', selectedConf);
+  saveGameSetItem('playerTeam', team);
   goToCoachBuilder('info');
 }
 
