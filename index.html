@@ -1055,6 +1055,25 @@
       padding:16px 22px 18px;
       min-height:0;
     }
+    .ng-coach-stage {
+      flex:1 1 0;
+      margin:14px 0 16px;
+      border:2px solid rgba(237,224,184,0.10);
+      background:
+        linear-gradient(180deg, rgba(8,7,4,0.45) 0%, rgba(22,18,9,0.20) 60%, rgba(168,36,24,0.12) 100%);
+      position:relative;
+      overflow:hidden;
+      min-height:200px;
+    }
+    #ng-coach-canvas {
+      image-rendering:pixelated;
+      image-rendering:crisp-edges;
+      display:block;
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+    }
     .ng-meta-row {
       display:flex;
       align-items:center;
@@ -1368,7 +1387,7 @@
     }
     .player-row {
       display:grid;
-      grid-template-columns:1.2fr .45fr .5fr .5fr 1fr;
+      grid-template-columns:1.2fr .36fr .42fr .5fr .5fr 1fr;
       gap:8px;
       align-items:center;
       border:2px solid rgba(237,224,184,0.16);
@@ -1506,6 +1525,12 @@
     }
     .stepper-btn:hover, .stepper-btn:focus-visible {
       border-color:#c08a18; color:#c08a18; outline:none;
+    }
+    .stepper-btn:disabled {
+      opacity:0.3;
+      cursor:not-allowed;
+      border-color:rgba(237,224,184,0.12);
+      color:rgba(237,224,184,0.24);
     }
     .stepper-val {
       width:24px; text-align:center;
@@ -2140,7 +2165,7 @@
       color:rgba(168,36,24,0.9);
     }
     .departure-row.retention-row {
-      grid-template-columns:1.4fr .45fr .45fr .75fr 1.4fr;
+      grid-template-columns:1.4fr .42fr .42fr .45fr .75fr 1.4fr;
     }
     .retention-actions {
       display:flex;
@@ -2193,6 +2218,195 @@
       background:#c08a18;
       border-color:#ede0b8;
       outline:none;
+    }
+    .conference-tournament-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .conference-tournament-screen::-webkit-scrollbar { display:none; }
+    .conf-tourney-shell {
+      width:100%;
+      max-width:980px;
+      display:grid;
+      gap:18px;
+    }
+    .conf-tourney-title {
+      color:#ede0b8;
+      font-size:clamp(14px,2.4vw,26px);
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .conf-tourney-subtitle {
+      color:rgba(237,224,184,0.5);
+      font-size:clamp(6px,0.78vw,8px);
+      margin-top:-8px;
+      line-height:1.7;
+    }
+    .conf-tourney-status {
+      border:2px solid rgba(192,138,24,0.32);
+      background:rgba(22,18,9,0.38);
+      padding:14px;
+      display:grid;
+      gap:8px;
+    }
+    .conf-tourney-status-label {
+      color:#c08a18;
+      font-size:clamp(6px,0.72vw,8px);
+      letter-spacing:1px;
+    }
+    .conf-tourney-status-name {
+      color:#ede0b8;
+      font-size:clamp(11px,1.5vw,17px);
+      line-height:1.35;
+    }
+    .conf-tourney-progress {
+      color:rgba(237,224,184,0.55);
+      font-size:clamp(5px,0.7vw,8px);
+      line-height:1.6;
+    }
+    .conf-tourney-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:10px;
+    }
+    .conf-tourney-card {
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(22,18,9,0.28);
+      padding:10px;
+      display:grid;
+      gap:7px;
+      min-width:0;
+    }
+    .conf-tourney-card.active {
+      border-color:rgba(192,138,24,0.7);
+      background:rgba(192,138,24,0.12);
+    }
+    .conf-tourney-card.complete {
+      border-color:rgba(237,224,184,0.22);
+    }
+    .conf-tourney-card-title {
+      color:#c08a18;
+      font-size:clamp(6px,0.76vw,8px);
+      line-height:1.5;
+      overflow-wrap:anywhere;
+    }
+    .conf-tourney-card-line {
+      color:rgba(237,224,184,0.68);
+      font-size:clamp(5px,0.68vw,7px);
+      line-height:1.6;
+      overflow-wrap:anywhere;
+    }
+    .conf-tourney-champ {
+      color:#ede0b8;
+    }
+    .conf-tourney-result-list {
+      display:grid;
+      gap:6px;
+      max-height:180px;
+      overflow:auto;
+      scrollbar-width:none;
+    }
+    .conf-tourney-result-list::-webkit-scrollbar { display:none; }
+    .conf-tourney-result {
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      color:rgba(237,224,184,0.58);
+      font-size:clamp(5px,0.64vw,7px);
+      line-height:1.5;
+      border-top:1px solid rgba(237,224,184,0.08);
+      padding-top:5px;
+    }
+    .conf-tourney-result .winner {
+      color:#ede0b8;
+    }
+    .conf-user-bracket {
+      display:grid;
+      grid-auto-flow:column;
+      grid-auto-columns:minmax(170px, 1fr);
+      gap:10px;
+      overflow-x:auto;
+      padding-bottom:8px;
+      scrollbar-width:none;
+    }
+    .conf-user-bracket::-webkit-scrollbar { display:none; }
+    .conf-user-round {
+      display:grid;
+      gap:10px;
+      align-content:stretch;
+      min-width:0;
+    }
+    .conf-user-round-title {
+      color:#c08a18;
+      font-size:clamp(6px,0.72vw,8px);
+      letter-spacing:1px;
+      line-height:1.5;
+      border-bottom:2px solid rgba(192,138,24,0.22);
+      padding-bottom:6px;
+    }
+    .conf-user-game {
+      border:2px solid rgba(237,224,184,0.13);
+      background:rgba(22,18,9,0.3);
+      display:grid;
+      align-self:center;
+    }
+    .conf-user-team {
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:7px;
+      align-items:center;
+      min-width:0;
+      color:rgba(237,224,184,0.58);
+      font-size:clamp(5px,0.66vw,7px);
+      line-height:1.5;
+      padding:7px 8px;
+      border-bottom:1px solid rgba(237,224,184,0.09);
+    }
+    .conf-user-team:last-child {
+      border-bottom:none;
+    }
+    .conf-user-team.user-team {
+      background:rgba(192,138,24,0.13);
+      color:#ede0b8;
+    }
+    .conf-user-team.winner {
+      color:#ede0b8;
+    }
+    .conf-user-team.bye {
+      color:rgba(237,224,184,0.28);
+    }
+    .conf-user-seed {
+      color:#c08a18;
+    }
+    .conf-user-name {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .conf-user-score {
+      color:#ede0b8;
+    }
+    .conf-user-champion {
+      border:2px solid rgba(192,138,24,0.5);
+      background:rgba(192,138,24,0.12);
+      color:#ede0b8;
+      font-size:clamp(7px,0.86vw,10px);
+      line-height:1.6;
+      padding:12px;
+      display:grid;
+      gap:6px;
+    }
+    .conf-user-champion span {
+      color:#c08a18;
+      font-size:clamp(5px,0.64vw,7px);
+      letter-spacing:1px;
+    }
+    .conf-tourney-actions {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
     .portal-body {
       display:grid;
@@ -2576,40 +2790,32 @@
       box-shadow:8px 8px 0 rgba(0,0,0,0.32), inset 0 0 0 4px rgba(168,36,24,0.14);
       padding:16px;
       display:grid;
-      gap:10px;
-      text-align:center;
-    }
-    .portal-work-office {
-      position:relative;
-      height:210px;
-      overflow:hidden;
-      border:2px solid rgba(237,224,184,0.16);
-      background:
-        linear-gradient(#352112 0 58%, #6b3d18 58% 100%);
-    }
-    .portal-work-office::before {
-      content:'';
-      position:absolute;
-      left:8%;
-      top:12%;
-      width:25%;
-      height:26%;
-      border:3px solid #3a2400;
-      background:linear-gradient(rgba(29,95,168,0.38), rgba(29,95,168,0.12));
-    }
-    #portal-work-canvas {
-      position:absolute;
-      left:50%;
-      bottom:0;
-      width:min(320px,72vw);
-      height:auto;
-      transform:translateX(-50%);
-      image-rendering:pixelated;
+      gap:12px;
     }
     .portal-work-label {
       color:#ede0b8;
       font-size:clamp(7px,0.9vw,10px);
       line-height:1.7;
+      text-align:left;
+    }
+    .portal-work-count {
+      color:rgba(237,224,184,0.58);
+      font-size:clamp(6px,0.74vw,8px);
+      line-height:1.7;
+      text-align:left;
+    }
+    .portal-work-track {
+      height:18px;
+      border:2px solid rgba(237,224,184,0.22);
+      background:#140f08;
+      overflow:hidden;
+    }
+    .portal-work-fill {
+      height:100%;
+      width:0%;
+      background:#c08a18;
+      box-shadow:inset 0 0 0 2px rgba(237,224,184,0.22);
+      transition:width 120ms linear;
     }
     .game-finished {
       display:none;
@@ -3119,6 +3325,23 @@
   </div>
 
   <!-- TOURNAMENT -->
+  <div id="conference-tournament-screen" class="screen-panel conference-tournament-screen hidden">
+    <div class="conf-tourney-shell">
+      <div>
+        <div class="conf-tourney-title" id="conf-tourney-title">CONFERENCE TOURNAMENTS</div>
+        <div class="conf-tourney-subtitle" id="conf-tourney-subtitle"></div>
+      </div>
+      <div class="conf-tourney-status" id="conf-tourney-status"></div>
+      <div class="conf-tourney-grid" id="conf-tourney-grid"></div>
+      <div class="conf-tourney-actions">
+        <button class="tournament-action-btn" id="conf-user-round-btn" type="button" onclick="simulateUserConferenceTournamentRound()" style="display:none;">SIMULATE ROUND</button>
+        <button class="tournament-action-btn" id="conf-user-tournament-btn" type="button" onclick="simulateUserConferenceTournament()" style="display:none;">SIMULATE TOURNAMENT</button>
+        <button class="tournament-action-btn" id="conf-other-tournaments-btn" type="button" onclick="simulateOtherConferenceTournaments()" style="display:none;">SIMULATE TOURNAMENTS</button>
+        <button class="tournament-continue-btn" id="conf-tourney-continue-btn" type="button" onclick="advanceConferenceTournamentReview()" style="display:none;">► NATIONAL TOURNAMENT</button>
+      </div>
+    </div>
+  </div>
+
   <div id="tournament-screen" class="screen-panel tournament-screen hidden">
     <div class="tournament-shell">
       <div class="tournament-actions">
@@ -3292,10 +3515,9 @@
 </div>
 <div class="portal-work-overlay" id="portal-work-overlay" aria-hidden="true">
   <div class="portal-work-card">
-    <div class="portal-work-office">
-      <canvas id="portal-work-canvas" width="320" height="210"></canvas>
-    </div>
     <div class="portal-work-label" id="portal-work-label">WORKING THE PORTAL...</div>
+    <div class="portal-work-count" id="portal-work-count">0 / 0</div>
+    <div class="portal-work-track"><div class="portal-work-fill" id="portal-work-fill"></div></div>
   </div>
 </div>
 <script src="teams.js"></script>
@@ -3460,6 +3682,8 @@ let recruitingHoursState = null;
 let recruitingRunId = saveGameGetItem('recruitingRunId') || '';
 let tournamentState = null;
 let tournamentSimInProgress = false;
+let conferenceTournamentState = null;
+let conferenceTournamentSimInProgress = false;
 let transferPortal = [];
 let portalStarFilter = 'all';
 let portalPositionFilter = 'all';
@@ -3468,6 +3692,8 @@ let portalSignedFilter = false;
 let portalWeek = 1;
 let portalHoursState = null;
 let portalWorkAnimId = null;
+let portalAdvanceInProgress = false;
+let portalSetupInProgress = false;
 let pendingRetentionPlayers = [];
 let retentionNILCommits = [];
 let departuresAwaitingRetention = false;
@@ -3927,6 +4153,9 @@ function showPanel(name) {
   const courtLayer = document.getElementById('court-layer');
   courtLayer.classList.toggle('hidden', name !== 'home');
   currentScreen = name;
+  if (name !== 'dashboard' && typeof stopDashboardCoachAnimation === 'function') {
+    stopDashboardCoachAnimation();
+  }
 }
 
 function goHome() {
@@ -3997,11 +4226,12 @@ function renderNextGame() {
   if (!body) return;
   const game = cachedSchedule ? cachedSchedule[currentGameIndex] : null;
   if (!game) {
+    stopDashboardCoachAnimation();
     body.innerHTML =
-      `<div class="ng-season-complete">` +
-        `<div class="ng-complete-label">REGULAR SEASON COMPLETE</div>` +
-        `<div class="ng-complete-title">POSTSEASON READY</div>` +
-        `<button class="ng-tournament-btn" type="button" onclick="startTournament()">START TOURNAMENT</button>` +
+        `<div class="ng-season-complete">` +
+          `<div class="ng-complete-label">REGULAR SEASON COMPLETE</div>` +
+          `<div class="ng-complete-title">POSTSEASON READY</div>` +
+        `<button class="ng-tournament-btn" type="button" onclick="startConferenceTournaments()">START CONFERENCE TOURNAMENTS</button>` +
       `</div>`;
     return;
   }
@@ -4021,6 +4251,9 @@ function renderNextGame() {
       `<div class="ng-date-row">${game.date} &nbsp;·&nbsp; ${haLabel}</div>` +
       `<div class="ng-opp-conf">${oppConf || '&nbsp;'}</div>` +
       `<div class="ng-opponent">${game.opponent}</div>` +
+      `<div class="ng-coach-stage">` +
+        `<canvas id="ng-coach-canvas" width="520" height="320"></canvas>` +
+      `</div>` +
       `<div class="ng-actions">` +
         `<button class="ng-play-btn" type="button" onclick="playGame()">▶ PLAY GAME</button>` +
         `<button class="ng-sim-btn"  type="button" onclick="toggleSuperSimPanel()">SUPER SIM</button>` +
@@ -4031,6 +4264,7 @@ function renderNextGame() {
         `</div>` +
       `</div>` +
     `</div>`;
+  startDashboardCoachAnimation();
 }
 
 function playGame()  {
@@ -4038,7 +4272,501 @@ function playGame()  {
   startGameSimulation(false);
 }
 
+function getConferenceTournamentKey() {
+  return `conferenceTournament:${seasonNumber || 1}`;
+}
+
+function saveConferenceTournamentState() {
+  if (conferenceTournamentState) saveGameJSON(getConferenceTournamentKey(), conferenceTournamentState);
+}
+
+function loadConferenceTournamentState() {
+  const saved = loadGameJSON(getConferenceTournamentKey());
+  if (saved && saved.season === (seasonNumber || 1) && Array.isArray(saved.conferences)) return normalizeConferenceTournamentState(saved);
+  return null;
+}
+
+function startConferenceTournaments() {
+  ensureRosterLoaded();
+  ensureLeagueSchedule();
+  ensureStandingsState();
+  conferenceTournamentState = loadConferenceTournamentState() || buildConferenceTournamentState();
+  renderConferenceTournamentPage();
+  flash(() => showPanel('conference-tournament'));
+}
+
+function buildConferenceTournamentState() {
+  const conferences = CONF_NAMES.map(conf => buildSingleConferenceTournament(conf));
+  return normalizeConferenceTournamentState({
+    season:seasonNumber || 1,
+    conferences,
+    currentIndex:null,
+    otherSimIndex:0,
+    complete:false,
+    reviewPhase:'user-bracket'
+  });
+}
+
+function normalizeConferenceTournamentState(state) {
+  if (!state) return state;
+  if (!Array.isArray(state.conferences)) state.conferences = [];
+  if (typeof state.otherSimIndex !== 'number') state.otherSimIndex = 0;
+  if (!state.reviewPhase || state.reviewPhase === 'simulating') {
+    state.reviewPhase = state.complete ? 'winners' : 'user-bracket';
+  }
+  if (state.complete) state.reviewPhase = state.reviewPhase === 'user-bracket' ? 'winners' : state.reviewPhase;
+  return state;
+}
+
+function buildSingleConferenceTournament(conf) {
+  const teams = getConferenceTournamentTeams(conf);
+  const bracketSize = getNextPowerOfTwo(Math.max(1, teams.length));
+  const roundCount = bracketSize === 1 ? 0 : Math.log2(bracketSize);
+  const rounds = [];
+  for (let roundIndex = 0; roundIndex < roundCount; roundIndex++) {
+    rounds.push(Array.from({ length:bracketSize / Math.pow(2, roundIndex + 1) }, () => makeConferenceTournamentGame(null, null)));
+  }
+  if (rounds.length) {
+    const seedOrder = getSeedBracketOrder(bracketSize);
+    const slots = seedOrder.map(seed => seed <= teams.length ? teams[seed - 1] : null);
+    rounds[0] = [];
+    for (let i = 0; i < slots.length; i += 2) {
+      rounds[0].push(makeConferenceTournamentGame(slots[i], slots[i + 1]));
+    }
+  }
+  const tournament = {
+    conf,
+    teamCount:teams.length,
+    bracketSize,
+    rounds,
+    champion:teams.length === 1 ? teams[0] : null,
+    complete:teams.length <= 1,
+    results:[]
+  };
+  advanceOpeningRoundByes(tournament);
+  return tournament;
+}
+
+function getConferenceTournamentTeams(conf) {
+  const ranked = getRankedTeams('all', 'conference', conf)
+    .filter(entry => entry.conf === conf)
+    .map((entry, i) => ({
+      conf:entry.conf,
+      team:entry.team,
+      seed:i + 1,
+      confWins:Number(entry.confWins) || 0,
+      confLosses:Number(entry.confLosses) || 0,
+      wins:Number(entry.wins) || 0,
+      losses:Number(entry.losses) || 0,
+      power:Number(entry.power) || 1
+    }));
+  if (ranked.length) return ranked;
+  return (CONFERENCES[conf] || []).map((team, i) => ({
+    conf,
+    team,
+    seed:i + 1,
+    confWins:0,
+    confLosses:0,
+    wins:0,
+    losses:0,
+    power:getTeamIndexScore(getTeamRoster(conf, team) || [])
+  }));
+}
+
+function getNextPowerOfTwo(n) {
+  let size = 1;
+  while (size < n) size *= 2;
+  return size;
+}
+
+function getSeedBracketOrder(size) {
+  if (size <= 1) return [1];
+  const previous = getSeedBracketOrder(size / 2);
+  return previous.flatMap(seed => [seed, size + 1 - seed]);
+}
+
+function makeConferenceTournamentGame(teamA, teamB) {
+  return {
+    teams:[teamA || null, teamB || null],
+    scores:null,
+    winner:null,
+    complete:false,
+    bye:false
+  };
+}
+
+function advanceOpeningRoundByes(tournament) {
+  const firstRound = tournament.rounds[0] || [];
+  firstRound.forEach((game, gameIndex) => {
+    if (game.complete) return;
+    const filled = game.teams.filter(Boolean);
+    if (filled.length !== 1) return;
+    game.winner = filled[0];
+    game.complete = true;
+    game.bye = true;
+    tournament.results.push({
+      round:'BYE',
+      winner:filled[0].team,
+      loser:'BYE',
+      score:''
+    });
+    advanceConferenceTournamentWinner(tournament, 0, gameIndex, filled[0]);
+  });
+}
+
+function renderConferenceTournamentPage() {
+  const state = normalizeConferenceTournamentState(conferenceTournamentState || buildConferenceTournamentState());
+  const title = document.getElementById('conf-tourney-title');
+  const subtitle = document.getElementById('conf-tourney-subtitle');
+  const status = document.getElementById('conf-tourney-status');
+  const grid = document.getElementById('conf-tourney-grid');
+  const continueBtn = document.getElementById('conf-tourney-continue-btn');
+  const userRoundBtn = document.getElementById('conf-user-round-btn');
+  const userTournamentBtn = document.getElementById('conf-user-tournament-btn');
+  const otherTournamentsBtn = document.getElementById('conf-other-tournaments-btn');
+  const total = state.conferences.length;
+  const currentIndex = Math.min(state.currentIndex || 0, Math.max(0, total - 1));
+  const current = state.conferences[currentIndex];
+  const phase = getConferenceTournamentReviewPhase(state);
+  const userTournament = getUserConferenceTournament(state);
+  const userTournamentComplete = !!(userTournament && userTournament.complete);
+  const canSimUserRound = phase === 'user-bracket' && !userTournamentComplete && !conferenceTournamentSimInProgress;
+  const canSimOthers = phase === 'user-bracket' && userTournamentComplete && !conferenceTournamentSimInProgress;
+
+  if (title) {
+    title.textContent = phase === 'user-bracket'
+      ? `${(selectedConf || '').toUpperCase()} TOURNAMENT BRACKET`
+      : (phase === 'winners' ? 'CONFERENCE TOURNAMENT WINNERS' : 'CONFERENCE TOURNAMENTS');
+  }
+  if (subtitle) {
+    subtitle.textContent = phase === 'user-bracket'
+      ? `${selectedTeam} conference tournament results. Simulate one round or the full bracket.`
+      : (phase === 'winners'
+        ? 'Automatic bids are locked. Conference champions are protected in the national tournament field.'
+        : 'The remaining conference tournaments reveal their championship results one at a time.');
+  }
+  if (userRoundBtn) userRoundBtn.style.display = canSimUserRound ? 'inline-block' : 'none';
+  if (userTournamentBtn) userTournamentBtn.style.display = canSimUserRound ? 'inline-block' : 'none';
+  if (otherTournamentsBtn) {
+    otherTournamentsBtn.style.display = canSimOthers ? 'inline-block' : 'none';
+    otherTournamentsBtn.disabled = conferenceTournamentSimInProgress;
+  }
+  if (continueBtn) {
+    continueBtn.style.display = phase === 'winners' ? 'inline-block' : 'none';
+    continueBtn.textContent = '► NATIONAL TOURNAMENT';
+  }
+  if (status) {
+    status.innerHTML = phase === 'user-bracket'
+      ? renderUserConferenceTournamentStatus(state)
+      : (phase === 'winners'
+      ? `<div class="conf-tourney-status-label">COMPLETE</div><div class="conf-tourney-status-name">${total} CONFERENCE CHAMPIONS CROWNED</div><div class="conf-tourney-progress">Review the winners, then start the national tournament.</div>`
+      : `<div class="conf-tourney-status-label">${phase === 'other-ready' ? 'READY' : 'SIMULATING'}</div><div class="conf-tourney-status-name">${escapeAttr(current ? current.conf : 'OTHER CONFERENCES')}</div><div class="conf-tourney-progress">${getOtherConferenceTournamentProgressText(state)}</div>`);
+  }
+  if (!grid) return;
+  if (phase === 'user-bracket') {
+    grid.className = 'conf-user-bracket';
+    grid.innerHTML = renderUserConferenceTournamentBracket(userTournament);
+    return;
+  }
+  grid.className = 'conf-tourney-grid';
+  grid.innerHTML = state.conferences.map((tourney, i) => {
+    const isUserTournament = userTournament && tourney.conf === userTournament.conf;
+    const statusClass = tourney.complete ? ' complete' : (i === state.currentIndex ? ' active' : '');
+    const champion = tourney.champion ? tourney.champion.team : (i === state.currentIndex ? 'SIMULATING...' : 'PENDING');
+    const seed = tourney.champion ? `#${tourney.champion.seed}` : '';
+    const finalResult = getConferenceTournamentFinalResult(tourney);
+    const finalHtml = finalResult
+      ? `<div class="conf-tourney-result"><span><span class="winner">${escapeAttr(finalResult.winner)}</span> def. ${escapeAttr(finalResult.loser)}</span><span>${escapeAttr(finalResult.score || '')}</span></div>`
+      : `<div class="conf-tourney-result"><span>${tourney.complete ? 'No final played' : (i === state.currentIndex ? 'Simulating final...' : 'Pending')}</span><span></span></div>`;
+    return `
+      <div class="conf-tourney-card${statusClass}">
+        <div class="conf-tourney-card-title">${escapeAttr(tourney.conf)}</div>
+        <div class="conf-tourney-card-line">${isUserTournament ? 'USER CONFERENCE' : 'OTHER CONFERENCE'} · TEAMS ${tourney.teamCount}</div>
+        <div class="conf-tourney-card-line conf-tourney-champ">${seed} ${escapeAttr(champion)}</div>
+        <div class="conf-tourney-result-list">${finalHtml}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function getConferenceTournamentReviewPhase(state) {
+  if (!state) return 'user-bracket';
+  if (state.reviewPhase === 'winners' || state.complete) return 'winners';
+  if (state.reviewPhase === 'other-ready' || state.reviewPhase === 'other-simulating') return state.reviewPhase;
+  return 'user-bracket';
+}
+
+function getUserConferenceTournament(state) {
+  if (!state || !Array.isArray(state.conferences)) return null;
+  return state.conferences.find(tournament => tournament.conf === selectedConf) ||
+    state.conferences.find(tournament =>
+      (tournament.rounds || []).some(round => (round || []).some(game =>
+        (game.teams || []).some(team => team && team.team === selectedTeam)
+      ))
+    ) ||
+    state.conferences[0] ||
+    null;
+}
+
+function renderUserConferenceTournamentStatus(state) {
+  const tournament = getUserConferenceTournament(state);
+  if (!tournament) {
+    return `<div class="conf-tourney-status-label">BRACKET REVIEW</div><div class="conf-tourney-status-name">NO CONFERENCE TOURNAMENT FOUND</div><div class="conf-tourney-progress">Continue to the conference winners page.</div>`;
+  }
+  const champion = tournament.champion ? `#${tournament.champion.seed} ${tournament.champion.team}` : 'TBD';
+  const nextRound = getCurrentConferenceTournamentRoundIndex(tournament);
+  const detail = tournament.complete
+    ? `Champion: ${champion} · press Simulate Tournaments for the rest`
+    : `${nextRound >= 0 ? getConferenceTournamentRoundName(tournament, nextRound) : 'Finalizing'} · ${tournament.teamCount} teams`;
+  return `<div class="conf-tourney-status-label">USER CONFERENCE TOURNAMENT</div><div class="conf-tourney-status-name">${escapeAttr(tournament.conf)}</div><div class="conf-tourney-progress">${escapeAttr(detail)}</div>`;
+}
+
+function renderUserConferenceTournamentBracket(tournament) {
+  if (!tournament) return '';
+  const rounds = tournament.rounds || [];
+  const columns = rounds.map((round, roundIndex) => `
+    <div class="conf-user-round">
+      <div class="conf-user-round-title">${escapeAttr(getConferenceTournamentRoundName(tournament, roundIndex))}</div>
+      ${(round || []).map(game => renderUserConferenceTournamentGame(game)).join('')}
+    </div>
+  `).join('');
+  const champion = tournament.champion ? `
+    <div class="conf-user-round">
+      <div class="conf-user-round-title">CHAMPION</div>
+      <div class="conf-user-champion">
+        <span>${escapeAttr(tournament.conf)}</span>
+        #${tournament.champion.seed} ${escapeAttr(tournament.champion.team)}
+      </div>
+    </div>
+  ` : '';
+  return columns + champion;
+}
+
+function renderUserConferenceTournamentGame(game) {
+  return `
+    <div class="conf-user-game">
+      ${renderUserConferenceTournamentTeam(game, 0)}
+      ${renderUserConferenceTournamentTeam(game, 1)}
+    </div>
+  `;
+}
+
+function renderUserConferenceTournamentTeam(game, slot) {
+  const team = game && game.teams ? game.teams[slot] : null;
+  if (!team) {
+    return `<div class="conf-user-team bye"><span class="conf-user-seed">--</span><span class="conf-user-name">BYE</span><span class="conf-user-score"></span></div>`;
+  }
+  const isUserTeam = team.team === selectedTeam && team.conf === selectedConf;
+  const isWinner = game && game.winner && game.winner.team === team.team && game.winner.conf === team.conf;
+  const score = game && game.scores ? game.scores[slot] : (game && game.bye && isWinner ? 'BYE' : '');
+  return `
+    <div class="conf-user-team${isUserTeam ? ' user-team' : ''}${isWinner ? ' winner' : ''}">
+      <span class="conf-user-seed">#${team.seed}</span>
+      <span class="conf-user-name">${escapeAttr(team.team)}</span>
+      <span class="conf-user-score">${escapeAttr(score)}</span>
+    </div>
+  `;
+}
+
+function advanceConferenceTournamentReview() {
+  if (!conferenceTournamentState || getConferenceTournamentReviewPhase(conferenceTournamentState) !== 'winners') return;
+  startTournament();
+}
+
+function simulateUserConferenceTournamentRound() {
+  if (!conferenceTournamentState || conferenceTournamentSimInProgress) return;
+  const tournament = getUserConferenceTournament(conferenceTournamentState);
+  if (!tournament || tournament.complete) return;
+  const roundIndex = getCurrentConferenceTournamentRoundIndex(tournament);
+  if (roundIndex < 0) return;
+  getPlayableConferenceTournamentGames(tournament, roundIndex).forEach(item => {
+    simulateConferenceTournamentGame(tournament, item);
+  });
+  if (tournament.complete) conferenceTournamentState.reviewPhase = 'user-bracket';
+  saveConferenceTournamentState();
+  renderConferenceTournamentPage();
+}
+
+function simulateUserConferenceTournament() {
+  if (!conferenceTournamentState || conferenceTournamentSimInProgress) return;
+  const tournament = getUserConferenceTournament(conferenceTournamentState);
+  if (!tournament || tournament.complete) return;
+  simulateSingleConferenceTournament(tournament);
+  conferenceTournamentState.reviewPhase = 'user-bracket';
+  saveConferenceTournamentState();
+  renderConferenceTournamentPage();
+}
+
+function getCurrentConferenceTournamentRoundIndex(tournament) {
+  for (let roundIndex = 0; roundIndex < (tournament.rounds || []).length; roundIndex++) {
+    if (getPlayableConferenceTournamentGames(tournament, roundIndex).length) return roundIndex;
+  }
+  return -1;
+}
+
+function getPlayableConferenceTournamentGames(tournament, roundIndex) {
+  const round = (tournament.rounds || [])[roundIndex] || [];
+  return round
+    .map((game, gameIndex) => ({ roundIndex, gameIndex, game }))
+    .filter(item => !item.game.complete && item.game.teams[0] && item.game.teams[1]);
+}
+
+function simulateOtherConferenceTournaments() {
+  if (!conferenceTournamentState || conferenceTournamentSimInProgress) return;
+  const userTournament = getUserConferenceTournament(conferenceTournamentState);
+  if (!userTournament || !userTournament.complete) return;
+  conferenceTournamentState.reviewPhase = 'other-simulating';
+  conferenceTournamentSimInProgress = true;
+  simulateNextOtherConferenceTournament();
+}
+
+function simulateNextOtherConferenceTournament() {
+  const state = conferenceTournamentState;
+  if (!state) return;
+  const nextIndex = getNextOtherConferenceTournamentIndex(state);
+  if (nextIndex < 0) {
+    state.currentIndex = null;
+    state.complete = true;
+    state.reviewPhase = 'winners';
+    conferenceTournamentSimInProgress = false;
+    saveConferenceTournamentState();
+    renderConferenceTournamentPage();
+    return;
+  }
+  state.currentIndex = nextIndex;
+  state.reviewPhase = 'other-simulating';
+  renderConferenceTournamentPage();
+  setTimeout(() => {
+    const tournament = state.conferences[nextIndex];
+    simulateSingleConferenceTournament(tournament);
+    state.otherSimIndex = (Number(state.otherSimIndex) || 0) + 1;
+    saveConferenceTournamentState();
+    renderConferenceTournamentPage();
+    setTimeout(simulateNextOtherConferenceTournament, 520);
+  }, 520);
+}
+
+function getNextOtherConferenceTournamentIndex(state) {
+  const userTournament = getUserConferenceTournament(state);
+  return (state.conferences || []).findIndex(tournament =>
+    tournament &&
+    (!userTournament || tournament.conf !== userTournament.conf) &&
+    !tournament.complete
+  );
+}
+
+function getOtherConferenceTournamentProgressText(state) {
+  const userTournament = getUserConferenceTournament(state);
+  const others = (state.conferences || []).filter(tournament => !userTournament || tournament.conf !== userTournament.conf);
+  const completed = others.filter(tournament => tournament.complete).length;
+  if (getConferenceTournamentReviewPhase(state) === 'other-ready') return `${others.length} conference tournaments ready to simulate.`;
+  return `${completed} / ${others.length} other conference tournaments complete.`;
+}
+
+function getConferenceTournamentFinalResult(tournament) {
+  if (!tournament) return null;
+  const finalFromResults = [...(tournament.results || [])].reverse().find(result => result.round === 'FINAL' && result.loser && result.loser !== 'BYE');
+  if (finalFromResults) return finalFromResults;
+  const finalGame = tournament.rounds && tournament.rounds.length ? tournament.rounds[tournament.rounds.length - 1][0] : null;
+  if (!finalGame || !finalGame.complete || !finalGame.winner || !finalGame.scores) return null;
+  const winnerSlot = finalGame.teams.findIndex(team => team && finalGame.winner && team.team === finalGame.winner.team && team.conf === finalGame.winner.conf);
+  const loserSlot = winnerSlot === 0 ? 1 : 0;
+  const loser = finalGame.teams[loserSlot];
+  if (!loser) return null;
+  return {
+    round:'FINAL',
+    winner:finalGame.winner.team,
+    loser:loser.team,
+    score:`${Math.max(...finalGame.scores)}-${Math.min(...finalGame.scores)}`
+  };
+}
+
+function simulateSingleConferenceTournament(tournament) {
+  while (!tournament.complete) {
+    const item = getNextConferenceTournamentGame(tournament);
+    if (!item) {
+      const finalGame = tournament.rounds.length ? tournament.rounds[tournament.rounds.length - 1][0] : null;
+      tournament.champion = finalGame && finalGame.winner ? finalGame.winner : tournament.champion;
+      tournament.complete = !!tournament.champion;
+      break;
+    }
+    simulateConferenceTournamentGame(tournament, item);
+  }
+}
+
+function getNextConferenceTournamentGame(tournament) {
+  for (let roundIndex = 0; roundIndex < tournament.rounds.length; roundIndex++) {
+    const round = tournament.rounds[roundIndex] || [];
+    for (let gameIndex = 0; gameIndex < round.length; gameIndex++) {
+      const game = round[gameIndex];
+      if (!game.complete && game.teams[0] && game.teams[1]) return { roundIndex, gameIndex, game };
+    }
+  }
+  return null;
+}
+
+function simulateConferenceTournamentGame(tournament, item) {
+  const { game, roundIndex, gameIndex } = item;
+  const seed = strHash(`${seasonNumber || 1}|CONFTOURNAMENT|${tournament.conf}|${roundIndex}|${gameIndex}|${game.teams[0].team}|${game.teams[1].team}`);
+  const rng = mulberry32(seed);
+  const result = withRandomSource(rng, () => {
+    const state = createTournamentGameState(game.teams[0], game.teams[1], rng);
+    let guard = 0;
+    while (!state.complete && guard < 5000) {
+      simulatePossession(state);
+      guard++;
+    }
+    const scores = [state.scores.home, state.scores.away];
+    return {
+      scores,
+      winner:scores[0] > scores[1] ? game.teams[0] : game.teams[1],
+      loser:scores[0] > scores[1] ? game.teams[1] : game.teams[0]
+    };
+  });
+  game.scores = result.scores;
+  game.winner = result.winner;
+  game.complete = true;
+  tournament.results.push({
+    round:getConferenceTournamentRoundName(tournament, roundIndex),
+    winner:result.winner.team,
+    loser:result.loser.team,
+    score:`${Math.max(...result.scores)}-${Math.min(...result.scores)}`
+  });
+  advanceConferenceTournamentWinner(tournament, roundIndex, gameIndex, result.winner);
+}
+
+function getConferenceTournamentRoundName(tournament, roundIndex) {
+  const roundsLeft = tournament.rounds.length - roundIndex;
+  if (roundsLeft === 1) return 'FINAL';
+  if (roundsLeft === 2) return 'SEMIFINAL';
+  if (roundsLeft === 3) return 'QUARTERFINAL';
+  return `ROUND ${roundIndex + 1}`;
+}
+
+function advanceConferenceTournamentWinner(tournament, roundIndex, gameIndex, winner) {
+  if (roundIndex >= tournament.rounds.length - 1) {
+    tournament.champion = winner;
+    tournament.complete = true;
+    return;
+  }
+  const nextGame = tournament.rounds[roundIndex + 1][Math.floor(gameIndex / 2)];
+  nextGame.teams[gameIndex % 2] = winner;
+}
+
+function getConferenceTournamentChampionKeys() {
+  const state = conferenceTournamentState || loadConferenceTournamentState();
+  if (!state || !state.complete) return new Set();
+  return new Set((state.conferences || [])
+    .filter(tournament => tournament.champion)
+    .map(tournament => getTeamKey(tournament.champion.conf, tournament.champion.team)));
+}
+
 function startTournament() {
+  conferenceTournamentState = conferenceTournamentState || loadConferenceTournamentState();
+  if (!conferenceTournamentState || !conferenceTournamentState.complete) {
+    startConferenceTournaments();
+    return;
+  }
   if (!tournamentState) tournamentState = buildTournamentState();
   renderTournamentBracket();
   flash(() => showPanel('tournament'));
@@ -4050,11 +4778,31 @@ function getTournamentSeed(rank) {
 
 function getTournamentRegions() {
   const regionNames = ['EAST','SOUTH','MIDWEST','WEST'];
-  const ranked = getRankedTeams('all').slice(0, 64).map((team, i) => ({
+  const championKeys = getConferenceTournamentChampionKeys();
+  const rankedAll = getRankedTeams('all').map((team, i) => ({
     ...team,
     overallRank:i + 1,
-    seed:getTournamentSeed(i + 1)
+    autoBid:championKeys.has(getTeamKey(team.conf, team.team))
   }));
+  const fieldKeys = new Set();
+  const ranked = rankedAll.slice(0, 64);
+  ranked.forEach(team => fieldKeys.add(getTeamKey(team.conf, team.team)));
+  championKeys.forEach(key => {
+    if (fieldKeys.has(key)) return;
+    const champion = rankedAll.find(team => getTeamKey(team.conf, team.team) === key);
+    if (!champion) return;
+    const replaceIndex = ranked.map((team, i) => ({ team, i }))
+      .reverse()
+      .find(item => !item.team.autoBid);
+    if (!replaceIndex) return;
+    fieldKeys.delete(getTeamKey(replaceIndex.team.conf, replaceIndex.team.team));
+    ranked[replaceIndex.i] = champion;
+    fieldKeys.add(key);
+  });
+  ranked.sort((a, b) => a.overallRank - b.overallRank);
+  ranked.forEach((team, i) => {
+    team.seed = getTournamentSeed(i + 1);
+  });
   const bySeed = {};
   ranked.forEach(team => {
     if (!bySeed[team.seed]) bySeed[team.seed] = [];
@@ -4359,7 +5107,8 @@ function processSeasonDepartures() {
       const finalRoster = [];
       for (const player of afterFirst) {
         const isTopAtPos = player.overall >= bestByPos[player.position];
-        const transferChance = isTopAtPos ? Math.min(0.5, 1 - winPct) : 0.9;
+        const baseTransferChance = isTopAtPos ? Math.min(0.5, 1 - winPct) : 0.9;
+        const transferChance = baseTransferChance * getTransferGradeMultiplier(player.grade);
         if (Math.random() < transferChance) {
           transferPortal.push({
             ...player,
@@ -4399,6 +5148,15 @@ function processSeasonDepartures() {
   portalHoursState = null;
   savePortalState();
   return userDeparting;
+}
+
+function getTransferGradeMultiplier(grade) {
+  return ({
+    Freshman:0.5,
+    Sophomore:0.6,
+    Junior:0.75,
+    Senior:1
+  })[grade] || 1;
 }
 
 function getPlayerRetentionFairValue(player) {
@@ -4496,6 +5254,7 @@ function renderRetentionOffers() {
         <div class="departure-row retention-row">
           <div><strong>${escapeAttr(player.name)}</strong></div>
           <div>${player.position}</div>
+          <div>${getGradeAbbrev(player.grade)}</div>
           <div>${player.overall}</div>
           <div class="dep-reason">${formatDollars(amount)}</div>
           <div class="retention-actions">
@@ -4541,13 +5300,25 @@ function declineRetentionOffer(playerName) {
   renderRetentionOffers();
 }
 
-function openFinalizedTransferPortal() {
-  pendingRetentionPlayers = [];
-  departuresAwaitingRetention = false;
-  generateCPUPortalOffers();
-  savePortalState();
-  saveAllRosters();
-  goToTransferPortal();
+async function openFinalizedTransferPortal() {
+  if (portalSetupInProgress) return;
+  portalSetupInProgress = true;
+  try {
+    await runPortalProgress(async () => {
+      pendingRetentionPlayers = [];
+      departuresAwaitingRetention = false;
+      await generateCPUPortalOffersWithProgress();
+      updatePortalWorkProgress('OPENING TRANSFER PORTAL', 0, 1);
+      await yieldToPortalAnimation();
+      savePortalState();
+      saveAllRosters();
+      updatePortalWorkProgress('OPENING TRANSFER PORTAL', 1, 1);
+      await yieldToPortalAnimation();
+      goToTransferPortal();
+    });
+  } finally {
+    portalSetupInProgress = false;
+  }
 }
 
 function goToTransferPortal() {
@@ -5075,6 +5846,60 @@ function scorePortalTargetForCPU(player, team, conf, prestige, rng) {
 
 function generateCPUPortalOffers() {
   if (!transferPortal.length) return;
+  const teams = getPortalCPUTeams();
+  const rng = mulberry32(strHash(`cpu-portal-init|${seasonNumber || 1}`));
+
+  teams.forEach(cpuTeam => generateInitialCPUPortalOffersForTeam(cpuTeam, rng));
+
+  sortPortalCPUOffers();
+}
+
+async function generateCPUPortalOffersWithProgress() {
+  if (!transferPortal.length) {
+    updatePortalWorkProgress('PREPARING TRANSFER PORTAL', 1, 1);
+    await yieldToPortalAnimation();
+    return;
+  }
+  const teams = getPortalCPUTeams();
+  const rng = mulberry32(strHash(`cpu-portal-init|${seasonNumber || 1}`));
+  updatePortalWorkProgress('PREPARING CPU PORTAL OFFERS', 0, teams.length);
+  await yieldToPortalAnimation();
+  for (let i = 0; i < teams.length; i++) {
+    generateInitialCPUPortalOffersForTeam(teams[i], rng);
+    if (i % 8 === 7) sortPortalCPUOffers();
+    updatePortalWorkProgress('PREPARING CPU PORTAL OFFERS', i + 1, teams.length);
+    await yieldToPortalAnimation();
+  }
+  sortPortalCPUOffers();
+}
+
+function generateInitialCPUPortalOffersForTeam(cpuTeam, rng) {
+  if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) >= PORTAL_ROSTER_CAP) return;
+  let remaining = cpuTeam.budget;
+  const scored = transferPortal
+    .map(p => ({ player: p, score: scorePortalTargetForCPU(p, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige, rng) }))
+    .filter(x => x.score >= 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6);
+  scored.forEach(({ player }) => {
+    if (remaining <= 0 && getPortalFairValue(player) > 0) return;
+    const fairValue = getPortalFairValue(player);
+    const mult = 0.82 + rng() * 0.46;
+    const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
+    const amount = Math.min(desired, remaining);
+    if (fairValue > 0 && amount <= 0) return;
+    remaining -= amount;
+    if (!player.cpuOffers) player.cpuOffers = [];
+    player.cpuOffers.push({
+      conf: cpuTeam.conf,
+      team: cpuTeam.team,
+      amount,
+      interest: getCPUOfferInterest(cpuTeam, player, amount)
+    });
+  });
+}
+
+function getPortalCPUTeams() {
   const teams = [];
   Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
     teamNames.forEach(team => {
@@ -5083,46 +5908,10 @@ function generateCPUPortalOffers() {
       teams.push({ conf, team, prestige: Number(data.p) || 0, budget: Math.max(0, Math.round((Number(data.n) || 0) * 1000000)) });
     });
   });
-  const rng = mulberry32(strHash(`cpu-portal-init|${seasonNumber || 1}`));
-
-  teams.forEach(cpuTeam => {
-    if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) >= PORTAL_ROSTER_CAP) return;
-    let remaining = cpuTeam.budget;
-    const scored = transferPortal
-      .map(p => ({ player: p, score: scorePortalTargetForCPU(p, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige, rng) }))
-      .filter(x => x.score >= 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 6);
-    scored.forEach(({ player }) => {
-      if (remaining <= 0 && getPortalFairValue(player) > 0) return;
-      const fairValue = getPortalFairValue(player);
-      const mult = 0.82 + rng() * 0.46;
-      const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
-      const amount = Math.min(desired, remaining);
-      if (fairValue > 0 && amount <= 0) return;
-      remaining -= amount;
-      if (!player.cpuOffers) player.cpuOffers = [];
-      player.cpuOffers.push({
-        conf: cpuTeam.conf,
-        team: cpuTeam.team,
-        amount,
-        interest: getCPUOfferInterest(cpuTeam, player, amount)
-      });
-    });
-  });
-
-  transferPortal.forEach(p => {
-    p.cpuOffers = (p.cpuOffers || [])
-      .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
-      .slice(0, 6);
-  });
+  return teams;
 }
 
-function simulateCPUPortalWeek() {
-  if (!transferPortal.length) return;
-  const rng = mulberry32(strHash(`cpu-portal|${seasonNumber || 1}|w${portalWeek}`));
-
-  // Prune offers from teams already at cap
+function prunePortalOffersFromFullTeams() {
   const fullKeys = new Set();
   Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
     teamNames.forEach(team => {
@@ -5136,74 +5925,9 @@ function simulateCPUPortalWeek() {
       }
     });
   }
+}
 
-  const teams = [];
-  Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
-    teamNames.forEach(team => {
-      if (conf === selectedConf && team === selectedTeam) return;
-      const data = ((TEAM_DATA[conf] || {})[team] || {});
-      teams.push({ conf, team, prestige: Number(data.p) || 0, budget: Math.max(0, Math.round((Number(data.n) || 0) * 1000000)) });
-    });
-  });
-
-  teams.forEach(cpuTeam => {
-    let hoursLeft = 100;
-    if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) >= PORTAL_ROSTER_CAP) return;
-
-    const myOffers = [];
-    transferPortal.forEach(p => {
-      const idx = (p.cpuOffers || []).findIndex(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
-      if (idx === -1) return;
-      if (p.committedTo || p.signed) {
-        p.cpuOffers.splice(idx, 1);
-        return;
-      }
-      myOffers.push({ player: p, offer: p.cpuOffers[idx] });
-    });
-
-    // Boost interest on existing offers
-    for (const { player, offer } of myOffers) {
-      if (hoursLeft < 5) break;
-      const boost = (3 + Math.floor(rng() * 6)) / 100;
-      offer.interest = Math.min(1.0, offer.interest + boost);
-      hoursLeft -= 5;
-      if (offer.interest >= 1.0 && !player.committedTo && !player.signed) {
-        if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) < PORTAL_ROSTER_CAP) {
-          player.committedTo = { team: cpuTeam.team, conf: cpuTeam.conf };
-        }
-      }
-    }
-
-    // Send new offers based on positional need / improvement
-    if (hoursLeft >= 5) {
-      const committedAmt = transferPortal.reduce((sum, p) => {
-        const o = (p.cpuOffers || []).find(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
-        return sum + (o ? (Number(o.amount) || 0) : 0);
-      }, 0);
-      let remaining = Math.max(0, cpuTeam.budget - committedAmt);
-      const targeted = new Set(myOffers.map(x => x.player.portalId));
-      const candidates = transferPortal
-        .filter(p => !targeted.has(p.portalId) && !p.committedTo && !p.signed)
-        .map(p => ({ player: p, score: scorePortalTargetForCPU(p, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige, rng) }))
-        .filter(x => x.score >= 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 4);
-
-      for (const { player } of candidates) {
-        if (hoursLeft < 5) break;
-        const fairValue = getPortalFairValue(player);
-        const mult = 0.82 + rng() * 0.46;
-        const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
-        const amount = fairValue > 0 ? Math.min(desired, remaining) : 0;
-        if (fairValue > 0 && amount <= 0) continue;
-        remaining -= amount;
-        if (!player.cpuOffers) player.cpuOffers = [];
-        player.cpuOffers.push({ conf: cpuTeam.conf, team: cpuTeam.team, amount, interest: getCPUOfferInterest(cpuTeam, player, amount) });
-        hoursLeft -= 5;
-      }
-    }
-  });
-
+function sortPortalCPUOffers() {
   transferPortal.forEach(p => {
     p.cpuOffers = (p.cpuOffers || [])
       .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
@@ -5211,38 +5935,149 @@ function simulateCPUPortalWeek() {
   });
 }
 
-async function advancePortalWeek() {
+function simulateCPUPortalTeam(cpuTeam, rng) {
+  let hoursLeft = 100;
+  if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) >= PORTAL_ROSTER_CAP) return;
+
+  const myOffers = [];
+  transferPortal.forEach(p => {
+    const idx = (p.cpuOffers || []).findIndex(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+    if (idx === -1) return;
+    if (p.committedTo || p.signed) {
+      p.cpuOffers.splice(idx, 1);
+      return;
+    }
+    myOffers.push({ player: p, offer: p.cpuOffers[idx] });
+  });
+
+  // Boost interest on existing offers
+  for (const { player, offer } of myOffers) {
+    if (hoursLeft < 5) break;
+    const boost = (3 + Math.floor(rng() * 6)) / 100;
+    offer.interest = Math.min(1.0, offer.interest + boost);
+    hoursLeft -= 5;
+    if (offer.interest >= 1.0 && !player.committedTo && !player.signed) {
+      if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) < PORTAL_ROSTER_CAP) {
+        player.committedTo = { team: cpuTeam.team, conf: cpuTeam.conf };
+      }
+    }
+  }
+
+  // Send new offers based on positional need / improvement
+  if (hoursLeft >= 5) {
+    const committedAmt = transferPortal.reduce((sum, p) => {
+      const o = (p.cpuOffers || []).find(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+      return sum + (o ? (Number(o.amount) || 0) : 0);
+    }, 0);
+    let remaining = Math.max(0, cpuTeam.budget - committedAmt);
+    const targeted = new Set(myOffers.map(x => x.player.portalId));
+    const candidates = transferPortal
+      .filter(p => !targeted.has(p.portalId) && !p.committedTo && !p.signed)
+      .map(p => ({ player: p, score: scorePortalTargetForCPU(p, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige, rng) }))
+      .filter(x => x.score >= 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4);
+
+    for (const { player } of candidates) {
+      if (hoursLeft < 5) break;
+      const fairValue = getPortalFairValue(player);
+      const mult = 0.82 + rng() * 0.46;
+      const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
+      const amount = fairValue > 0 ? Math.min(desired, remaining) : 0;
+      if (fairValue > 0 && amount <= 0) continue;
+      remaining -= amount;
+      if (!player.cpuOffers) player.cpuOffers = [];
+      player.cpuOffers.push({ conf: cpuTeam.conf, team: cpuTeam.team, amount, interest: getCPUOfferInterest(cpuTeam, player, amount) });
+      hoursLeft -= 5;
+    }
+  }
+}
+
+function simulateCPUPortalWeek() {
   if (!transferPortal.length) return;
-  await runPortalWorkAnimation(
-    portalWeek >= PORTAL_TOTAL_WEEKS ? 'FINAL PORTAL CHECKS...' : 'WORKING THE TRANSFER PORTAL...',
-    async () => {
+  prunePortalOffersFromFullTeams();
+  const rng = mulberry32(strHash(`cpu-portal|${seasonNumber || 1}|w${portalWeek}`));
+  getPortalCPUTeams().forEach(cpuTeam => simulateCPUPortalTeam(cpuTeam, rng));
+  sortPortalCPUOffers();
+}
+
+async function advancePortalWeek() {
+  if (portalAdvanceInProgress) return;
+  if (!transferPortal.length) return;
+  portalAdvanceInProgress = true;
+  try {
+    await runPortalProgress(async () => {
       pruneUnfulfillablePortalOffers();
       await yieldToPortalAnimation();
-      // Signing sweep: each unsigned player rolls best-offer interest
-      const signRng = mulberry32(strHash(`portal-sign|${seasonNumber || 1}|w${portalWeek}`));
-      transferPortal.forEach(player => {
-        if (player.signed || player.committedTo) return;
-        const offers = getFulfillablePortalOffers(player);
-        if (!offers.length) return;
-        const best = offers.sort((a, b) => b.interest - a.interest)[0];
-        if (best.interest <= 0) return;
-        if (signRng() < best.interest) commitPortalPlayer(player, best);
-      });
+
+      if (portalWeek < PORTAL_TOTAL_WEEKS) {
+        await resolveCPUPortalTeamOffersWithProgress();
+        await yieldToPortalAnimation();
+      }
+
+      await resolvePortalPlayerOffersWithProgress();
 
       portalWeek++;
       portalHoursState = null;
       pruneUnfulfillablePortalOffers();
       await yieldToPortalAnimation();
       if (portalWeek > PORTAL_TOTAL_WEEKS) {
+        updatePortalWorkProgress('FINAL PORTAL CHECKS', 0, 1);
+        await yieldToPortalAnimation();
         await finalizePortal();
-      } else {
-        simulateCPUPortalWeek();
+        updatePortalWorkProgress('FINAL PORTAL CHECKS', 1, 1);
       }
       await yieldToPortalAnimation();
       savePortalState();
       renderTransferPortal();
-    }
-  );
+    });
+  } finally {
+    portalAdvanceInProgress = false;
+  }
+}
+
+async function resolveCPUPortalTeamOffersWithProgress() {
+  prunePortalOffersFromFullTeams();
+  const teams = getPortalCPUTeams();
+  const rng = mulberry32(strHash(`cpu-portal|${seasonNumber || 1}|w${portalWeek}`));
+  updatePortalWorkProgress('RESOLVING TEAM OFFERS', 0, teams.length);
+  await yieldToPortalAnimation();
+  for (let i = 0; i < teams.length; i++) {
+    simulateCPUPortalTeam(teams[i], rng);
+    if (i % 8 === 7) sortPortalCPUOffers();
+    updatePortalWorkProgress('RESOLVING TEAM OFFERS', i + 1, teams.length);
+    await yieldToPortalAnimation();
+  }
+  sortPortalCPUOffers();
+  pruneUnfulfillablePortalOffers();
+}
+
+function getPortalPlayersWithFulfillableOffers() {
+  return transferPortal.filter(player => {
+    if (player.signed || player.committedTo) return false;
+    return getFulfillablePortalOffers(player).length > 0;
+  });
+}
+
+async function resolvePortalPlayerOffersWithProgress() {
+  const offeredPlayers = getPortalPlayersWithFulfillableOffers();
+  const signRng = mulberry32(strHash(`portal-sign|${seasonNumber || 1}|w${portalWeek}`));
+  updatePortalWorkProgress('RESOLVING PLAYER OFFERS', 0, offeredPlayers.length);
+  await yieldToPortalAnimation();
+  for (let i = 0; i < offeredPlayers.length; i++) {
+    resolveSinglePortalPlayerOffer(offeredPlayers[i], signRng);
+    updatePortalWorkProgress('RESOLVING PLAYER OFFERS', i + 1, offeredPlayers.length);
+    await yieldToPortalAnimation();
+  }
+}
+
+function resolveSinglePortalPlayerOffer(player, signRng) {
+  if (!player || player.signed || player.committedTo) return;
+  const offers = getFulfillablePortalOffers(player);
+  if (!offers.length) return;
+  const best = offers.sort((a, b) => b.interest - a.interest)[0];
+  if (best.interest <= 0) return;
+  if (signRng() < best.interest) commitPortalPlayer(player, best);
 }
 
 async function finalizePortal() {
@@ -5572,7 +6407,8 @@ function resetForNextSeason() {
     getRecruitingVersionKey(),
     getRecruitingHoursKey(),
     getPortalStateKey(),
-    getPortalHoursKey()
+    getPortalHoursKey(),
+    getConferenceTournamentKey()
   ];
 
   clearRecruitedFreshmanFlags();
@@ -5583,6 +6419,8 @@ function resetForNextSeason() {
   activeGame = null;
   lastBoxScore = null;
   tournamentState = null;
+  conferenceTournamentState = null;
+  conferenceTournamentSimInProgress = false;
   cachedSchedule = null;
   leagueSchedule = null;
   currentGameIndex = 0;
@@ -6054,18 +6892,28 @@ function renderRoster() {
   const grid = document.getElementById('roster-grid');
   grid.innerHTML = `
     <div class="player-row header">
-      <div>NAME</div><div>GRADE</div><div>OVR</div><div>POT</div><div>HOME</div>
+      <div>NAME</div><div>POS</div><div>YR</div><div>OVR</div><div>POT</div><div>HOME</div>
     </div>
     ${roster.map(p => `
       <div class="player-row">
         <div><strong>${p.name}</strong></div>
-        <div>${p.grade}</div>
+        <div>${p.position || '--'}</div>
+        <div>${getGradeAbbrev(p.grade)}</div>
         <div>${p.overall}</div>
         <div>${p.potential}</div>
         <div>${p.hometown}, ${p.homeState}</div>
       </div>
     `).join('')}
   `;
+}
+
+function getGradeAbbrev(grade) {
+  return ({
+    Freshman:'FR',
+    Sophomore:'SO',
+    Junior:'JR',
+    Senior:'SR'
+  })[grade] || String(grade || '').slice(0, 2).toUpperCase();
 }
 
 function getRecruitingClassKey() {
@@ -7711,12 +8559,16 @@ function buildRotationDefaults(roster) {
   roster.forEach(p => {
     const pos = p.position || 'G';
     if (!posGroups[pos]) posGroups[pos] = [];
-    posGroups[pos].push(p.name);
+    posGroups[pos].push(p);
   });
   const posAlloc = {};
-  Object.entries(posGroups).forEach(([pos, names]) => {
-    const splits = splitMinutes30(names.length);
-    names.forEach((name, i) => { posAlloc[name] = splits[i] || 0; });
+  Object.entries(posGroups).forEach(([pos, players]) => {
+    const sorted = [...players].sort((a, b) =>
+      (Number(b.overall) || 0) - (Number(a.overall) || 0) ||
+      String(a.name || '').localeCompare(String(b.name || ''))
+    );
+    const splits = splitMinutes30(sorted.length);
+    sorted.forEach((player, i) => { posAlloc[player.name] = splits[i] || 0; });
   });
   return roster.map(p => ({ playerName: p.name, minutes: posAlloc[p.name] || 0 }));
 }
@@ -7825,6 +8677,13 @@ function renderStyleSelect(field, label, options, value, presserAnswer) {
 
 const POS_ORDER = ['PG','SG','SF','PF','C','G','F'];
 
+function compareRotationEntriesByOverall(a, b, playerMap) {
+  const playerA = playerMap.get(a.item.playerName) || {};
+  const playerB = playerMap.get(b.item.playerName) || {};
+  return (Number(playerB.overall) || 0) - (Number(playerA.overall) || 0) ||
+    String(a.item.playerName || '').localeCompare(String(b.item.playerName || ''));
+}
+
 function renderGameplanRotation() {
   const panel = document.getElementById('gameplan-rotation-panel');
   const roster = getTeamRoster(selectedConf, selectedTeam);
@@ -7842,21 +8701,22 @@ function renderGameplanRotation() {
 
   let rows = '';
   posKeys.forEach(pos => {
-    const used = sum(groups[pos].map(e => Number(e.item.minutes) || 0));
+    const entries = groups[pos].sort((a, b) => compareRotationEntriesByOverall(a, b, playerMap));
+    const used = sum(entries.map(e => Number(e.item.minutes) || 0));
     rows += `<div class="rot-pos-header"><span>${pos}</span><span>${used} / 30 MIN</span></div>`;
-    groups[pos].forEach(({ item, idx: gi }) => {
+    entries.forEach(({ item, idx: gi }, posIndex) => {
       const player = playerMap.get(item.playerName) || {};
       const mins = Number(item.minutes) || 0;
-      const role = gi < 5 ? 'START' : 'BENCH';
+      const role = posIndex === 0 ? 'START' : 'BENCH';
+      const canAdd = canIncreaseRotationMinutes(gi);
       rows += `
       <div class="rotation-row">
         <div><strong>${escapeAttr(item.playerName)}</strong></div>
         <div>${player.overall || '--'}</div>
         <div>${role}</div>
         <div class="min-stepper">
-          <button class="stepper-btn" type="button" onclick="updateRotationMinutesBy(${gi},-1)">-</button>
           <span class="stepper-val">${mins}</span>
-          <button class="stepper-btn" type="button" onclick="updateRotationMinutesBy(${gi},1)">+</button>
+          <button class="stepper-btn" type="button" onclick="updateRotationMinutesBy(${gi},1)"${canAdd ? '' : ' disabled'}>+</button>
         </div>
       </div>`;
     });
@@ -7874,15 +8734,67 @@ function updateGameplanStyle(field, value) {
 
 function updateRotationMinutes(index, value) {
   ensureGameplan();
-  const minutes = clamp(parseInt(value, 10) || 0, 0, 30);
-  if (gameplan.rotation[index]) gameplan.rotation[index].minutes = minutes;
+  const current = Number((gameplan.rotation[index] || {}).minutes) || 0;
+  const target = clamp(parseInt(value, 10) || 0, 0, 30);
+  const diff = target - current;
+  if (diff > 0) {
+    for (let i = 0; i < diff; i++) {
+      if (!increaseRotationMinutesWithinPosition(index)) break;
+    }
+  }
   renderGameplanRotation();
 }
 
 function updateRotationMinutesBy(index, delta) {
   ensureGameplan();
-  const current = Number((gameplan.rotation[index] || {}).minutes) || 0;
-  updateRotationMinutes(index, current + delta);
+  if (delta <= 0) return;
+  increaseRotationMinutesWithinPosition(index);
+  renderGameplanRotation();
+}
+
+function canIncreaseRotationMinutes(index) {
+  const rotation = gameplan.rotation || [];
+  const target = rotation[index];
+  if (!target || (Number(target.minutes) || 0) >= 30) return false;
+  const group = getSamePositionRotationIndexes(index);
+  return group.some(i => i !== index && (Number(rotation[i].minutes) || 0) > 0);
+}
+
+function increaseRotationMinutesWithinPosition(index) {
+  const rotation = gameplan.rotation || [];
+  const target = rotation[index];
+  if (!target || (Number(target.minutes) || 0) >= 30) return false;
+  const donorIndex = getRotationMinuteDonorIndex(index);
+  if (donorIndex < 0) return false;
+  target.minutes = (Number(target.minutes) || 0) + 1;
+  rotation[donorIndex].minutes = Math.max(0, (Number(rotation[donorIndex].minutes) || 0) - 1);
+  return true;
+}
+
+function getSamePositionRotationIndexes(index) {
+  const roster = getTeamRoster(selectedConf, selectedTeam);
+  const playerMap = new Map(roster.map(p => [p.name, p]));
+  const rotation = gameplan.rotation || [];
+  const target = rotation[index];
+  if (!target) return [];
+  const targetPos = (playerMap.get(target.playerName) || {}).position || 'G';
+  return rotation
+    .map((item, i) => ({ item, i }))
+    .filter(({ item }) => ((playerMap.get(item.playerName) || {}).position || 'G') === targetPos)
+    .map(({ i }) => i);
+}
+
+function getRotationMinuteDonorIndex(index) {
+  const rotation = gameplan.rotation || [];
+  const roster = getTeamRoster(selectedConf, selectedTeam);
+  const playerMap = new Map(roster.map(p => [p.name, p]));
+  return getSamePositionRotationIndexes(index)
+    .filter(i => i !== index && (Number(rotation[i].minutes) || 0) > 0)
+    .sort((a, b) =>
+      (Number(rotation[b].minutes) || 0) - (Number(rotation[a].minutes) || 0) ||
+      (Number((playerMap.get(rotation[a].playerName) || {}).overall) || 0) - (Number((playerMap.get(rotation[b].playerName) || {}).overall) || 0) ||
+      String(rotation[a].playerName || '').localeCompare(String(rotation[b].playerName || ''))
+    )[0] ?? -1;
 }
 
 function moveRotation(index, dir) {
@@ -8173,11 +9085,390 @@ function finishCoachBuilder() {
   goToCutscene();
 }
 
-function drawCoach(canvasId = 'coach-canvas', profile = coachProfile) {
+const SCENE_W = 520;
+const SCENE_H = 320;
+const FLOOR_Y = 290;
+const PACE_LEFT_BOUND = 90;
+const PACE_RIGHT_BOUND = 320;
+const DESK_LEFT = 350;
+const DESK_RIGHT = 510;
+const DESK_TOP_Y = 215;
+const DESK_SIT_X = 400;
+
+const dashboardCoachAnim = {
+  intervalId:null,
+  frame:0,
+  state:'idle-stand',
+  stateStart:0,
+  stateDuration:35,
+  x:240,
+  targetX:240,
+  facing:1,
+  walking:false,
+  sitting:false,
+  pose:'idle',
+  mouth:'neutral'
+};
+
+function pickNextCoachState() {
+  const a = dashboardCoachAnim;
+  const opts = [
+    { name:'pacing',        weight:5 },
+    { name:'arms-crossed',  weight:2 },
+    { name:'clipboard',     weight:2 },
+    { name:'pointing',      weight:2 },
+    { name:'yelling',       weight:3 },
+    { name:'hands-on-hips', weight:2 },
+    { name:'desk-work',     weight:3 },
+    { name:'idle-stand',    weight:1 }
+  ];
+  const filtered = opts.filter(o => o.name !== a.state);
+  let total = filtered.reduce((s, o) => s + o.weight, 0);
+  let r = Math.random() * total;
+  let pick = filtered[0].name;
+  for (const o of filtered) {
+    if (r < o.weight) { pick = o.name; break; }
+    r -= o.weight;
+  }
+  enterCoachState(pick);
+}
+
+function enterCoachState(name) {
+  const a = dashboardCoachAnim;
+  a.state = name;
+  a.stateStart = a.frame;
+  a.sitting = false;
+  switch (name) {
+    case 'pacing':
+      a.pose = 'idle';
+      a.mouth = 'neutral';
+      a.targetX = (a.x < (PACE_LEFT_BOUND + PACE_RIGHT_BOUND) / 2)
+        ? PACE_RIGHT_BOUND - Math.floor(Math.random() * 30)
+        : PACE_LEFT_BOUND + Math.floor(Math.random() * 30);
+      a.stateDuration = 80 + Math.floor(Math.random() * 80);
+      break;
+    case 'arms-crossed':
+      a.targetX = a.x;
+      a.pose = 'arms-crossed';
+      a.mouth = 'neutral';
+      a.stateDuration = 35 + Math.floor(Math.random() * 35);
+      break;
+    case 'hands-on-hips':
+      a.targetX = a.x;
+      a.pose = 'hands-on-hips';
+      a.mouth = 'neutral';
+      a.stateDuration = 30 + Math.floor(Math.random() * 30);
+      break;
+    case 'clipboard':
+      a.targetX = a.x;
+      a.pose = 'clipboard';
+      a.mouth = 'neutral';
+      a.stateDuration = 50 + Math.floor(Math.random() * 50);
+      break;
+    case 'pointing':
+      a.targetX = a.x;
+      a.pose = 'pointing';
+      a.facing = 1;
+      a.mouth = 'open';
+      a.stateDuration = 25 + Math.floor(Math.random() * 25);
+      break;
+    case 'yelling':
+      a.targetX = a.x;
+      a.pose = 'yelling';
+      a.facing = 1;
+      a.mouth = 'yell';
+      a.stateDuration = 30 + Math.floor(Math.random() * 30);
+      break;
+    case 'desk-work':
+      a.targetX = DESK_SIT_X;
+      a.pose = 'desk';
+      a.mouth = 'neutral';
+      a.stateDuration = 110 + Math.floor(Math.random() * 90);
+      break;
+    case 'idle-stand':
+    default:
+      a.targetX = a.x;
+      a.pose = 'idle';
+      a.mouth = 'neutral';
+      a.stateDuration = 18 + Math.floor(Math.random() * 18);
+      break;
+  }
+}
+
+function tickCoachAnim() {
+  const a = dashboardCoachAnim;
+  a.frame += 1;
+  // movement toward target
+  if (a.x !== a.targetX) {
+    const dx = a.targetX - a.x;
+    const speed = 3;
+    a.facing = dx >= 0 ? 1 : -1;
+    if (Math.abs(dx) <= speed) a.x = a.targetX;
+    else a.x += Math.sign(dx) * speed;
+    a.walking = a.x !== a.targetX;
+  } else {
+    a.walking = false;
+  }
+  // sitting flag once arrived
+  if (a.state === 'desk-work' && !a.walking) a.sitting = true;
+  // mouth chatter for talking states
+  if (a.state === 'yelling' && a.frame % 3 === 0) {
+    a.mouth = a.mouth === 'yell' ? 'open' : 'yell';
+  } else if (a.state === 'pointing' && a.frame % 5 === 0) {
+    a.mouth = a.mouth === 'open' ? 'neutral' : 'open';
+  } else if (a.state === 'clipboard' && a.frame % 14 === 0 && Math.random() < 0.4) {
+    a.mouth = a.mouth === 'open' ? 'neutral' : 'open';
+  } else if (a.state === 'desk-work' && a.sitting && a.frame % 18 === 0 && Math.random() < 0.35) {
+    a.mouth = a.mouth === 'open' ? 'neutral' : 'open';
+  }
+  // pacing turns around when reaching bound
+  if (a.state === 'pacing' && !a.walking) {
+    if (a.frame < a.stateStart + a.stateDuration) {
+      a.targetX = (Math.abs(a.x - PACE_LEFT_BOUND) < 40)
+        ? PACE_RIGHT_BOUND - Math.floor(Math.random() * 30)
+        : PACE_LEFT_BOUND + Math.floor(Math.random() * 30);
+    }
+  }
+  // state duration check (only switch when not still walking to a target for non-pacing)
+  if (a.frame >= a.stateStart + a.stateDuration) {
+    if (a.state === 'pacing' || !a.walking) pickNextCoachState();
+  }
+}
+
+function startDashboardCoachAnimation() {
+  stopDashboardCoachAnimation();
+  const canvas = document.getElementById('ng-coach-canvas');
+  if (!canvas) return;
+  const a = dashboardCoachAnim;
+  a.frame = 0;
+  a.x = 240; a.targetX = 240;
+  a.facing = 1; a.walking = false; a.sitting = false;
+  enterCoachState('idle-stand');
+  drawDashboardScene();
+  a.intervalId = setInterval(() => {
+    if (!document.getElementById('ng-coach-canvas')) {
+      stopDashboardCoachAnimation();
+      return;
+    }
+    tickCoachAnim();
+    drawDashboardScene();
+  }, 70);
+}
+
+function stopDashboardCoachAnimation() {
+  if (dashboardCoachAnim.intervalId) {
+    clearInterval(dashboardCoachAnim.intervalId);
+    dashboardCoachAnim.intervalId = null;
+  }
+}
+
+function drawDashboardScene() {
+  const canvas = document.getElementById('ng-coach-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawSceneBackground(ctx);
+  const a = dashboardCoachAnim;
+  // draw coach first when at desk so desk hides lower body
+  drawCoachInScene(ctx);
+  drawDesk(ctx);
+  drawCoachOverlays(ctx);
+}
+
+function drawSceneBackground(ctx) {
+  // back wall texture (subtle vertical paneling)
+  ctx.fillStyle = 'rgba(237,224,184,0.04)';
+  for (let x = 30; x < SCENE_W; x += 78) {
+    ctx.fillRect(x, 0, 1, FLOOR_Y);
+  }
+  // floor
+  ctx.fillStyle = 'rgba(168,36,24,0.18)';
+  ctx.fillRect(0, FLOOR_Y, SCENE_W, 2);
+  ctx.fillStyle = 'rgba(8,7,4,0.55)';
+  ctx.fillRect(0, FLOOR_Y + 2, SCENE_W, SCENE_H - FLOOR_Y - 2);
+  ctx.fillStyle = 'rgba(192,138,24,0.10)';
+  for (let x = 0; x < SCENE_W; x += 60) {
+    ctx.fillRect(x, FLOOR_Y + 2, 1, SCENE_H - FLOOR_Y - 2);
+  }
+  // chalkboard
+  ctx.fillStyle = '#3a2400';
+  ctx.fillRect(36, 22, 130, 76);
+  ctx.fillStyle = '#0f1410';
+  ctx.fillRect(40, 26, 122, 68);
+  ctx.fillStyle = 'rgba(237,224,184,0.55)';
+  // X's
+  ctx.fillRect(54, 42, 2, 2); ctx.fillRect(56, 44, 2, 2); ctx.fillRect(58, 46, 2, 2);
+  ctx.fillRect(58, 42, 2, 2); ctx.fillRect(56, 44, 2, 2); ctx.fillRect(54, 46, 2, 2);
+  ctx.fillRect(76, 56, 2, 2); ctx.fillRect(78, 58, 2, 2); ctx.fillRect(80, 60, 2, 2);
+  ctx.fillRect(80, 56, 2, 2); ctx.fillRect(78, 58, 2, 2); ctx.fillRect(76, 60, 2, 2);
+  // O's
+  ctx.fillRect(100, 40, 8, 1); ctx.fillRect(100, 48, 8, 1);
+  ctx.fillRect(100, 41, 1, 7); ctx.fillRect(107, 41, 1, 7);
+  ctx.fillRect(126, 64, 8, 1); ctx.fillRect(126, 72, 8, 1);
+  ctx.fillRect(126, 65, 1, 7); ctx.fillRect(133, 65, 1, 7);
+  // arrow play line
+  ctx.fillStyle = 'rgba(237,224,184,0.4)';
+  for (let i = 0; i < 30; i++) {
+    ctx.fillRect(60 + i * 2, 78 - Math.floor(Math.sin(i * 0.4) * 6), 1, 1);
+  }
+  // window/poster on right wall above desk
+  ctx.fillStyle = '#3a2400';
+  ctx.fillRect(DESK_LEFT - 4, 24, 80, 90);
+  ctx.fillStyle = '#a82418';
+  ctx.fillRect(DESK_LEFT, 28, 72, 82);
+  ctx.fillStyle = '#ede0b8';
+  ctx.fillRect(DESK_LEFT + 14, 36, 44, 6);
+  ctx.fillRect(DESK_LEFT + 8, 50, 56, 2);
+  // basketball graphic on poster
+  ctx.fillStyle = '#c08a18';
+  ctx.fillRect(DESK_LEFT + 26, 64, 20, 20);
+  ctx.fillStyle = '#350a04';
+  ctx.fillRect(DESK_LEFT + 26, 72, 20, 1);
+  ctx.fillRect(DESK_LEFT + 35, 64, 1, 20);
+}
+
+function drawDesk(ctx) {
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.fillRect(DESK_LEFT - 6, FLOOR_Y - 1, DESK_RIGHT - DESK_LEFT + 12, 4);
+  // legs
+  ctx.fillStyle = '#3a2400';
+  ctx.fillRect(DESK_LEFT + 8, DESK_TOP_Y + 14, 8, FLOOR_Y - DESK_TOP_Y - 14);
+  ctx.fillRect(DESK_RIGHT - 16, DESK_TOP_Y + 14, 8, FLOOR_Y - DESK_TOP_Y - 14);
+  // top
+  ctx.fillStyle = '#5c3a14';
+  ctx.fillRect(DESK_LEFT, DESK_TOP_Y, DESK_RIGHT - DESK_LEFT, 14);
+  ctx.fillStyle = '#3a2400';
+  ctx.fillRect(DESK_LEFT, DESK_TOP_Y + 12, DESK_RIGHT - DESK_LEFT, 2);
+  // front panel
+  ctx.fillStyle = '#4a2e10';
+  ctx.fillRect(DESK_LEFT, DESK_TOP_Y + 14, DESK_RIGHT - DESK_LEFT, 56);
+  ctx.fillStyle = 'rgba(0,0,0,0.32)';
+  ctx.fillRect(DESK_LEFT, DESK_TOP_Y + 14, DESK_RIGHT - DESK_LEFT, 2);
+  // drawer line
+  ctx.fillStyle = 'rgba(237,224,184,0.10)';
+  ctx.fillRect(DESK_LEFT + 6, DESK_TOP_Y + 32, DESK_RIGHT - DESK_LEFT - 12, 1);
+  ctx.fillRect(DESK_LEFT + 30, DESK_TOP_Y + 36, 8, 2);
+  // items on top
+  // clipboard
+  ctx.fillStyle = '#3a2400';
+  ctx.fillRect(DESK_LEFT + 14, DESK_TOP_Y - 18, 32, 18);
+  ctx.fillStyle = '#ede0b8';
+  ctx.fillRect(DESK_LEFT + 16, DESK_TOP_Y - 16, 28, 14);
+  ctx.fillStyle = '#a82418';
+  ctx.fillRect(DESK_LEFT + 24, DESK_TOP_Y - 19, 12, 3);
+  ctx.fillStyle = '#350a04';
+  ctx.fillRect(DESK_LEFT + 19, DESK_TOP_Y - 13, 22, 1);
+  ctx.fillRect(DESK_LEFT + 19, DESK_TOP_Y - 10, 18, 1);
+  ctx.fillRect(DESK_LEFT + 19, DESK_TOP_Y - 7, 20, 1);
+  // coffee mug
+  ctx.fillStyle = '#a82418';
+  ctx.fillRect(DESK_LEFT + 60, DESK_TOP_Y - 14, 14, 14);
+  ctx.fillStyle = '#3a2400';
+  ctx.fillRect(DESK_LEFT + 62, DESK_TOP_Y - 12, 10, 2);
+  ctx.fillStyle = '#a82418';
+  ctx.fillRect(DESK_LEFT + 74, DESK_TOP_Y - 11, 3, 6);
+  // basketball
+  ctx.fillStyle = '#a04018';
+  ctx.fillRect(DESK_LEFT + 96, DESK_TOP_Y - 16, 16, 16);
+  ctx.fillStyle = '#350a04';
+  ctx.fillRect(DESK_LEFT + 103, DESK_TOP_Y - 16, 1, 16);
+  ctx.fillRect(DESK_LEFT + 96, DESK_TOP_Y - 9, 16, 1);
+  // steam from coffee
+  const a = dashboardCoachAnim;
+  ctx.fillStyle = 'rgba(237,224,184,0.32)';
+  const steamY = DESK_TOP_Y - 22 - (a.frame % 12);
+  ctx.fillRect(DESK_LEFT + 64 + Math.sin(a.frame * 0.3) * 1, steamY, 2, 4);
+  ctx.fillRect(DESK_LEFT + 70 + Math.cos(a.frame * 0.25) * 1, steamY - 2, 2, 4);
+}
+
+function drawCoachInScene(ctx) {
+  const a = dashboardCoachAnim;
+  ctx.save();
+  if (a.sitting) {
+    // sitting: torso/head appear above desk, lower body hidden by desk
+    ctx.translate(a.x - 90, FLOOR_Y - 220);
+    if (a.facing === -1) { ctx.scale(-1, 1); ctx.translate(-180, 0); }
+    _drawCoachPixels(ctx, coachProfile, {
+      pose:'desk',
+      mouth:a.mouth,
+      blink:(a.frame % 80) < 2,
+      sway:0,
+      headTilt:Math.round(Math.sin(a.frame * 0.06) * 1),
+      walking:false,
+      walkPhase:0,
+      hideShadow:true
+    });
+  } else {
+    ctx.translate(a.x - 90, FLOOR_Y - 220);
+    if (a.facing === -1) { ctx.scale(-1, 1); ctx.translate(-180, 0); }
+    _drawCoachPixels(ctx, coachProfile, {
+      pose:a.pose,
+      mouth:a.mouth,
+      blink:(a.frame % 80) < 2,
+      sway:a.walking ? 0 : Math.round(Math.sin(a.frame * 0.12) * 1),
+      headTilt:Math.round(Math.sin(a.frame * 0.05) * 1),
+      walking:a.walking,
+      walkPhase:Math.floor(a.frame / 4) % 2,
+      hideShadow:false
+    });
+  }
+  ctx.restore();
+}
+
+function drawCoachOverlays(ctx) {
+  const a = dashboardCoachAnim;
+  // yelling marks above head
+  if (a.state === 'yelling') {
+    const headTopY = FLOOR_Y - 220 + (48 - 12);
+    const headLeft = a.x - 90 + 58;
+    ctx.fillStyle = '#c08a18';
+    // Exclamation mark shaking
+    const shake = (a.frame % 4 < 2) ? 1 : -1;
+    ctx.fillRect(headLeft + 28 + shake, headTopY - 28, 4, 14);
+    ctx.fillRect(headLeft + 28 + shake, headTopY - 10, 4, 4);
+    // anger lines around head
+    ctx.fillStyle = 'rgba(192,138,24,0.7)';
+    ctx.fillRect(headLeft - 6, headTopY - 4, 6, 1);
+    ctx.fillRect(headLeft - 8, headTopY - 8, 8, 1);
+    ctx.fillRect(headLeft + 64, headTopY - 4, 6, 1);
+    ctx.fillRect(headLeft + 64, headTopY - 8, 8, 1);
+  }
+  // walking dust puff
+  if (a.walking && a.frame % 4 === 0) {
+    const dustX = a.x - a.facing * 18;
+    ctx.fillStyle = 'rgba(192,138,24,0.35)';
+    ctx.fillRect(dustX, FLOOR_Y - 4, 4, 2);
+    ctx.fillRect(dustX + 2, FLOOR_Y - 6, 2, 2);
+  }
+}
+
+function drawCoach(canvasId = 'coach-canvas', profile = coachProfile, anim = null) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = 'rgba(192,138,24,0.12)';
+  ctx.fillRect(35, 215, 110, 8);
+  _drawCoachPixels(ctx, profile, {
+    pose:anim ? (anim.pose || 'idle') : 'idle',
+    mouth:anim ? (anim.mouth || 'neutral') : 'neutral',
+    blink:anim ? !!anim.blink : false,
+    sway:anim ? (anim.sway | 0) : 0,
+    headTilt:anim ? (anim.headTilt | 0) : 0,
+    walking:false,
+    walkPhase:0,
+    hideShadow:true
+  });
+  const bio = document.getElementById('coach-bio');
+  if (bio && canvasId === 'coach-canvas') {
+    bio.textContent = `${profile.firstName || 'Coach'} ${profile.lastName || ''} / ${profile.hometown}, ${profile.homeState}`;
+  }
+}
+
+function _drawCoachPixels(ctx, profile, opts) {
   const skin = COACH_PALETTE.skinColor[profile.skinColor];
   const hair = COACH_PALETTE.hairColor[profile.hairColor];
   const eyes = COACH_PALETTE.eyeColor[profile.eyeColor];
@@ -8193,88 +9484,207 @@ function drawCoach(canvasId = 'coach-canvas', profile = coachProfile) {
   const legY = bodyY + bodyH - 2;
   const legH = shoeY - legY;
 
-  ctx.imageSmoothingEnabled = false;
-  ctx.fillStyle = 'rgba(192,138,24,0.12)';
-  ctx.fillRect(35, 215, 110, 8);
+  const sway = opts.sway | 0;
+  const headTilt = opts.headTilt | 0;
+  const headX = sway + headTilt;
+  const pose = opts.pose || 'idle';
+  const blink = !!opts.blink;
+  const mouth = opts.mouth || 'neutral';
+  const walking = !!opts.walking;
+  const walkPhase = opts.walkPhase | 0;
 
+  if (!opts.hideShadow) {
+    ctx.fillStyle = 'rgba(0,0,0,0.32)';
+    ctx.fillRect(40, 218, 100, 4);
+  }
+
+  // legs and shoes (animated for walking)
+  const liftA = walking && walkPhase === 0 ? 5 : 0;
+  const liftB = walking && walkPhase === 1 ? 5 : 0;
   ctx.fillStyle = shoes;
-  ctx.fillRect(54 - wide / 2, shoeY, 28 + wide / 2, 10);
-  ctx.fillRect(98, shoeY, 28 + wide / 2, 10);
+  ctx.fillRect(54 - wide / 2, shoeY - liftA, 28 + wide / 2, 10);
+  ctx.fillRect(98, shoeY - liftB, 28 + wide / 2, 10);
   ctx.fillStyle = '#2b2518';
-  ctx.fillRect(62, legY, 18 + wide / 2, legH);
-  ctx.fillRect(100, legY, 18 + wide / 2, legH);
+  ctx.fillRect(62, legY, 18 + wide / 2, legH - liftA);
+  ctx.fillRect(100, legY, 18 + wide / 2, legH - liftB);
 
+  // body
   ctx.fillStyle = outfit;
-  ctx.fillRect(54 - wide, bodyY, 72 + wide * 2, bodyH);
+  ctx.fillRect(54 - wide + sway, bodyY, 72 + wide * 2, bodyH);
   ctx.fillStyle = 'rgba(237,224,184,0.62)';
   if (profile.outfit === 'Suit') {
-    ctx.fillRect(84, bodyY + 4, 12, bodyH - 8);
+    ctx.fillRect(84 + sway, bodyY + 4, 12, bodyH - 8);
     ctx.fillStyle = '#a82418';
-    ctx.fillRect(88, bodyY + 8, 6, bodyH - 24);
+    ctx.fillRect(88 + sway, bodyY + 8, 6, bodyH - 24);
   } else {
-    ctx.fillRect(62 - wide, bodyY + 10, 56 + wide * 2, 8);
+    ctx.fillRect(62 - wide + sway, bodyY + 10, 56 + wide * 2, 8);
   }
-  ctx.fillStyle = outfit;
-  ctx.fillRect(39 - wide, bodyY + 6, 18, 48);
-  ctx.fillRect(123 + wide, bodyY + 6, 18, 48);
-  ctx.fillStyle = skin;
-  ctx.fillRect(37 - wide, bodyY + 52, 20, 14);
-  ctx.fillRect(123 + wide, bodyY + 52, 20, 14);
 
+  drawCoachArms(ctx, { pose, sway, bodyY, wide, outfit, skin });
+
+  // neck and head
   ctx.fillStyle = skin;
-  ctx.fillRect(76, bodyY - 8, 28, 10);
-  ctx.fillRect(58, headY, 64, 58);
-  ctx.fillRect(66, headY - 12, 48, 16);
+  ctx.fillRect(76 + sway, bodyY - 8, 28, 10);
+  ctx.fillRect(58 + headX, headY, 64, 58);
+  ctx.fillRect(66 + headX, headY - 12, 48, 16);
   ctx.fillStyle = 'rgba(0,0,0,0.18)';
-  ctx.fillRect(58, headY + 48, 64, 10);
+  ctx.fillRect(58 + headX, headY + 48, 64, 10);
 
+  // hair
   ctx.fillStyle = hair;
   if (profile.hair === 'Short') {
-    ctx.fillRect(58, headY - 10, 64, 14);
-    ctx.fillRect(50, headY + 6, 10, 24);
+    ctx.fillRect(58 + headX, headY - 10, 64, 14);
+    ctx.fillRect(50 + headX, headY + 6, 10, 24);
   } else if (profile.hair === 'Fade') {
-    ctx.fillRect(62, headY - 12, 56, 10);
-    ctx.fillRect(54, headY, 8, 18);
+    ctx.fillRect(62 + headX, headY - 12, 56, 10);
+    ctx.fillRect(54 + headX, headY, 8, 18);
   } else if (profile.hair === 'Flat Top') {
-    ctx.fillRect(60, hairTopY - 10, 60, 22);
-    ctx.fillRect(56, hairTopY + 6, 68, 8);
+    ctx.fillRect(60 + headX, hairTopY - 10, 60, 22);
+    ctx.fillRect(56 + headX, hairTopY + 6, 68, 8);
   } else if (profile.hair === 'Waves') {
-    ctx.fillRect(56, headY - 12, 68, 12);
-    ctx.fillRect(62, headY - 18, 12, 8);
-    ctx.fillRect(84, headY - 19, 12, 8);
-    ctx.fillRect(106, headY - 17, 12, 8);
+    ctx.fillRect(56 + headX, headY - 12, 68, 12);
+    ctx.fillRect(62 + headX, headY - 18, 12, 8);
+    ctx.fillRect(84 + headX, headY - 19, 12, 8);
+    ctx.fillRect(106 + headX, headY - 17, 12, 8);
   }
 
-  ctx.fillStyle = 'rgba(237,224,184,0.82)';
-  ctx.fillRect(70, headY + 16, 12, 9);
-  ctx.fillRect(98, headY + 16, 12, 9);
-  ctx.fillStyle = eyes;
-  ctx.fillRect(73, headY + 18, 6, 5);
-  ctx.fillRect(101, headY + 18, 6, 5);
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.fillRect(74, headY + 18, 2, 2);
-  ctx.fillRect(102, headY + 18, 2, 2);
+  // eyes / brows
+  if (mouth === 'yell' || pose === 'yelling') {
+    ctx.fillStyle = '#2b160e';
+    ctx.fillRect(68 + headX, headY + 12, 14, 3);
+    ctx.fillRect(78 + headX, headY + 10, 4, 3);
+    ctx.fillRect(98 + headX, headY + 12, 14, 3);
+    ctx.fillRect(98 + headX, headY + 10, 4, 3);
+  }
+  if (blink) {
+    ctx.fillStyle = '#2b160e';
+    ctx.fillRect(70 + headX, headY + 22, 12, 2);
+    ctx.fillRect(98 + headX, headY + 22, 12, 2);
+  } else {
+    ctx.fillStyle = 'rgba(237,224,184,0.82)';
+    ctx.fillRect(70 + headX, headY + 16, 12, 9);
+    ctx.fillRect(98 + headX, headY + 16, 12, 9);
+    ctx.fillStyle = eyes;
+    ctx.fillRect(73 + headX, headY + 18, 6, 5);
+    ctx.fillRect(101 + headX, headY + 18, 6, 5);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillRect(74 + headX, headY + 18, 2, 2);
+    ctx.fillRect(102 + headX, headY + 18, 2, 2);
+  }
+
+  // facial hair
   ctx.fillStyle = '#2b160e';
   if (profile.facialHair === 'Mustache') {
-    ctx.fillRect(78, headY + 34, 24, 6);
+    ctx.fillRect(78 + headX, headY + 34, 24, 6);
   } else if (profile.facialHair === 'Goatee') {
-    ctx.fillRect(78, headY + 34, 24, 6);
-    ctx.fillRect(84, headY + 42, 12, 12);
+    ctx.fillRect(78 + headX, headY + 34, 24, 6);
+    ctx.fillRect(84 + headX, headY + 42, 12, 12);
   } else if (profile.facialHair === 'Beard') {
-    ctx.fillRect(68, headY + 34, 44, 8);
-    ctx.fillRect(72, headY + 42, 36, 14);
+    ctx.fillRect(68 + headX, headY + 34, 44, 8);
+    ctx.fillRect(72 + headX, headY + 42, 36, 14);
   }
-  ctx.fillStyle = 'rgba(237,224,184,0.5)';
-  ctx.fillRect(76, headY + 42, 28, 4);
 
-  const bio = document.getElementById('coach-bio');
-  if (bio && canvasId === 'coach-canvas') {
-    bio.textContent = `${profile.firstName || 'Coach'} ${profile.lastName || ''} / ${profile.hometown}, ${profile.homeState}`;
+  // mouth
+  ctx.fillStyle = 'rgba(237,224,184,0.5)';
+  if (mouth === 'open') {
+    ctx.fillRect(78 + headX, headY + 42, 24, 6);
+    ctx.fillStyle = '#2b160e';
+    ctx.fillRect(80 + headX, headY + 43, 20, 4);
+  } else if (mouth === 'yell') {
+    ctx.fillRect(74 + headX, headY + 40, 32, 12);
+    ctx.fillStyle = '#2b160e';
+    ctx.fillRect(76 + headX, headY + 42, 28, 8);
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(78 + headX, headY + 42, 24, 2);
+  } else if (mouth === 'smile') {
+    ctx.fillRect(76 + headX, headY + 42, 28, 4);
+    ctx.fillRect(74 + headX, headY + 40, 4, 4);
+    ctx.fillRect(102 + headX, headY + 40, 4, 4);
+  } else {
+    ctx.fillRect(76 + headX, headY + 42, 28, 4);
   }
 }
 
-function runPortalWorkAnimation(label, work) {
-  showPortalWorkAnimation(label);
+function drawCoachArms(ctx, opts) {
+  const { pose, sway, bodyY, wide, outfit, skin } = opts;
+  const sx = sway;
+  if (pose === 'arms-crossed') {
+    ctx.fillStyle = outfit;
+    ctx.fillRect(39 - wide + sx, bodyY + 6, 18, 22);
+    ctx.fillRect(123 + wide + sx, bodyY + 6, 18, 22);
+    ctx.fillRect(54 - wide + sx, bodyY + 26, 38, 12);
+    ctx.fillRect(88 + sx, bodyY + 22, 38, 12);
+    ctx.fillStyle = skin;
+    ctx.fillRect(54 - wide + sx, bodyY + 30, 10, 8);
+    ctx.fillRect(116 + sx, bodyY + 24, 10, 8);
+  } else if (pose === 'clipboard') {
+    ctx.fillStyle = outfit;
+    ctx.fillRect(39 - wide + sx, bodyY + 6, 18, 26);
+    ctx.fillRect(123 + wide + sx, bodyY + 6, 18, 26);
+    ctx.fillRect(56 - wide + sx, bodyY + 30, 22, 12);
+    ctx.fillRect(102 + sx, bodyY + 30, 22, 12);
+    ctx.fillStyle = '#3a2400';
+    ctx.fillRect(72 + sx, bodyY + 38, 36, 22);
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(74 + sx, bodyY + 40, 32, 18);
+    ctx.fillStyle = '#a82418';
+    ctx.fillRect(82 + sx, bodyY + 36, 16, 4);
+    ctx.fillStyle = '#350a04';
+    ctx.fillRect(78 + sx, bodyY + 44, 24, 1);
+    ctx.fillRect(78 + sx, bodyY + 48, 18, 1);
+    ctx.fillRect(78 + sx, bodyY + 52, 22, 1);
+    ctx.fillStyle = skin;
+    ctx.fillRect(60 - wide + sx, bodyY + 42, 14, 8);
+    ctx.fillRect(106 + sx, bodyY + 42, 14, 8);
+  } else if (pose === 'pointing') {
+    ctx.fillStyle = outfit;
+    ctx.fillRect(39 - wide + sx, bodyY + 6, 18, 48);
+    ctx.fillRect(123 + wide + sx, bodyY + 6, 18, 22);
+    ctx.fillRect(135 + wide + sx, bodyY + 22, 22, 10);
+    ctx.fillStyle = skin;
+    ctx.fillRect(37 - wide + sx, bodyY + 52, 20, 14);
+    ctx.fillRect(155 + wide + sx, bodyY + 22, 12, 10);
+  } else if (pose === 'hands-on-hips') {
+    ctx.fillStyle = outfit;
+    ctx.fillRect(39 - wide + sx, bodyY + 6, 18, 22);
+    ctx.fillRect(123 + wide + sx, bodyY + 6, 18, 22);
+    ctx.fillRect(45 - wide + sx, bodyY + 22, 14, 24);
+    ctx.fillRect(121 + wide + sx, bodyY + 22, 14, 24);
+    ctx.fillStyle = skin;
+    ctx.fillRect(48 - wide + sx, bodyY + 44, 14, 10);
+    ctx.fillRect(118 + wide + sx, bodyY + 44, 14, 10);
+  } else if (pose === 'yelling') {
+    // one arm raised forward/up, other gesturing
+    ctx.fillStyle = outfit;
+    ctx.fillRect(39 - wide + sx, bodyY + 6, 18, 22);
+    ctx.fillRect(45 - wide + sx, bodyY + 22, 14, 22);
+    ctx.fillRect(123 + wide + sx, bodyY + 4, 18, 16);
+    ctx.fillRect(135 + wide + sx, bodyY - 6, 16, 14);
+    ctx.fillStyle = skin;
+    ctx.fillRect(48 - wide + sx, bodyY + 42, 14, 10);
+    ctx.fillRect(149 + wide + sx, bodyY - 12, 12, 12);
+  } else if (pose === 'desk') {
+    // arms forward on desk surface
+    ctx.fillStyle = outfit;
+    ctx.fillRect(39 - wide + sx, bodyY + 6, 18, 22);
+    ctx.fillRect(123 + wide + sx, bodyY + 6, 18, 22);
+    ctx.fillRect(50 - wide + sx, bodyY + 24, 24, 10);
+    ctx.fillRect(106 + sx, bodyY + 24, 24, 10);
+    ctx.fillStyle = skin;
+    ctx.fillRect(70 - wide + sx, bodyY + 26, 14, 8);
+    ctx.fillRect(96 + sx, bodyY + 26, 14, 8);
+  } else {
+    ctx.fillStyle = outfit;
+    ctx.fillRect(39 - wide + sx, bodyY + 6, 18, 48);
+    ctx.fillRect(123 + wide + sx, bodyY + 6, 18, 48);
+    ctx.fillStyle = skin;
+    ctx.fillRect(37 - wide + sx, bodyY + 52, 20, 14);
+    ctx.fillRect(123 + wide + sx, bodyY + 52, 20, 14);
+  }
+}
+
+function runPortalProgress(work) {
+  showPortalWorkProgress('WORKING THE PORTAL', 0, 1);
   return new Promise(resolve => {
     requestAnimationFrame(() => {
       setTimeout(async () => {
@@ -8282,11 +9692,11 @@ function runPortalWorkAnimation(label, work) {
           await work();
         } finally {
           setTimeout(() => {
-            hidePortalWorkAnimation();
+            hidePortalWorkProgress();
             resolve();
           }, 180);
         }
-      }, 80);
+      }, 40);
     });
   });
 }
@@ -8295,32 +9705,31 @@ function yieldToPortalAnimation() {
   return new Promise(resolve => setTimeout(resolve, 0));
 }
 
-function showPortalWorkAnimation(label) {
+function showPortalWorkProgress(label, current = 0, total = 1) {
   const overlay = document.getElementById('portal-work-overlay');
-  const labelEl = document.getElementById('portal-work-label');
-  if (labelEl) labelEl.textContent = label || 'WORKING THE PORTAL...';
   if (overlay) {
     overlay.classList.add('show');
     overlay.setAttribute('aria-hidden', 'false');
   }
-  if (portalWorkAnimId) cancelAnimationFrame(portalWorkAnimId);
-  const start = performance.now();
-  const tick = now => {
-    drawPortalWorkCoach((now - start) / 1000);
-    portalWorkAnimId = requestAnimationFrame(tick);
-  };
-  portalWorkAnimId = requestAnimationFrame(tick);
+  updatePortalWorkProgress(label, current, total);
 }
 
-function hidePortalWorkAnimation() {
+function updatePortalWorkProgress(label, current = 0, total = 1) {
+  const labelEl = document.getElementById('portal-work-label');
+  const countEl = document.getElementById('portal-work-count');
+  const fillEl = document.getElementById('portal-work-fill');
+  const safeTotal = Math.max(1, Number(total) || 1);
+  const safeCurrent = clamp(Number(current) || 0, 0, safeTotal);
+  if (labelEl) labelEl.textContent = label || 'WORKING THE PORTAL';
+  if (countEl) countEl.textContent = `${safeCurrent} / ${Number(total) || 0}`;
+  if (fillEl) fillEl.style.width = `${Math.round((safeCurrent / safeTotal) * 100)}%`;
+}
+
+function hidePortalWorkProgress() {
   const overlay = document.getElementById('portal-work-overlay');
   if (overlay) {
     overlay.classList.remove('show');
     overlay.setAttribute('aria-hidden', 'true');
-  }
-  if (portalWorkAnimId) {
-    cancelAnimationFrame(portalWorkAnimId);
-    portalWorkAnimId = null;
   }
 }
 
@@ -9241,6 +10650,11 @@ window.addEventListener('keydown', e => {
       goToDashboard();
     }
   } else if (currentScreen === 'recruiting') {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      goToDashboard();
+    }
+  } else if (currentScreen === 'conference-tournament') {
     if (e.code === 'Escape' || e.code === 'Backspace') {
       e.preventDefault();
       goToDashboard();
