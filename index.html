@@ -750,7 +750,7 @@
       position:relative;
       transition:border-color 0.08s, background 0.08s, box-shadow 0.08s;
     }
-    .reporter-seat:hover:not(.answered) {
+    .reporter-seat:hover:not(.answered):not(:disabled) {
       border-color:rgba(237,224,184,0.5);
       background:rgba(168,36,24,0.18);
     }
@@ -764,6 +764,9 @@
       cursor:default;
       border-style:dashed;
       border-color:rgba(237,224,184,0.18);
+    }
+    .reporter-seat:disabled {
+      cursor:default;
     }
     .reporter-seat canvas {
       display:block;
@@ -3263,9 +3266,6 @@
 
   <!-- DASHBOARD -->
   <div id="dashboard-screen" class="screen-panel dash-screen hidden">
-    <div class="back-row">
-      <button class="back-btn" onclick="goToCoachBuilder('customize')">◄ COACH BUILDER</button>
-    </div>
     <div class="dash-shell">
       <div class="dash-header">
         <div class="dash-team-block">
@@ -3577,24 +3577,42 @@ const STATE_HOMETOWNS = {
 };
 
 const COACH_OPTIONS = {
-  hair:["Short","Fade","Flat Top","Waves","Bald"],
-  hairColor:["Black","Brown","Blonde","Red","Gray"],
-  facialHair:["None","Mustache","Goatee","Beard"],
+  hair:["Buzz","Short","Fade","Flat Top","Waves","Slick Back","Afro","Mohawk","Cornrows","Twists","Dreads Short","Dreads Long","Dreads Tied","Bald"],
+  hairColor:["Black","Brown","Blonde","Red","Auburn","Gray","Salt & Pepper","Silver","Platinum"],
+  facialHair:["None","Stubble","Mustache","Goatee","Chin Strap","Beard","Full Beard"],
   height:["Short","Average","Tall"],
   physique:["Lean","Average","Stocky"],
   eyeColor:["Brown","Blue","Green","Hazel"],
   skinColor:["Light","Tan","Medium","Dark","Deep"],
-  outfit:["Suit","Polo","Track Suit","Hoodie"],
-  shoes:["Black","White","Red","Gold"]
+  outfit:["Suit","Blazer","Polo","Quarter Zip","Track Suit","Hoodie","Sweater","Vest"],
+  shoes:["Black","White","Red","Gold","Royal","Forest","Silver","Maroon"]
 };
 
 const COACH_PALETTE = {
-  hairColor:{Black:"#15100b",Brown:"#5b3518",Blonde:"#c08a18",Red:"#8f2d16",Gray:"#8b8675"},
+  hairColor:{Black:"#15100b",Brown:"#5b3518",Blonde:"#c08a18",Red:"#8f2d16",Auburn:"#6b2a14","Gray":"#8b8675","Salt & Pepper":"#4a4036",Silver:"#c5c1b8",Platinum:"#e8dfc4"},
   eyeColor:{Brown:"#3b2412",Blue:"#1d5fa8",Green:"#2d7c3a",Hazel:"#8a6a1c"},
   skinColor:{Light:"#f0c59a",Tan:"#c98952",Medium:"#9f633b",Dark:"#6c3b25",Deep:"#3a2118"},
-  outfit:{Suit:"#1f2530",Polo:"#a82418","Track Suit":"#1f4d78",Hoodie:"#6a2b75"},
-  shoes:{Black:"#111111",White:"#ede0b8",Red:"#a82418",Gold:"#c08a18"}
+  outfit:{Suit:"#1f2530",Blazer:"#2c2218",Polo:"#a82418","Quarter Zip":"#2d3f4f","Track Suit":"#1f4d78",Hoodie:"#6a2b75",Sweater:"#5c3a1c",Vest:"#3a2418"},
+  shoes:{Black:"#111111",White:"#ede0b8",Red:"#a82418",Gold:"#c08a18",Royal:"#1f3a8a",Forest:"#1f4d2b",Silver:"#a8a89c",Maroon:"#5c1818"}
 };
+
+function shadeCoachColor(hex, pct) {
+  const n = parseInt((hex || '#000').replace('#',''), 16);
+  const clamp = v => Math.min(255, Math.max(0, Math.round(v)));
+  const r = clamp(((n>>16)&255)*(1+pct));
+  const g = clamp(((n>>8)&255)*(1+pct));
+  const b = clamp((n&255)*(1+pct));
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function lightenCoachColor(hex, amt) {
+  const n = parseInt((hex || '#000').replace('#',''), 16);
+  const clamp = v => Math.min(255, Math.max(0, Math.round(v)));
+  const r = clamp(((n>>16)&255) + amt);
+  const g = clamp(((n>>8)&255) + amt);
+  const b = clamp((n&255) + amt);
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
 
 const PERSONALITIES = [
   { id:'steady', name:'Steady', desc:'Measured answers with a calm locker-room tone.' },
@@ -3663,6 +3681,7 @@ let pressPersonality = null;
 let pressQuestionIndex = 0;
 let activeReporterIndex = null;
 let pressAnswers = [];
+let pressAwaitingNext = false;
 let currentGameIndex = 0;
 let allRosters = null;
 let namePool = null;
@@ -3904,6 +3923,8 @@ function compactRosterPlayer(player) {
     tendencies:player.tendencies || makeTendencies(player.position)
   };
   if (player.recruitedFreshman) compact.recruitedFreshman = true;
+  if (player.originalConf) compact.originalConf = player.originalConf;
+  if (player.originalTeam) compact.originalTeam = player.originalTeam;
   return compact;
 }
 
@@ -5108,14 +5129,15 @@ function processSeasonDepartures() {
       for (const player of afterFirst) {
         const isTopAtPos = player.overall >= bestByPos[player.position];
         const baseTransferChance = isTopAtPos ? Math.min(0.5, 1 - winPct) : 0.9;
-        const transferChance = baseTransferChance * getTransferGradeMultiplier(player.grade);
+        const rawTransferChance = baseTransferChance * getTransferGradeMultiplier(player.grade);
+        const transferChance = getOriginalSchoolAdjustedTransferChance(player, conf, team, rawTransferChance);
         if (Math.random() < transferChance) {
           transferPortal.push({
             ...player,
             portalId: `portal-${portalId++}`,
             fromTeam: team,
             fromConf: conf,
-            stars: overallToStars(player.overall),
+            stars:getPortalPlayerStars(player),
             overallRevealed: true,
             potentialRevealed: false,
             cpuOffers: [],
@@ -5159,8 +5181,34 @@ function getTransferGradeMultiplier(grade) {
   })[grade] || 1;
 }
 
+function isPlayerAtOriginalSchool(player, conf, team) {
+  return !!player
+    && player.originalConf === conf
+    && player.originalTeam === team;
+}
+
+function getOriginalSchoolAdjustedTransferChance(player, conf, team, transferChance) {
+  const normalizedTransferChance = clamp(Number(transferChance) || 0, 0, 1);
+  if (!isPlayerAtOriginalSchool(player, conf, team)) return normalizedTransferChance;
+  const doubledStayChance = Math.min(1, (1 - normalizedTransferChance) * 2);
+  return 1 - doubledStayChance;
+}
+
 function getPlayerRetentionFairValue(player) {
   return getRecruitFairValue({ stars:overallToStars(player.overall) });
+}
+
+function getPortalPlayerStars(player) {
+  const potential = Number(player && player.potential);
+  const overall = Number(player && player.overall);
+  return overallToStars(Number.isFinite(potential) && potential > 0 ? potential : overall);
+}
+
+function normalizeTransferPortalStars() {
+  if (!Array.isArray(transferPortal)) return;
+  transferPortal.forEach(player => {
+    player.stars = getPortalPlayerStars(player);
+  });
 }
 
 function addPlayerToTransferPortal(player, reason = 'RETENTION') {
@@ -5169,7 +5217,7 @@ function addPlayerToTransferPortal(player, reason = 'RETENTION') {
     portalId:getNextPortalId(),
     fromTeam:selectedTeam,
     fromConf:selectedConf,
-    stars:overallToStars(player.overall),
+    stars:getPortalPlayerStars(player),
     overallRevealed:true,
     potentialRevealed:false,
     cpuOffers:[],
@@ -5416,6 +5464,7 @@ function renderPortalRoster() {
 }
 
 function renderTransferPortal() {
+  normalizeTransferPortalStars();
   const remainingCount = transferPortal.filter(p => !p.signed && !p.committedTo).length;
   const subtitle = document.getElementById('portal-subtitle');
   if (subtitle) subtitle.textContent = `${remainingCount} AVAILABLE / ${transferPortal.length} TOTAL`;
@@ -5673,6 +5722,7 @@ function getPortalStateKey() {
 }
 
 function savePortalState() {
+  normalizeTransferPortalStars();
   saveGameJSON(getPortalStateKey(), {
     portal: transferPortal,
     week: portalWeek,
@@ -5685,6 +5735,7 @@ function loadPortalState() {
     const saved = loadGameJSON(getPortalStateKey());
     if (saved && Array.isArray(saved.portal)) {
       transferPortal = saved.portal;
+      normalizeTransferPortalStars();
       portalWeek = saved.week || 1;
       retentionNILCommits = Array.isArray(saved.retentionNILCommits) ? saved.retentionNILCommits : [];
       return true;
@@ -6204,7 +6255,7 @@ function createPortalFallbackPlayer(position) {
     portalId:getNextPortalId(),
     fromTeam:'Walk-On Pool',
     fromConf:'',
-    stars:1,
+    stars:getPortalPlayerStars({ potential, overall }),
     overallRevealed:true,
     potentialRevealed:false,
     cpuOffers:[],
@@ -6248,7 +6299,9 @@ function applyPortalCommits() {
       attributes: p.attributes || {},
       homeState: p.homeState,
       hometown: p.hometown,
-      tendencies: p.tendencies || makeTendencies(p.position)
+      tendencies: p.tendencies || makeTendencies(p.position),
+      originalConf: p.originalConf || p.fromConf,
+      originalTeam: p.originalTeam || p.fromTeam
     });
     if (Array.isArray(entry)) allRosters[targetConf][targetTeam] = roster;
     else entry.roster = roster;
@@ -6278,6 +6331,8 @@ function applyRecruitingCommits() {
       homeState:r.homeState,
       hometown:r.hometown,
       tendencies:r.tendencies || makeTendencies(r.position),
+      originalConf:targetConf,
+      originalTeam:targetTeam,
       recruitedFreshman:true
     });
     if (Array.isArray(entry)) allRosters[targetConf][targetTeam] = roster;
@@ -6636,6 +6691,7 @@ function goToPressConference() {
   pressQuestionIndex = 0;
   activeReporterIndex = null;
   pressAnswers = [];
+  pressAwaitingNext = false;
   cachedSchedule = null;    // new season start — reset schedule
   leagueSchedule = null;
   currentGameIndex = 0;
@@ -6767,7 +6823,7 @@ function generateAllRosters(names) {
     for (const team of CONFERENCES[conf]) {
       const teamOverall = ((TEAM_DATA[conf] || {})[team] || {}).o || 70;
       rosters[conf][team] = {
-        roster:generateTeamRoster(teamOverall, names),
+        roster:generateTeamRoster(teamOverall, names, conf, team),
         style:generateRandomTeamStyle()
       };
     }
@@ -6798,7 +6854,7 @@ function generateRandomTeamStyle() {
   };
 }
 
-function generateTeamRoster(teamOverall, names) {
+function generateTeamRoster(teamOverall, names, originalConf, originalTeam) {
   const grades = ['Freshman','Freshman','Freshman','Sophomore','Sophomore','Sophomore','Junior','Junior','Senior','Senior'];
   const positions = ['PG','SG','SF','PF','C','PG','SG','SF','PF','C'];
   shuffle(grades);
@@ -6819,7 +6875,9 @@ function generateTeamRoster(teamOverall, names) {
       attributes,
       homeState,
       hometown,
-      tendencies:makeTendencies(positions[i])
+      tendencies:makeTendencies(positions[i]),
+      originalConf,
+      originalTeam
     };
   }).sort((a, b) => b.overall - a.overall);
 }
@@ -8503,7 +8561,25 @@ function ensureRosterLoaded() {
       saveGameJSON(getPlayerStatsKey(), playerStatsState);
     }
   }
+  hydrateOriginalSchools();
   hydrateRosterPositions();
+}
+
+function hydrateOriginalSchools() {
+  if (!allRosters) return;
+  let changed = false;
+  Object.entries(allRosters).forEach(([conf, confTeams]) => {
+    Object.entries(confTeams || {}).forEach(([team, entry]) => {
+      getRosterFromEntry(entry).forEach(player => {
+        if (!player.originalConf || !player.originalTeam) {
+          player.originalConf = conf;
+          player.originalTeam = team;
+          changed = true;
+        }
+      });
+    });
+  });
+  if (changed) saveAllRosters();
 }
 
 function hydrateRosterPositions() {
@@ -9006,6 +9082,7 @@ async function skipCoachSetup() {
   pressQuestionIndex = PRESS_QUESTIONS.length;
   activeReporterIndex = null;
   pressAnswers = [];
+  pressAwaitingNext = false;
   cachedSchedule = null;
   leagueSchedule = null;
   currentGameIndex = 0;
@@ -9468,6 +9545,267 @@ function drawCoach(canvasId = 'coach-canvas', profile = coachProfile, anim = nul
   }
 }
 
+function drawDreadColumn(ctx, x, y, length, hair, hairDk, hairLt, opts) {
+  if (length <= 0) return;
+  const w = (opts && opts.width) || 4;
+  // bright contrast highlight that stays visible against dark outfits
+  const highlight = lightenCoachColor(hair, 70);
+  ctx.fillStyle = hair;
+  ctx.fillRect(x, y, w, length);
+  // dark right edge
+  ctx.fillStyle = hairDk;
+  ctx.fillRect(x + w - 1, y, 1, length);
+  // bright left highlight stripe
+  ctx.fillStyle = highlight;
+  ctx.fillRect(x, y + 1, 1, Math.max(0, length - 4));
+  // twist bands every 6px
+  for (let i = 4; i < length - 3; i += 6) {
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(x, y + i, w, 2);
+    if (i + 3 < length) {
+      ctx.fillStyle = highlight;
+      ctx.fillRect(x + 1, y + i + 2, 1, 1);
+    }
+  }
+  // tapered tip
+  ctx.fillStyle = hairDk;
+  ctx.fillRect(x, y + length - 1, w, 2);
+  ctx.fillRect(x + 1, y + length + 1, Math.max(1, w - 2), 1);
+}
+
+function drawCoachHair(ctx, profile, hair, headX, headY, hairTopY) {
+  if (profile.hair === 'Bald') return;
+  const hairDk = shadeCoachColor(hair, -0.4);
+  const hairLt = shadeCoachColor(hair, 0.22);
+  const skullL = 58 + headX;
+  const skullR = 122 + headX;
+  const skullW = skullR - skullL;
+  const crownL = 66 + headX;
+  const crownR = 114 + headX;
+  const crownW = crownR - crownL;
+  const crownT = headY - 12;
+
+  ctx.fillStyle = hair;
+
+  if (profile.hair === 'Buzz') {
+    ctx.fillRect(crownL, crownT + 8, crownW, 4);
+    ctx.fillRect(skullL, headY, skullW, 4);
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(skullL, headY + 4, 5, 12);
+    ctx.fillRect(skullR - 5, headY + 4, 5, 12);
+    for (let r = 0; r < 4; r += 2) {
+      for (let c = 0; c < crownW; c += 4) {
+        ctx.fillRect(crownL + c + ((r % 4 === 0) ? 0 : 2), crownT + 8 + r, 1, 1);
+      }
+    }
+  } else if (profile.hair === 'Short') {
+    ctx.fillRect(crownL - 2, crownT + 2, crownW + 4, 12);
+    ctx.fillRect(skullL, headY, 6, 22);
+    ctx.fillRect(skullR - 6, headY, 6, 22);
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(crownL + 4, crownT + 3, 16, 2);
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(crownL - 2, crownT + 12, crownW + 4, 2);
+    ctx.fillRect(skullL, headY + 18, 6, 4);
+    ctx.fillRect(skullR - 6, headY + 18, 6, 4);
+  } else if (profile.hair === 'Fade') {
+    ctx.fillRect(crownL, crownT + 4, crownW, 10);
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(skullL, headY, 5, 8);
+    ctx.fillRect(skullR - 5, headY, 5, 8);
+    // stipple fade
+    for (let r = 0; r < 8; r += 2) {
+      for (let c = 0; c < 5; c += 2) {
+        ctx.fillRect(skullL + c, headY + 8 + r, 1, 1);
+        ctx.fillRect(skullR - 5 + c, headY + 8 + r, 1, 1);
+      }
+    }
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(crownL + 6, crownT + 4, 18, 2);
+  } else if (profile.hair === 'Flat Top') {
+    ctx.fillRect(crownL - 2, crownT - 12, crownW + 4, 24);
+    ctx.fillRect(skullL, headY, 6, 14);
+    ctx.fillRect(skullR - 6, headY, 6, 14);
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(crownL, crownT - 12, crownW, 3);
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(crownL - 2, crownT + 10, crownW + 4, 2);
+    ctx.fillRect(crownL - 2, crownT - 12, 2, 24);
+    ctx.fillRect(crownL + crownW, crownT - 12, 2, 24);
+  } else if (profile.hair === 'Waves') {
+    ctx.fillRect(crownL, crownT, crownW, 14);
+    ctx.fillRect(skullL, headY, 5, 8);
+    ctx.fillRect(skullR - 5, headY, 5, 8);
+    // wave bumps on top
+    ctx.fillRect(crownL - 2, crownT - 4, 8, 4);
+    ctx.fillRect(crownL + 10, crownT - 6, 10, 6);
+    ctx.fillRect(crownL + 24, crownT - 4, 10, 4);
+    ctx.fillRect(crownL + 38, crownT - 6, crownW - 38, 6);
+    ctx.fillStyle = hairLt;
+    for (let i = 0; i < crownW; i += 6) {
+      ctx.fillRect(crownL + i, crownT + 2, 3, 1);
+      ctx.fillRect(crownL + i + 2, crownT + 6, 3, 1);
+      ctx.fillRect(crownL + i, crownT + 10, 3, 1);
+    }
+  } else if (profile.hair === 'Slick Back') {
+    ctx.fillRect(crownL - 2, crownT - 4, crownW + 4, 18);
+    ctx.fillRect(skullL, headY, 6, 26);
+    ctx.fillRect(skullR - 6, headY, 6, 26);
+    ctx.fillRect(crownL + 4, crownT - 8, crownW - 8, 6);
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(crownL + 4, crownT - 2, crownW - 8, 2);
+    ctx.fillRect(crownL + 8, crownT + 4, crownW - 16, 1);
+    ctx.fillRect(crownL + 6, crownT + 8, crownW - 12, 1);
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(crownL - 2, crownT + 12, crownW + 4, 2);
+  } else if (profile.hair === 'Afro') {
+    // big bouffant
+    ctx.fillRect(crownL - 8, crownT - 14, crownW + 16, 26);
+    ctx.fillRect(skullL - 8, headY - 4, 14, 24);
+    ctx.fillRect(skullR - 6, headY - 4, 14, 24);
+    ctx.fillRect(crownL - 6, crownT - 18, crownW + 12, 4);
+    ctx.fillRect(crownL - 2, crownT - 22, crownW + 4, 4);
+    // texture curls
+    ctx.fillStyle = hairDk;
+    for (let r = -20; r < 22; r += 4) {
+      for (let c = -8; c < crownW + 16; c += 5) {
+        const off = (r % 8 === 0) ? 0 : 2;
+        ctx.fillRect(crownL + c + off, crownT + r, 2, 2);
+      }
+    }
+    // side curls
+    for (let r = 0; r < 22; r += 4) {
+      ctx.fillRect(skullL - 6 + ((r % 8 === 0) ? 0 : 2), headY + r, 2, 2);
+      ctx.fillRect(skullR + 4 + ((r % 8 === 0) ? 0 : 2), headY + r, 2, 2);
+    }
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(crownL - 2, crownT - 16, 4, 2);
+    ctx.fillRect(crownL + 16, crownT - 20, 6, 2);
+    ctx.fillRect(crownL + 30, crownT - 18, 6, 2);
+  } else if (profile.hair === 'Mohawk') {
+    const mhL = crownL + Math.floor(crownW / 2) - 8;
+    // shaved sides shadow
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(crownL - 2, crownT + 8, crownW + 4, 4);
+    ctx.fillRect(skullL, headY, 4, 12);
+    ctx.fillRect(skullR - 4, headY, 4, 12);
+    // strip
+    ctx.fillStyle = hair;
+    ctx.fillRect(mhL, crownT - 16, 16, 28);
+    // spikes
+    ctx.fillRect(mhL + 1, crownT - 22, 4, 6);
+    ctx.fillRect(mhL + 7, crownT - 24, 4, 8);
+    ctx.fillRect(mhL + 12, crownT - 20, 4, 4);
+    // highlight
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(mhL + 2, crownT - 14, 2, 22);
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(mhL + 12, crownT - 14, 2, 22);
+  } else if (profile.hair === 'Cornrows') {
+    ctx.fillRect(crownL - 2, crownT, crownW + 4, 14);
+    ctx.fillRect(skullL, headY, 5, 16);
+    ctx.fillRect(skullR - 5, headY, 5, 16);
+    // dark gaps between rows
+    ctx.fillStyle = hairDk;
+    for (let i = 0; i < crownW + 4; i += 5) {
+      ctx.fillRect(crownL - 2 + i, crownT, 1, 14);
+    }
+    for (let i = 0; i < 16; i += 5) {
+      ctx.fillRect(skullL, headY + i, 5, 1);
+      ctx.fillRect(skullR - 5, headY + i, 5, 1);
+    }
+    // beads at the back hem
+    ctx.fillStyle = hairLt;
+    for (let i = 2; i < crownW; i += 6) {
+      ctx.fillRect(crownL + i, crownT + 14, 3, 3);
+    }
+  } else if (profile.hair === 'Twists') {
+    ctx.fillRect(crownL - 2, crownT, crownW + 4, 12);
+    ctx.fillRect(skullL - 2, headY, 6, 14);
+    ctx.fillRect(skullR - 4, headY, 6, 14);
+    // twist strokes on top
+    ctx.fillStyle = hairDk;
+    for (let i = 0; i < crownW; i += 5) {
+      ctx.fillRect(crownL + i + 2, crownT, 1, 12);
+      ctx.fillRect(crownL + i, crownT + 4, 5, 1);
+      ctx.fillRect(crownL + i + 2, crownT + 8, 3, 1);
+    }
+    ctx.fillStyle = hairLt;
+    for (let i = 0; i < crownW; i += 5) {
+      ctx.fillRect(crownL + i, crownT + 2, 1, 2);
+      ctx.fillRect(crownL + i, crownT + 6, 1, 2);
+    }
+    // short hanging twists
+    drawDreadColumn(ctx, skullL - 4, headY + 6, 18, hair, hairDk, hairLt);
+    drawDreadColumn(ctx, skullR, headY + 6, 18, hair, hairDk, hairLt);
+  } else if (profile.hair === 'Dreads Short' || profile.hair === 'Dreads Long' || profile.hair === 'Dreads Tied') {
+    // base scalp
+    ctx.fillRect(crownL - 4, crownT - 4, crownW + 8, 18);
+    ctx.fillRect(skullL - 2, headY, 8, 14);
+    ctx.fillRect(skullR - 6, headY, 8, 14);
+    // dark roots
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(crownL - 4, crownT - 4, crownW + 8, 3);
+
+    if (profile.hair === 'Dreads Tied') {
+      // Top knot bun
+      const bunL = crownL + Math.floor(crownW / 2) - 12;
+      const bunY = crownT - 18;
+      ctx.fillStyle = hair;
+      ctx.fillRect(bunL, bunY, 24, 16);
+      ctx.fillRect(bunL + 2, bunY - 2, 20, 2);
+      ctx.fillRect(bunL - 2, bunY + 2, 2, 12);
+      ctx.fillRect(bunL + 24, bunY + 2, 2, 12);
+      // bun shading
+      ctx.fillStyle = hairDk;
+      ctx.fillRect(bunL, bunY, 24, 3);
+      ctx.fillRect(bunL, bunY + 13, 24, 3);
+      // wrap detail
+      ctx.fillRect(bunL, bunY + 6, 24, 1);
+      ctx.fillRect(bunL, bunY + 10, 24, 1);
+      // highlights showing lock texture
+      ctx.fillStyle = hairLt;
+      ctx.fillRect(bunL + 4, bunY + 2, 6, 1);
+      ctx.fillRect(bunL + 14, bunY + 4, 6, 1);
+      ctx.fillRect(bunL + 6, bunY + 8, 4, 1);
+      // a few loose locks falling at temples (short)
+      drawDreadColumn(ctx, skullL - 4, headY + 4, 24, hair, hairDk, hairLt);
+      drawDreadColumn(ctx, skullL + 2, headY + 8, 18, hair, hairDk, hairLt);
+      drawDreadColumn(ctx, skullR - 2, headY + 4, 24, hair, hairDk, hairLt);
+      drawDreadColumn(ctx, skullR - 8, headY + 8, 18, hair, hairDk, hairLt);
+    } else {
+      const long = profile.hair === 'Dreads Long';
+      const baseLen = long ? 64 : 36;
+      const W = 5;
+      // front fringe — short locks across forehead
+      const fringe = [crownL - 2, crownL + 6, crownL + 14, crownL + 22, crownL + 30, crownL + 38, crownL + 46];
+      fringe.forEach((x, i) => {
+        const len = 7 + (i % 2) * 4;
+        drawDreadColumn(ctx, x, crownT + 4, len, hair, hairDk, hairLt, { width: 4 });
+      });
+      // side locks - hang down past head, framing face and continuing onto chest
+      const sideStarts = [
+        { x: skullL - 8, y: headY + 4, len: baseLen + 10 },
+        { x: skullL - 3, y: headY + 6, len: baseLen + 6 },
+        { x: skullL + 1, y: headY + 18, len: baseLen - 6 },
+        { x: skullR - 6, y: headY + 18, len: baseLen - 6 },
+        { x: skullR - 1, y: headY + 6, len: baseLen + 6 },
+        { x: skullR + 4, y: headY + 4, len: baseLen + 10 }
+      ];
+      sideStarts.forEach(s => drawDreadColumn(ctx, s.x, s.y, s.len, hair, hairDk, hairLt, { width: W }));
+      // a couple of locks hanging fully behind, past the ear
+      drawDreadColumn(ctx, skullL - 12, headY + 16, baseLen + 4, hair, hairDk, hairLt, { width: W });
+      drawDreadColumn(ctx, skullR + 9, headY + 16, baseLen + 4, hair, hairDk, hairLt, { width: W });
+      // chest-front locks that drape over the shoulders so the cascade reads continuous
+      const bodyTopY = headY + 54; // matches bodyY from caller
+      const chestLocks = long
+        ? [{ x: skullL + 2, len: 40 }, { x: skullL + 10, len: 46 }, { x: skullR - 14, len: 46 }, { x: skullR - 6, len: 40 }]
+        : [{ x: skullL + 2, len: 18 }, { x: skullL + 10, len: 22 }, { x: skullR - 14, len: 22 }, { x: skullR - 6, len: 18 }];
+      chestLocks.forEach(c => drawDreadColumn(ctx, c.x, bodyTopY + 2, c.len, hair, hairDk, hairLt, { width: W }));
+    }
+  }
+}
+
 function _drawCoachPixels(ctx, profile, opts) {
   const skin = COACH_PALETTE.skinColor[profile.skinColor];
   const hair = COACH_PALETTE.hairColor[profile.hairColor];
@@ -9501,23 +9839,232 @@ function _drawCoachPixels(ctx, profile, opts) {
   // legs and shoes (animated for walking)
   const liftA = walking && walkPhase === 0 ? 5 : 0;
   const liftB = walking && walkPhase === 1 ? 5 : 0;
-  ctx.fillStyle = shoes;
-  ctx.fillRect(54 - wide / 2, shoeY - liftA, 28 + wide / 2, 10);
-  ctx.fillRect(98, shoeY - liftB, 28 + wide / 2, 10);
-  ctx.fillStyle = '#2b2518';
+  const shoeDk = shadeCoachColor(shoes, -0.4);
+  const shoeLt = shadeCoachColor(shoes, 0.22);
+  const soleColor = profile.shoes === 'White' ? '#888888' : '#ede0b8';
+  // pants
+  ctx.fillStyle = '#1f1a12';
   ctx.fillRect(62, legY, 18 + wide / 2, legH - liftA);
   ctx.fillRect(100, legY, 18 + wide / 2, legH - liftB);
+  // pant cuff highlight
+  ctx.fillStyle = '#3a2f1a';
+  ctx.fillRect(62, legY + legH - liftA - 4, 18 + wide / 2, 1);
+  ctx.fillRect(100, legY + legH - liftB - 4, 18 + wide / 2, 1);
+  // left shoe
+  const lsX = 54 - wide / 2;
+  const lsW = 28 + wide / 2;
+  const lsY = shoeY - liftA;
+  ctx.fillStyle = shoes;
+  ctx.fillRect(lsX, lsY, lsW, 8);
+  ctx.fillStyle = shoeDk;
+  ctx.fillRect(lsX, lsY, lsW, 2);
+  ctx.fillStyle = soleColor;
+  ctx.fillRect(lsX, lsY + 8, lsW, 2);
+  ctx.fillStyle = shoeLt;
+  ctx.fillRect(lsX + 4, lsY + 4, 14, 2);
+  ctx.fillStyle = '#ede0b8';
+  for (let i = 0; i < 3; i++) ctx.fillRect(lsX + 10 + i * 4, lsY + 2, 3, 1);
+  // right shoe
+  const rsX = 98;
+  const rsW = 28 + wide / 2;
+  const rsY = shoeY - liftB;
+  ctx.fillStyle = shoes;
+  ctx.fillRect(rsX, rsY, rsW, 8);
+  ctx.fillStyle = shoeDk;
+  ctx.fillRect(rsX, rsY, rsW, 2);
+  ctx.fillStyle = soleColor;
+  ctx.fillRect(rsX, rsY + 8, rsW, 2);
+  ctx.fillStyle = shoeLt;
+  ctx.fillRect(rsX + 8, rsY + 4, 14, 2);
+  ctx.fillStyle = '#ede0b8';
+  for (let i = 0; i < 3; i++) ctx.fillRect(rsX + 6 + i * 4, rsY + 2, 3, 1);
 
-  // body
+  // body / outfit
+  const outfitDk = shadeCoachColor(outfit, -0.3);
+  const outfitLt = shadeCoachColor(outfit, 0.2);
+  const bodyLeft = 54 - wide + sway;
+  const bodyW = 72 + wide * 2;
+  const bodyRight = bodyLeft + bodyW;
+  const bodyCx = bodyLeft + Math.floor(bodyW / 2);
   ctx.fillStyle = outfit;
-  ctx.fillRect(54 - wide + sway, bodyY, 72 + wide * 2, bodyH);
-  ctx.fillStyle = 'rgba(237,224,184,0.62)';
+  ctx.fillRect(bodyLeft, bodyY, bodyW, bodyH);
+  // shoulder/edge shading
+  ctx.fillStyle = outfitDk;
+  ctx.fillRect(bodyLeft, bodyY, bodyW, 3);
+  ctx.fillRect(bodyRight - 3, bodyY + 3, 3, bodyH - 3);
+  ctx.fillStyle = outfitLt;
+  ctx.fillRect(bodyLeft, bodyY + 3, 2, bodyH - 6);
+
   if (profile.outfit === 'Suit') {
-    ctx.fillRect(84 + sway, bodyY + 4, 12, bodyH - 8);
+    // lapels
+    ctx.fillStyle = outfitDk;
+    for (let i = 0; i < 6; i++) {
+      ctx.fillRect(bodyLeft + 10 + i, bodyY + i * 3, 14 - i, 4);
+      ctx.fillRect(bodyRight - 24 + i, bodyY + i * 3, 14 - i, 4);
+    }
+    // dress shirt
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(bodyCx - 6, bodyY + 4, 12, bodyH - 8);
+    // tie knot + body
     ctx.fillStyle = '#a82418';
-    ctx.fillRect(88 + sway, bodyY + 8, 6, bodyH - 24);
+    ctx.fillRect(bodyCx - 4, bodyY + 6, 8, 5);
+    ctx.fillRect(bodyCx - 5, bodyY + 11, 10, bodyH - 26);
+    ctx.fillStyle = '#7a1a10';
+    ctx.fillRect(bodyCx - 5, bodyY + 11, 1, bodyH - 26);
+    ctx.fillStyle = '#c44a2a';
+    ctx.fillRect(bodyCx + 3, bodyY + 11, 1, bodyH - 26);
+    // pocket square
+    ctx.fillStyle = '#c08a18';
+    ctx.fillRect(bodyLeft + 8, bodyY + 18, 6, 4);
+  } else if (profile.outfit === 'Blazer') {
+    // open lapels, no tie
+    ctx.fillStyle = outfitDk;
+    for (let i = 0; i < 5; i++) {
+      ctx.fillRect(bodyLeft + 10 + i, bodyY + i * 3, 12 - i, 4);
+      ctx.fillRect(bodyRight - 22 + i, bodyY + i * 3, 12 - i, 4);
+    }
+    // dress shirt
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(bodyCx - 8, bodyY + 4, 16, 16);
+    // open collar V
+    ctx.fillStyle = outfit;
+    ctx.fillRect(bodyCx - 1, bodyY + 4, 2, 14);
+    // jacket buttons
+    ctx.fillStyle = '#c08a18';
+    ctx.fillRect(bodyCx + 12, bodyY + 24, 2, 2);
+    ctx.fillRect(bodyCx + 12, bodyY + 34, 2, 2);
+    // pocket flap
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyLeft + 8, bodyY + 30, 18, 3);
+  } else if (profile.outfit === 'Polo') {
+    // collar
+    ctx.fillStyle = outfitLt;
+    ctx.fillRect(bodyCx - 16, bodyY, 14, 6);
+    ctx.fillRect(bodyCx + 2, bodyY, 14, 6);
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyCx - 16, bodyY + 5, 14, 1);
+    ctx.fillRect(bodyCx + 2, bodyY + 5, 14, 1);
+    ctx.fillRect(bodyCx - 16, bodyY, 2, 6);
+    ctx.fillRect(bodyCx + 14, bodyY, 2, 6);
+    // placket
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyCx - 2, bodyY + 6, 4, 14);
+    // buttons
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(bodyCx - 1, bodyY + 9, 2, 2);
+    ctx.fillRect(bodyCx - 1, bodyY + 15, 2, 2);
+    // chest crest
+    ctx.fillStyle = '#c08a18';
+    ctx.fillRect(bodyLeft + 14, bodyY + 18, 5, 5);
+  } else if (profile.outfit === 'Quarter Zip') {
+    // raised collar
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyCx - 14, bodyY - 4, 28, 8);
+    ctx.fillStyle = outfitLt;
+    ctx.fillRect(bodyCx - 14, bodyY - 4, 28, 2);
+    ctx.fillStyle = outfit;
+    ctx.fillRect(bodyCx - 12, bodyY - 2, 24, 4);
+    // zipper
+    ctx.fillStyle = '#2b2518';
+    ctx.fillRect(bodyCx - 1, bodyY - 4, 2, 22);
+    ctx.fillStyle = '#c08a18';
+    ctx.fillRect(bodyCx - 2, bodyY + 14, 4, 4);
+    // chest logo
+    ctx.fillStyle = outfitLt;
+    ctx.fillRect(bodyLeft + 14, bodyY + 24, 8, 4);
+    // hem texture
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyLeft, bodyY + bodyH - 4, bodyW, 2);
+  } else if (profile.outfit === 'Track Suit') {
+    // 3-stripe shoulder accents
+    ctx.fillStyle = '#ede0b8';
+    for (let s = 0; s < 3; s++) {
+      ctx.fillRect(bodyLeft + 4 + s * 5, bodyY + 6, 3, bodyH - 12);
+      ctx.fillRect(bodyRight - 7 - s * 5, bodyY + 6, 3, bodyH - 12);
+    }
+    // zipper
+    ctx.fillStyle = '#15100b';
+    ctx.fillRect(bodyCx - 1, bodyY + 4, 2, bodyH - 8);
+    ctx.fillStyle = '#c08a18';
+    ctx.fillRect(bodyCx - 2, bodyY + 14, 4, 3);
+    // chest emblem
+    ctx.fillStyle = outfitLt;
+    ctx.fillRect(bodyCx - 14, bodyY + 22, 10, 6);
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(bodyCx - 13, bodyY + 23, 2, 4);
+  } else if (profile.outfit === 'Hoodie') {
+    // hood draped behind shoulders
+    ctx.fillStyle = outfit;
+    ctx.fillRect(bodyCx - 22, bodyY - 8, 44, 16);
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyCx - 22, bodyY - 8, 44, 3);
+    ctx.fillRect(bodyCx - 22, bodyY - 8, 3, 16);
+    ctx.fillRect(bodyCx + 19, bodyY - 8, 3, 16);
+    // hood cavity (dark)
+    ctx.fillStyle = '#0e0a08';
+    ctx.fillRect(bodyCx - 16, bodyY + 0, 32, 6);
+    // drawstrings
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(bodyCx - 6, bodyY + 6, 2, 16);
+    ctx.fillRect(bodyCx + 4, bodyY + 6, 2, 14);
+    // aglet tips
+    ctx.fillStyle = '#3a2400';
+    ctx.fillRect(bodyCx - 7, bodyY + 22, 4, 2);
+    ctx.fillRect(bodyCx + 3, bodyY + 20, 4, 2);
+    // kangaroo pocket
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyLeft + 8, bodyY + 30, bodyW - 16, 16);
+    ctx.fillStyle = outfit;
+    ctx.fillRect(bodyLeft + 10, bodyY + 32, bodyW - 20, 12);
+    // pocket openings
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyLeft + 14, bodyY + 36, 2, 8);
+    ctx.fillRect(bodyRight - 16, bodyY + 36, 2, 8);
+    // ribbed cuff at bottom
+    ctx.fillStyle = outfitLt;
+    ctx.fillRect(bodyLeft, bodyY + bodyH - 4, bodyW, 2);
+  } else if (profile.outfit === 'Sweater') {
+    // crewneck collar
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyCx - 14, bodyY - 2, 28, 5);
+    ctx.fillStyle = outfitLt;
+    ctx.fillRect(bodyCx - 13, bodyY - 1, 26, 1);
+    // knit stipple
+    ctx.fillStyle = outfitLt;
+    for (let r = 6; r < bodyH - 6; r += 5) {
+      for (let c = 4; c < bodyW - 4; c += 5) {
+        ctx.fillRect(bodyLeft + c + ((r % 10) ? 0 : 2), bodyY + r, 1, 1);
+      }
+    }
+    // ribbed hem
+    ctx.fillStyle = outfitDk;
+    for (let i = 0; i < bodyW; i += 3) ctx.fillRect(bodyLeft + i, bodyY + bodyH - 3, 1, 2);
+  } else if (profile.outfit === 'Vest') {
+    // dress shirt center
+    ctx.fillStyle = '#ede0b8';
+    ctx.fillRect(bodyCx - 12, bodyY, 24, bodyH);
+    // vest sides over shirt
+    ctx.fillStyle = outfit;
+    ctx.fillRect(bodyLeft, bodyY, (bodyCx - 12) - bodyLeft, bodyH);
+    ctx.fillRect(bodyCx + 12, bodyY, bodyRight - (bodyCx + 12), bodyH);
+    // vest V trim
+    ctx.fillStyle = outfitDk;
+    ctx.fillRect(bodyCx - 14, bodyY, 2, bodyH);
+    ctx.fillRect(bodyCx + 12, bodyY, 2, bodyH);
+    // tie underneath
+    ctx.fillStyle = '#1d5fa8';
+    ctx.fillRect(bodyCx - 3, bodyY + 4, 6, 5);
+    ctx.fillRect(bodyCx - 4, bodyY + 9, 8, bodyH - 14);
+    ctx.fillStyle = '#15406b';
+    ctx.fillRect(bodyCx - 4, bodyY + 9, 1, bodyH - 14);
+    // vest buttons
+    ctx.fillStyle = '#c08a18';
+    ctx.fillRect(bodyLeft + 14, bodyY + 14, 2, 2);
+    ctx.fillRect(bodyLeft + 14, bodyY + 24, 2, 2);
+    ctx.fillRect(bodyLeft + 14, bodyY + 34, 2, 2);
   } else {
-    ctx.fillRect(62 - wide + sway, bodyY + 10, 56 + wide * 2, 8);
+    ctx.fillStyle = 'rgba(237,224,184,0.62)';
+    ctx.fillRect(bodyLeft + 8, bodyY + 10, bodyW - 16, 8);
   }
 
   drawCoachArms(ctx, { pose, sway, bodyY, wide, outfit, skin });
@@ -9531,22 +10078,7 @@ function _drawCoachPixels(ctx, profile, opts) {
   ctx.fillRect(58 + headX, headY + 48, 64, 10);
 
   // hair
-  ctx.fillStyle = hair;
-  if (profile.hair === 'Short') {
-    ctx.fillRect(58 + headX, headY - 10, 64, 14);
-    ctx.fillRect(50 + headX, headY + 6, 10, 24);
-  } else if (profile.hair === 'Fade') {
-    ctx.fillRect(62 + headX, headY - 12, 56, 10);
-    ctx.fillRect(54 + headX, headY, 8, 18);
-  } else if (profile.hair === 'Flat Top') {
-    ctx.fillRect(60 + headX, hairTopY - 10, 60, 22);
-    ctx.fillRect(56 + headX, hairTopY + 6, 68, 8);
-  } else if (profile.hair === 'Waves') {
-    ctx.fillRect(56 + headX, headY - 12, 68, 12);
-    ctx.fillRect(62 + headX, headY - 18, 12, 8);
-    ctx.fillRect(84 + headX, headY - 19, 12, 8);
-    ctx.fillRect(106 + headX, headY - 17, 12, 8);
-  }
+  drawCoachHair(ctx, profile, hair, headX, headY, hairTopY);
 
   // eyes / brows
   if (mouth === 'yell' || pose === 'yelling') {
@@ -9573,15 +10105,48 @@ function _drawCoachPixels(ctx, profile, opts) {
   }
 
   // facial hair
-  ctx.fillStyle = '#2b160e';
-  if (profile.facialHair === 'Mustache') {
-    ctx.fillRect(78 + headX, headY + 34, 24, 6);
+  const facialColor = shadeCoachColor(hair, -0.25);
+  ctx.fillStyle = facialColor;
+  if (profile.facialHair === 'Stubble') {
+    // dotted stubble across jaw
+    for (let r = 32; r <= 50; r += 3) {
+      for (let c = 60; c <= 118; c += 3) {
+        if (((r + c) >> 1) % 2 === 0) ctx.fillRect(c + headX, headY + r, 1, 1);
+      }
+    }
+  } else if (profile.facialHair === 'Mustache') {
+    ctx.fillRect(78 + headX, headY + 34, 24, 5);
+    ctx.fillRect(76 + headX, headY + 36, 4, 3);
+    ctx.fillRect(100 + headX, headY + 36, 4, 3);
   } else if (profile.facialHair === 'Goatee') {
-    ctx.fillRect(78 + headX, headY + 34, 24, 6);
-    ctx.fillRect(84 + headX, headY + 42, 12, 12);
+    ctx.fillRect(78 + headX, headY + 34, 24, 5);
+    ctx.fillRect(82 + headX, headY + 42, 16, 12);
+    ctx.fillRect(86 + headX, headY + 54, 8, 4);
+  } else if (profile.facialHair === 'Chin Strap') {
+    // thin line tracing the jaw
+    ctx.fillRect(60 + headX, headY + 36, 4, 16);
+    ctx.fillRect(116 + headX, headY + 36, 4, 16);
+    ctx.fillRect(64 + headX, headY + 50, 52, 4);
+    ctx.fillRect(80 + headX, headY + 34, 20, 3);
   } else if (profile.facialHair === 'Beard') {
-    ctx.fillRect(68 + headX, headY + 34, 44, 8);
-    ctx.fillRect(72 + headX, headY + 42, 36, 14);
+    ctx.fillRect(68 + headX, headY + 34, 44, 7);
+    ctx.fillRect(72 + headX, headY + 41, 36, 14);
+    ctx.fillRect(64 + headX, headY + 38, 6, 12);
+    ctx.fillRect(110 + headX, headY + 38, 6, 12);
+  } else if (profile.facialHair === 'Full Beard') {
+    // full coverage from sideburns down past chin
+    ctx.fillRect(60 + headX, headY + 30, 60, 6);
+    ctx.fillRect(60 + headX, headY + 36, 60, 22);
+    ctx.fillRect(64 + headX, headY + 58, 52, 6);
+    // mustache on top
+    ctx.fillRect(76 + headX, headY + 34, 28, 6);
+    // texture - lighter strands
+    ctx.fillStyle = shadeCoachColor(hair, -0.1);
+    for (let i = 0; i < 30; i++) {
+      const cx = 62 + headX + ((i * 7) % 56);
+      const cy = headY + 38 + ((i * 5) % 22);
+      ctx.fillRect(cx, cy, 1, 2);
+    }
   }
 
   // mouth
@@ -9769,14 +10334,104 @@ function drawPortalWorkCoach(t) {
   ctx.fillStyle = 'rgba(0,0,0,0.16)';
   ctx.fillRect(128, 66, 64, 8);
 
-  ctx.fillStyle = hair;
-  if (coachProfile.hair !== 'Bald') {
+  const hairDk = shadeCoachColor(hair, -0.4);
+  const hairLt = shadeCoachColor(hair, 0.22);
+  if (coachProfile.hair !== 'Bald' && coachProfile.hair !== 'Buzz') {
+    ctx.fillStyle = hair;
     ctx.fillRect(128, 16, 64, 13);
-    if (coachProfile.hair === 'Flat Top') ctx.fillRect(132, 8, 56, 12);
-    if (coachProfile.hair === 'Waves') {
-      ctx.fillRect(134, 8, 10, 7);
-      ctx.fillRect(154, 6, 10, 7);
-      ctx.fillRect(174, 8, 10, 7);
+  } else if (coachProfile.hair === 'Buzz') {
+    ctx.fillStyle = hair;
+    ctx.fillRect(128, 22, 64, 7);
+    ctx.fillStyle = hairDk;
+    for (let c = 0; c < 64; c += 3) ctx.fillRect(128 + c, 24, 1, 1);
+  }
+  ctx.fillStyle = hair;
+  if (coachProfile.hair === 'Flat Top') ctx.fillRect(132, 6, 56, 14);
+  if (coachProfile.hair === 'Waves') {
+    ctx.fillRect(134, 8, 10, 7);
+    ctx.fillRect(154, 6, 10, 7);
+    ctx.fillRect(174, 8, 10, 7);
+  }
+  if (coachProfile.hair === 'Slick Back') ctx.fillRect(132, 12, 56, 8);
+  if (coachProfile.hair === 'Afro') {
+    ctx.fillRect(118, 4, 84, 30);
+    ctx.fillStyle = hairDk;
+    for (let r = 0; r < 30; r += 4) {
+      for (let c = 0; c < 84; c += 5) {
+        ctx.fillRect(118 + c + ((r % 8 === 0) ? 0 : 2), 4 + r, 2, 2);
+      }
+    }
+    ctx.fillStyle = hair;
+  }
+  if (coachProfile.hair === 'Mohawk') {
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(128, 22, 64, 6);
+    ctx.fillStyle = hair;
+    ctx.fillRect(150, 0, 18, 30);
+  }
+  if (coachProfile.hair === 'Cornrows') {
+    ctx.fillStyle = hairDk;
+    for (let c = 0; c < 64; c += 6) ctx.fillRect(128 + c, 16, 1, 14);
+    ctx.fillStyle = hairLt;
+    for (let c = 4; c < 60; c += 8) ctx.fillRect(128 + c, 30, 3, 3);
+  }
+  if (coachProfile.hair === 'Twists') {
+    ctx.fillStyle = hairDk;
+    for (let c = 0; c < 64; c += 5) {
+      ctx.fillRect(128 + c + 2, 16, 1, 14);
+      ctx.fillRect(128 + c, 22, 5, 1);
+    }
+    // hanging twists at temples
+    ctx.fillStyle = hair;
+    ctx.fillRect(122, 30, 4, 22);
+    ctx.fillRect(196, 30, 4, 22);
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(125, 30, 1, 22);
+    ctx.fillRect(199, 30, 1, 22);
+  }
+  if (coachProfile.hair === 'Dreads Tied') {
+    ctx.fillStyle = hair;
+    ctx.fillRect(142, 0, 36, 18);
+    ctx.fillStyle = hairDk;
+    ctx.fillRect(142, 0, 36, 3);
+    ctx.fillRect(142, 8, 36, 1);
+    ctx.fillRect(142, 14, 36, 1);
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(146, 4, 8, 1);
+    ctx.fillRect(160, 6, 8, 1);
+    // small loose locks
+    ctx.fillStyle = hair;
+    ctx.fillRect(122, 30, 4, 24);
+    ctx.fillRect(196, 30, 4, 24);
+  }
+  if (coachProfile.hair === 'Dreads Short' || coachProfile.hair === 'Dreads Long') {
+    const long = coachProfile.hair === 'Dreads Long';
+    const len = long ? 70 : 36;
+    ctx.fillStyle = hair;
+    // side locks hanging down past head
+    const sides = [
+      { x: 118, y: 28, len: len + 6 },
+      { x: 124, y: 30, len: len + 2 },
+      { x: 196, y: 30, len: len + 2 },
+      { x: 202, y: 28, len: len + 6 }
+    ];
+    sides.forEach(s => {
+      ctx.fillStyle = hair;
+      ctx.fillRect(s.x, s.y, 4, s.len);
+      ctx.fillStyle = hairDk;
+      ctx.fillRect(s.x + 3, s.y, 1, s.len);
+      for (let i = 5; i < s.len - 3; i += 7) ctx.fillRect(s.x, s.y + i, 4, 2);
+      ctx.fillStyle = hairLt;
+      ctx.fillRect(s.x, s.y + 1, 1, Math.max(0, s.len - 4));
+    });
+    // front fringe locks
+    ctx.fillStyle = hair;
+    for (let i = 0; i < 7; i++) {
+      const fx = 128 + i * 9;
+      ctx.fillRect(fx, 16, 4, 10 + (i % 2) * 4);
+      ctx.fillStyle = hairDk;
+      ctx.fillRect(fx + 3, 16, 1, 12);
+      ctx.fillStyle = hair;
     }
   }
 
@@ -10035,6 +10690,7 @@ function renderPressRoom() {
   const stage = document.getElementById('press-stage');
   const current = PRESS_QUESTIONS[pressQuestionIndex];
   const keys = ['A','B','C','D'];
+  const reporterLocked = pressAwaitingNext || pressQuestionIndex >= PRESS_QUESTIONS.length;
 
   stage.innerHTML = `
     <div class="press-room">
@@ -10042,7 +10698,7 @@ function renderPressRoom() {
         ${REPORTERS.map((r, i) => {
           const answered = pressAnswers.some(a => a.reporterIndex === i);
           const active = activeReporterIndex === i;
-          return `<button class="reporter-seat${answered ? ' answered' : active ? ' active' : ''}" type="button" data-reporter="${i}">
+          return `<button class="reporter-seat${answered ? ' answered' : active ? ' active' : ''}" type="button" data-reporter="${i}"${answered || reporterLocked ? ' disabled' : ''}>
             ${answered ? '<span class="reporter-answered-badge">✓ DONE</span>' : ''}
             <canvas id="rseat-canvas-${i}" width="80" height="90"></canvas>
             <div class="reporter-name-tag"><strong>${r.name}</strong>${r.outlet}</div>
@@ -10061,7 +10717,7 @@ function renderPressRoom() {
           ${current ? getPressQuestionMarkup(current) : getPressCompleteMarkup()}
         </div>
         <div class="answer-grid" id="answer-grid">
-          ${current && activeReporterIndex !== null
+          ${current && activeReporterIndex !== null && !pressAwaitingNext
             ? current.answers.map((ans, ai) => `<button class="answer-btn" type="button" data-answer="${escapeAttr(ans)}"><span class="choice-key">${keys[ai]}</span>${ans}</button>`).join('')
             : ''}
         </div>
@@ -10089,7 +10745,7 @@ function renderPressRoom() {
   stage.querySelectorAll('.reporter-seat').forEach(btn => {
     btn.addEventListener('click', () => {
       const idx = Number(btn.dataset.reporter);
-      if (pressAnswers.some(a => a.reporterIndex === idx) || pressQuestionIndex >= PRESS_QUESTIONS.length) return;
+      if (pressAwaitingNext || pressAnswers.some(a => a.reporterIndex === idx) || pressQuestionIndex >= PRESS_QUESTIONS.length) return;
       activeReporterIndex = idx;
       renderPressRoom();
     });
@@ -10111,6 +10767,7 @@ function getPressCompleteMarkup() {
 }
 
 function answerPressQuestion(answer) {
+  if (pressAwaitingNext || activeReporterIndex === null || pressQuestionIndex >= PRESS_QUESTIONS.length) return;
   const current = PRESS_QUESTIONS[pressQuestionIndex];
   const response = formulatePressResponse(current, answer);
   pressAnswers.push({
@@ -10122,12 +10779,14 @@ function answerPressQuestion(answer) {
     reporter:REPORTERS[activeReporterIndex].name
   });
   saveGameJSON('pressAnswers', pressAnswers);
+  pressAwaitingNext = true;
   renderPressAnswer(response);
 }
 
 function renderPressAnswer(response) {
   const questionArea = document.getElementById('press-question-area');
   const answerGrid = document.getElementById('answer-grid');
+  document.querySelectorAll('#reporter-row .reporter-seat').forEach(btn => { btn.disabled = true; });
   questionArea.innerHTML = `<div>${PRESS_QUESTIONS[pressQuestionIndex].question}</div><div class="press-response">${response}</div>`;
   answerGrid.innerHTML = '';
   const isLast = pressQuestionIndex >= PRESS_QUESTIONS.length - 1;
@@ -10136,6 +10795,7 @@ function renderPressAnswer(response) {
   nextBtn.type = 'button';
   nextBtn.textContent = isLast ? '► END PRESSER' : '► NEXT REPORTER';
   nextBtn.addEventListener('click', () => {
+    pressAwaitingNext = false;
     pressQuestionIndex += 1;
     activeReporterIndex = null;
     if (pressQuestionIndex >= PRESS_QUESTIONS.length) {
@@ -10610,13 +11270,6 @@ window.addEventListener('keydown', e => {
     if (e.code === 'Enter' && coachStep === 'info') {
       e.preventDefault();
       saveCoachInfoAndContinue();
-    } else if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      if (coachStep === 'info') goToTeam(selectedConf);
-      else {
-        coachStep = 'info';
-        renderCoachBuilder();
-      }
     }
   } else if (currentScreen === 'cutscene') {
     if (e.code === 'Enter' || e.code === 'Space') {
@@ -10628,61 +11281,12 @@ window.addEventListener('keydown', e => {
     }
   } else if (currentScreen === 'press') {
     if (e.code === 'Enter' || e.code === 'Space') {
-      const firstAction = document.querySelector('#press-stage button:not(.answered)');
+      const firstAction = document.querySelector('#press-stage .answer-btn:not(:disabled)')
+        || document.querySelector('#press-stage button:not(.answered):not(:disabled)');
       if (firstAction) {
         e.preventDefault();
         firstAction.click();
       }
-    }
-  } else if (currentScreen === 'dashboard') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToCoachBuilder('customize');
-    }
-  } else if (currentScreen === 'standings') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToDashboard();
-    }
-  } else if (currentScreen === 'roster') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToDashboard();
-    }
-  } else if (currentScreen === 'recruiting') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToDashboard();
-    }
-  } else if (currentScreen === 'conference-tournament') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToDashboard();
-    }
-  } else if (currentScreen === 'tournament') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToDashboard();
-    }
-  } else if (currentScreen === 'stats') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToDashboard();
-    }
-  } else if (currentScreen === 'gameplan') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToRoster();
-    }
-  } else if (currentScreen === 'game') {
-    if ((e.code === 'Escape' || e.code === 'Backspace') && activeGame && activeGame.complete) {
-      e.preventDefault();
-      goToDashboard();
-    }
-  } else if (currentScreen === 'box') {
-    if (e.code === 'Escape' || e.code === 'Backspace') {
-      e.preventDefault();
-      goToDashboard();
     }
   }
 });
@@ -10696,8 +11300,6 @@ function handleGridNav(e, cols, len, getCursor, setCursor, onSelect, onBack) {
     case 'ArrowUp':    e.preventDefault(); next = Math.max(0, cur - cols); break;
     case 'ArrowDown':  e.preventDefault(); next = Math.min(len - 1, cur + cols); break;
     case 'Enter':      e.preventDefault(); onSelect(); return;
-    case 'Escape':
-    case 'Backspace':  e.preventDefault(); onBack(); return;
     default: return;
   }
   if (next !== cur) setCursor(next);
