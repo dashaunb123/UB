@@ -317,7 +317,6 @@ function simGameToEnd() {
       scheduleGame:activeGame.scheduleGame
     });
   }
-  if (typeof Sfx !== 'undefined' && activeGame && activeGame.complete) Sfx.simDone();
   renderGameScreen();
 }
 

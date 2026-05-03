@@ -292,19 +292,43 @@
     body[data-theme] :is(.back-btn,.settings-label,.departures-subtitle,.recruiting-subtitle,.conf-tourney-subtitle,.sched-game-date,.sched-game-opp,.ng-date-row,.ng-meta-row,.recruit-home,.prestige-sum-line,.portal-roster-empty,.recruit-empty,.game-feed-line) {
       color:rgba(var(--theme-text-rgb),0.58);
     }
-    body[data-theme] :is(.back-btn:hover,.theme-card:hover,.settings-toggle:hover,.recruit-bookmarks-toggle.active) {
+    body[data-theme] :is(.back-btn:hover,.theme-card:hover,.settings-toggle:hover,.recruit-bookmarks-toggle:hover,.recruit-bookmarks-toggle.active) {
       color:var(--theme-text);
       border-color:var(--theme-text);
     }
-    body[data-theme] :is(.settings-toggle,.settings-close,.dash-btn,.option-btn,.answer-btn,.roster-action-btn,.departures-continue-btn,.tournament-action-btn,.tournament-continue-btn,.ng-play-btn,.ng-sim-btn,.ng-tournament-btn,.game-btn,.stepper-btn,.recruit-offer-btn,.recruit-scout-btn,.recruit-detail-close-btn) {
+    body[data-theme] :is(.settings-toggle,.settings-close,.cutscene-btn,.dash-btn,.option-btn,.answer-btn,.roster-action-btn,.gameplan-save,.departures-continue-btn,.tournament-action-btn,.tournament-continue-btn,.ng-play-btn,.ng-sim-btn,.ng-super-start,.ng-tournament-btn,.game-btn,.stepper-btn,.recruit-bookmarks-toggle,.recruit-offer-btn,.recruit-scout-btn,.recruit-detail-action-btn,.recruit-detail-close-btn) {
       background:rgba(var(--theme-primary-rgb),0.42);
       border-color:rgba(var(--theme-text-rgb),0.48);
       color:var(--theme-text);
     }
-    body[data-theme] :is(.settings-close:hover,.dash-btn:hover,.dash-btn:focus-visible,.option-btn.active,.answer-btn:hover,.roster-action-btn:hover,.departures-continue-btn:hover,.tournament-action-btn:hover,.tournament-continue-btn:hover,.ng-play-btn:hover,.ng-sim-btn:hover,.ng-tournament-btn:hover,.game-btn:hover,.recruit-offer-btn:hover,.recruit-scout-btn:hover) {
+    body[data-theme] #start-btn {
+      color:var(--theme-text);
+    }
+    body[data-theme] #start-btn:hover,
+    body[data-theme] .answer-btn .choice-key {
+      color:var(--theme-accent);
+    }
+    body[data-theme] :is(.settings-close:hover,.cutscene-btn:hover,.cutscene-btn:focus-visible,.dash-btn:hover,.dash-btn:focus-visible,.option-btn.active,.answer-btn:hover,.roster-action-btn:hover,.gameplan-save:hover,.gameplan-save:focus-visible,.departures-continue-btn:hover,.tournament-action-btn:hover,.tournament-continue-btn:hover,.ng-play-btn:hover,.ng-sim-btn:hover,.ng-super-start:hover,.ng-super-start:focus-visible,.ng-tournament-btn:hover,.game-btn:hover,.recruit-offer-btn:hover,.recruit-scout-btn:hover,.recruit-detail-action-btn:hover,.recruit-detail-close-btn:hover) {
       background:var(--theme-primary);
       border-color:var(--theme-text);
       color:var(--theme-text);
+    }
+    body[data-theme] :is(.answer-btn:hover,.answer-btn:focus-visible) .choice-key {
+      color:var(--theme-text);
+    }
+    body[data-theme] :is(.bm-path,.recruit-detail-bookmark-btn .bm-path,.recruit-bookmarks-toggle .bm-path) {
+      stroke:rgba(var(--theme-text-rgb),0.28);
+    }
+    body[data-theme] :is(.recruit-bookmark-btn:hover,.recruit-detail-bookmark-btn:hover) .bm-path {
+      stroke:rgba(var(--theme-accent-rgb),0.78);
+    }
+    body[data-theme] :is(.recruit-bookmark-btn.bookmarked,.recruit-detail-bookmark-btn.bookmarked,.recruit-bookmarks-toggle.active) .bm-path {
+      fill:var(--theme-accent);
+      stroke:var(--theme-accent);
+    }
+    body[data-theme] :is(.recruit-bookmark-btn.bookmarked:hover,.recruit-detail-bookmark-btn.bookmarked:hover) .bm-path {
+      fill:var(--theme-primary);
+      stroke:var(--theme-primary);
     }
     body[data-theme] :is(.theme-card.active,.prestige-update-card.user,.standing-row.user-team,.conf-tourney-card.complete,.player-row.header,.recruit-row.header,.class-rankings-row.you,.crt-row.crt-you,.portal-roster-pos-header.needs) {
       background:rgba(var(--theme-accent-rgb),0.12);
@@ -5205,7 +5229,7 @@ function getConferenceTournamentTeams(conf) {
     confLosses:0,
     wins:0,
     losses:0,
-    power:getTeamIndexScore(getTeamRoster(conf, team) || [])
+    power:getTeamIndexScore(getTeamRoster(conf, team) || [], conf, team)
   }));
 }
 
@@ -5420,7 +5444,6 @@ function simulateUserConferenceTournamentRound() {
     if (typeof Sfx !== 'undefined') Sfx.simTick();
   });
   if (tournament.complete) conferenceTournamentState.reviewPhase = 'user-bracket';
-  if (typeof Sfx !== 'undefined') Sfx.simDone();
   saveConferenceTournamentState();
   renderConferenceTournamentPage();
 }
@@ -5431,7 +5454,6 @@ function simulateUserConferenceTournament() {
   if (!tournament || tournament.complete) return;
   simulateSingleConferenceTournament(tournament);
   conferenceTournamentState.reviewPhase = 'user-bracket';
-  if (typeof Sfx !== 'undefined') Sfx.simDone();
   saveConferenceTournamentState();
   renderConferenceTournamentPage();
 }
@@ -5832,7 +5854,6 @@ function simulateTournamentGameQueue(games, done) {
   const next = () => {
     const item = games.shift();
     if (!item) {
-      if (typeof Sfx !== 'undefined') Sfx.simDone();
       done();
       return;
     }
@@ -9548,9 +9569,15 @@ function formatStatAverage(value) {
   return Number(value || 0).toFixed(1);
 }
 
-function getTeamIndexScore(roster) {
+function getTeamIndexScore(roster, conf, team) {
   if (!roster || !roster.length) return 0;
-  return sum(roster.map(p => Math.pow((Number(p.overall) || 0) * 2, 2))) / roster.length;
+  const teamOverall = sum(roster.map(p => Number(p.overall) || 0)) / roster.length;
+  const data = (conf && team) ? (((TEAM_DATA || {})[conf] || {})[team] || null) : null;
+  const prestige = data && data.p != null
+    ? Math.max(0, Math.min(100, Number(data.p) || 0))
+    : teamOverall;
+  const blended = (teamOverall + prestige) / 2;
+  return Math.pow(blended * 2, 2);
 }
 
 function getStandingsStateKey() {
@@ -9573,7 +9600,7 @@ function buildInitialStandingsState() {
         losses:0,
         confWins:0,
         confLosses:0,
-        power:getTeamIndexScore(roster)
+        power:getTeamIndexScore(roster, conf, team)
       };
     });
   });
@@ -9603,7 +9630,7 @@ function ensureStandingsState() {
           losses:0,
           confWins:0,
           confLosses:0,
-          power:getTeamIndexScore(roster)
+          power:getTeamIndexScore(roster, conf, team)
         };
       }
       const entryState = standingsState.teams[key];
