@@ -71,6 +71,15 @@ function playGameSoundtrack() {
   const audio = document.getElementById('game-soundtrack');
   if (!audio) return;
   prepareGameSoundtrack(audio);
+  audio.dataset.userStarted = '1';
+  if (typeof Music !== 'undefined') {
+    if (Music.isMuted()) return;
+    if (typeof Music.start === 'function') {
+      Music.start();
+      return;
+    }
+    audio.volume = Music.getVolume();
+  }
   if (!audio.paused && !audio.ended) return;
   const playPromise = audio.play();
   if (playPromise && typeof playPromise.catch === 'function') {
@@ -308,6 +317,7 @@ function simGameToEnd() {
       scheduleGame:activeGame.scheduleGame
     });
   }
+  if (typeof Sfx !== 'undefined' && activeGame && activeGame.complete) Sfx.simDone();
   renderGameScreen();
 }
 

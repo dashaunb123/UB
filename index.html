@@ -13,6 +13,76 @@
       background:#161209;
       font-family:'Press Start 2P', monospace;
     }
+    :root {
+      --theme-bg:#161209;
+      --theme-panel:#1c160c;
+      --theme-panel-rgb:28,22,12;
+      --theme-primary:#a82418;
+      --theme-primary-rgb:168,36,24;
+      --theme-accent:#c08a18;
+      --theme-accent-rgb:192,138,24;
+      --theme-text:#ede0b8;
+      --theme-text-rgb:237,224,184;
+      --theme-dark:#3a2400;
+      --theme-dark-rgb:58,36,0;
+      --theme-deep:#350a04;
+    }
+    body[data-theme="midnight"] {
+      --theme-bg:#070d1a;
+      --theme-panel:#0c1530;
+      --theme-panel-rgb:12,21,48;
+      --theme-primary:#1f5fa8;
+      --theme-primary-rgb:31,95,168;
+      --theme-accent:#7cc8ff;
+      --theme-accent-rgb:124,200,255;
+      --theme-text:#dff0ff;
+      --theme-text-rgb:223,240,255;
+      --theme-dark:#061226;
+      --theme-dark-rgb:6,18,38;
+      --theme-deep:#050a18;
+    }
+    body[data-theme="court"] {
+      --theme-bg:#0e1f14;
+      --theme-panel:#16281b;
+      --theme-panel-rgb:22,40,27;
+      --theme-primary:#1f4d2b;
+      --theme-primary-rgb:31,77,43;
+      --theme-accent:#e8c870;
+      --theme-accent-rgb:232,200,112;
+      --theme-text:#ede0b8;
+      --theme-text-rgb:237,224,184;
+      --theme-dark:#1a1208;
+      --theme-dark-rgb:26,18,8;
+      --theme-deep:#0a1a10;
+    }
+    body[data-theme="hardwood"] {
+      --theme-bg:#2a1808;
+      --theme-panel:#3a200c;
+      --theme-panel-rgb:58,32,12;
+      --theme-primary:#a8651c;
+      --theme-primary-rgb:168,101,28;
+      --theme-accent:#ffd070;
+      --theme-accent-rgb:255,208,112;
+      --theme-text:#fff7e0;
+      --theme-text-rgb:255,247,224;
+      --theme-dark:#2a1408;
+      --theme-dark-rgb:42,20,8;
+      --theme-deep:#1a0c02;
+    }
+    body[data-theme="neon"] {
+      --theme-bg:#08020e;
+      --theme-panel:#160222;
+      --theme-panel-rgb:22,2,34;
+      --theme-primary:#a01880;
+      --theme-primary-rgb:160,24,128;
+      --theme-accent:#80f8ff;
+      --theme-accent-rgb:128,248,255;
+      --theme-text:#fff0ff;
+      --theme-text-rgb:255,240,255;
+      --theme-dark:#22002f;
+      --theme-dark-rgb:34,0,47;
+      --theme-deep:#08020e;
+    }
 
     #screen {
       position:relative;
@@ -32,6 +102,238 @@
     #version {
       position:absolute; bottom:8px; right:14px;
       font-size:6px; color:rgba(237,224,184,.18); z-index:55;
+    }
+    /* settings gear */
+    #settings-gear {
+      position:absolute; top:10px; right:14px; z-index:65;
+      width:28px; height:28px; padding:0;
+      background:rgba(20,16,11,0.65);
+      border:2px solid rgba(237,224,184,0.35);
+      color:rgba(237,224,184,0.82); cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-family:inherit; image-rendering:pixelated;
+    }
+    #settings-gear:hover { color:#ede0b8; border-color:#ede0b8; background:rgba(168,36,24,0.45); }
+    #settings-gear svg { width:16px; height:16px; display:block; }
+
+    /* settings modal */
+    #settings-overlay {
+      position:fixed; inset:0; z-index:200;
+      background:rgba(8,5,2,0.78);
+      display:none; align-items:center; justify-content:center;
+      font-family:'Press Start 2P', monospace;
+    }
+    #settings-overlay.show { display:flex; }
+    .settings-shell {
+      background:#1c160c;
+      border:3px solid #c08a18;
+      padding:22px 26px;
+      width:min(440px, 94vw);
+      max-height:90vh; overflow-y:auto;
+      color:#ede0b8;
+      box-shadow:6px 6px 0 rgba(0,0,0,0.7);
+    }
+    .settings-title {
+      font-size:clamp(10px,1.2vw,14px); color:#c08a18;
+      letter-spacing:3px; text-align:center; margin-bottom:14px;
+      text-shadow:1px 1px 0 #3a2400;
+    }
+    .settings-section {
+      margin-bottom:18px; padding-bottom:14px;
+      border-bottom:1px dashed rgba(237,224,184,0.18);
+    }
+    .settings-section:last-child { border-bottom:none; margin-bottom:0; }
+    .settings-label {
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:clamp(7px,0.9vw,9px); letter-spacing:2px;
+      color:rgba(237,224,184,0.78); margin-bottom:8px;
+    }
+    .settings-row { display:flex; align-items:center; gap:10px; margin-top:6px; }
+    .settings-row input[type="range"] {
+      flex:1; height:14px; appearance:none; background:transparent; cursor:pointer;
+    }
+    .settings-row input[type="range"]::-webkit-slider-runnable-track {
+      height:6px; background:#3a2400; border:1px solid rgba(237,224,184,0.32);
+    }
+    .settings-row input[type="range"]::-webkit-slider-thumb {
+      appearance:none; width:14px; height:14px; background:#c08a18;
+      border:2px solid #ede0b8; margin-top:-5px; cursor:pointer;
+    }
+    .settings-row input[type="range"]::-moz-range-track {
+      height:6px; background:#3a2400; border:1px solid rgba(237,224,184,0.32);
+    }
+    .settings-row input[type="range"]::-moz-range-thumb {
+      width:12px; height:12px; background:#c08a18;
+      border:2px solid #ede0b8; cursor:pointer;
+    }
+    .settings-toggle {
+      font-family:inherit; font-size:7px; letter-spacing:1.5px;
+      padding:5px 10px; min-width:54px;
+      background:rgba(168,36,24,0.25); color:#ede0b8;
+      border:2px solid rgba(237,224,184,0.4); cursor:pointer;
+    }
+    .settings-toggle.off { background:rgba(40,30,20,0.4); color:rgba(237,224,184,0.5); }
+    .settings-toggle:hover { border-color:#ede0b8; }
+    .settings-value { min-width:38px; text-align:right; font-size:8px; color:#c08a18; }
+    .theme-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:6px; }
+    .theme-card {
+      font-family:inherit; padding:10px 8px; cursor:pointer;
+      border:2px solid rgba(237,224,184,0.3);
+      background:rgba(20,16,11,0.55);
+      color:#ede0b8; font-size:8px; letter-spacing:1px;
+      text-align:left;
+    }
+    .theme-card:hover { border-color:#ede0b8; }
+    .theme-card.active { border-color:#c08a18; background:rgba(192,138,24,0.18); }
+    .theme-swatches { display:flex; gap:3px; margin-top:6px; }
+    .theme-swatch { width:14px; height:14px; border:1px solid rgba(0,0,0,0.5); }
+    .settings-close {
+      display:block; margin:14px auto 0; padding:8px 22px;
+      font-family:inherit; font-size:9px; letter-spacing:2px;
+      color:#ede0b8; background:#a82418;
+      border:2px solid #ede0b8; cursor:pointer;
+    }
+    .settings-close:hover { background:#c0301c; }
+
+    /* ── THEME OVERRIDES ── */
+    /* Midnight: dark navy + ice blue accents */
+    body[data-theme="midnight"] { background:#070d1a; }
+    body[data-theme="midnight"] .dash-btn { background:rgba(20,40,80,0.45); border-color:rgba(120,200,255,0.35); color:rgba(220,240,255,0.92); text-shadow:1px 1px 0 #050a18; box-shadow:inset 0 -5px 0 rgba(8,16,40,0.5); }
+    body[data-theme="midnight"] .dash-btn:hover, body[data-theme="midnight"] .dash-btn:focus-visible { background:#1f5fa8; border-color:#bfe2ff; color:#ffffff; }
+    body[data-theme="midnight"] .dash-btn::after { color:#7cc8ff; }
+    body[data-theme="midnight"] .back-btn { color:rgba(180,220,255,0.55); }
+    body[data-theme="midnight"] .back-btn:hover { color:#dff0ff; }
+    body[data-theme="midnight"] .conf-badge,
+    body[data-theme="midnight"] .sel-eyebrow,
+    body[data-theme="midnight"] .coach-eyebrow,
+    body[data-theme="midnight"] .settings-title { color:#7cc8ff; text-shadow:1px 1px 0 #061226; }
+    body[data-theme="midnight"] .settings-shell { background:#0c1530; border-color:#7cc8ff; color:#dff0ff; }
+    body[data-theme="midnight"] .settings-toggle { background:rgba(31,95,168,0.35); }
+    body[data-theme="midnight"] .settings-row input[type="range"]::-webkit-slider-thumb { background:#7cc8ff; border-color:#dff0ff; }
+    body[data-theme="midnight"] .settings-close { background:#1f5fa8; border-color:#bfe2ff; }
+    body[data-theme="midnight"] #settings-gear { border-color:rgba(120,200,255,0.5); color:#dff0ff; }
+
+    /* Court: chalkboard green + cream chalk */
+    body[data-theme="court"] { background:#0e1f14; }
+    body[data-theme="court"] .dash-btn { background:rgba(31,77,43,0.45); border-color:rgba(237,224,184,0.32); color:rgba(237,224,184,0.92); text-shadow:1px 1px 0 #0a1a10; box-shadow:inset 0 -5px 0 rgba(8,20,12,0.55); }
+    body[data-theme="court"] .dash-btn:hover, body[data-theme="court"] .dash-btn:focus-visible { background:#1f4d2b; border-color:#ede0b8; color:#ffffff; }
+    body[data-theme="court"] .dash-btn::after { color:#e8c870; }
+    body[data-theme="court"] .conf-badge,
+    body[data-theme="court"] .sel-eyebrow,
+    body[data-theme="court"] .coach-eyebrow,
+    body[data-theme="court"] .settings-title { color:#e8c870; text-shadow:1px 1px 0 #1a1208; }
+    body[data-theme="court"] .settings-shell { background:#16281b; border-color:#e8c870; }
+    body[data-theme="court"] .settings-close { background:#1f4d2b; border-color:#e8c870; }
+    body[data-theme="court"] #settings-gear { border-color:rgba(232,200,112,0.5); }
+
+    /* Hardwood: warm walnut + amber */
+    body[data-theme="hardwood"] { background:#2a1808; }
+    body[data-theme="hardwood"] .dash-btn { background:rgba(120,60,18,0.45); border-color:rgba(232,180,90,0.45); color:rgba(255,232,180,0.95); text-shadow:1px 1px 0 #1a0c02; box-shadow:inset 0 -5px 0 rgba(40,18,4,0.6); }
+    body[data-theme="hardwood"] .dash-btn:hover, body[data-theme="hardwood"] .dash-btn:focus-visible { background:#a8651c; border-color:#ffe4a0; color:#fff7e0; }
+    body[data-theme="hardwood"] .dash-btn::after { color:#ffd070; }
+    body[data-theme="hardwood"] .conf-badge,
+    body[data-theme="hardwood"] .sel-eyebrow,
+    body[data-theme="hardwood"] .coach-eyebrow,
+    body[data-theme="hardwood"] .settings-title { color:#ffd070; text-shadow:1px 1px 0 #2a1408; }
+    body[data-theme="hardwood"] .settings-shell { background:#3a200c; border-color:#ffd070; }
+    body[data-theme="hardwood"] .settings-close { background:#a8651c; border-color:#ffd070; }
+    body[data-theme="hardwood"] #settings-gear { border-color:rgba(255,208,112,0.5); }
+
+    /* Neon Retro: black + magenta/cyan */
+    body[data-theme="neon"] { background:#08020e; }
+    body[data-theme="neon"] .dash-btn { background:rgba(40,8,60,0.55); border-color:rgba(255,80,200,0.55); color:#fff0ff; text-shadow:0 0 4px #ff40c0; box-shadow:inset 0 -5px 0 rgba(80,0,80,0.6); }
+    body[data-theme="neon"] .dash-btn:hover, body[data-theme="neon"] .dash-btn:focus-visible { background:#5a0a8a; border-color:#80f8ff; color:#80f8ff; }
+    body[data-theme="neon"] .dash-btn::after { color:#80f8ff; }
+    body[data-theme="neon"] .conf-badge,
+    body[data-theme="neon"] .sel-eyebrow,
+    body[data-theme="neon"] .coach-eyebrow,
+    body[data-theme="neon"] .settings-title { color:#80f8ff; text-shadow:0 0 4px #00d0ff; }
+    body[data-theme="neon"] .settings-shell { background:#160222; border-color:#ff40c0; color:#fff0ff; }
+    body[data-theme="neon"] .settings-toggle { background:rgba(120,20,160,0.35); border-color:#ff40c0; }
+    body[data-theme="neon"] .settings-row input[type="range"]::-webkit-slider-thumb { background:#80f8ff; border-color:#ff40c0; }
+    body[data-theme="neon"] .settings-close { background:#a01880; border-color:#80f8ff; }
+    body[data-theme="neon"] #settings-gear { border-color:#ff40c0; color:#80f8ff; }
+    body[data-theme="neon"] .back-btn:hover { color:#80f8ff; }
+
+    body[data-theme] {
+      background:var(--theme-bg);
+      color:var(--theme-text);
+    }
+    body[data-theme] #version { color:rgba(var(--theme-text-rgb),0.2); }
+    body[data-theme] #settings-overlay { background:rgba(var(--theme-dark-rgb),0.78); }
+    body[data-theme] #settings-gear,
+    body[data-theme] .settings-shell,
+    body[data-theme] .theme-card,
+    body[data-theme] .coach-preview-panel,
+    body[data-theme] .next-game-panel,
+    body[data-theme] .gameplan-panel,
+    body[data-theme] .ng-super-panel,
+    body[data-theme] .portal-roster-panel,
+    body[data-theme] .portal-work-card,
+    body[data-theme] .prestige-update-card,
+    body[data-theme] .recruit-detail-card,
+    body[data-theme] .recruit-offer-panel,
+    body[data-theme] .personality-card,
+    body[data-theme] .conf-tourney-card,
+    body[data-theme] .game-feed,
+    body[data-theme] .box-shell {
+      background:rgba(var(--theme-panel-rgb),0.72);
+      border-color:rgba(var(--theme-text-rgb),0.24);
+      color:var(--theme-text);
+    }
+    body[data-theme] :is(.t-eyebrow,.t-sub,.conf-badge,.sel-eyebrow,.coach-eyebrow,.dash-eyebrow,.standings-eyebrow,.sched-eyebrow,.press-eyebrow,.settings-title,.settings-value,.coach-control-title,.coach-preview-title,.next-game-title,.gameplan-panel-title,.portal-roster-title,.portal-work-label,.recruit-motivations-label,.departures-section-label,.conf-tourney-status-label,.conf-tourney-card-title,.ng-complete-label,.ng-super-label,.sched-ha.home,.sched-summary-item span) {
+      color:var(--theme-accent);
+      text-shadow:1px 1px 0 var(--theme-dark);
+    }
+    body[data-theme] :is(.t-main,.sel-title,.coach-title,.dash-title,.standings-title,.sched-title,.press-title,.roster-title,.gameplan-title,.departures-title,.conf-tourney-title,.box-title,.ng-complete-title,.game-feed-line strong) {
+      color:var(--theme-text);
+      text-shadow:3px 3px 0 var(--theme-primary), 5px 5px 0 var(--theme-deep);
+    }
+    body[data-theme] :is(.back-btn,.settings-label,.departures-subtitle,.recruiting-subtitle,.conf-tourney-subtitle,.sched-game-date,.sched-game-opp,.ng-date-row,.ng-meta-row,.recruit-home,.prestige-sum-line,.portal-roster-empty,.recruit-empty,.game-feed-line) {
+      color:rgba(var(--theme-text-rgb),0.58);
+    }
+    body[data-theme] :is(.back-btn:hover,.theme-card:hover,.settings-toggle:hover,.recruit-bookmarks-toggle.active) {
+      color:var(--theme-text);
+      border-color:var(--theme-text);
+    }
+    body[data-theme] :is(.settings-toggle,.settings-close,.dash-btn,.option-btn,.answer-btn,.roster-action-btn,.departures-continue-btn,.tournament-action-btn,.tournament-continue-btn,.ng-play-btn,.ng-sim-btn,.ng-tournament-btn,.game-btn,.stepper-btn,.recruit-offer-btn,.recruit-scout-btn,.recruit-detail-close-btn) {
+      background:rgba(var(--theme-primary-rgb),0.42);
+      border-color:rgba(var(--theme-text-rgb),0.48);
+      color:var(--theme-text);
+    }
+    body[data-theme] :is(.settings-close:hover,.dash-btn:hover,.dash-btn:focus-visible,.option-btn.active,.answer-btn:hover,.roster-action-btn:hover,.departures-continue-btn:hover,.tournament-action-btn:hover,.tournament-continue-btn:hover,.ng-play-btn:hover,.ng-sim-btn:hover,.ng-tournament-btn:hover,.game-btn:hover,.recruit-offer-btn:hover,.recruit-scout-btn:hover) {
+      background:var(--theme-primary);
+      border-color:var(--theme-text);
+      color:var(--theme-text);
+    }
+    body[data-theme] :is(.theme-card.active,.prestige-update-card.user,.standing-row.user-team,.conf-tourney-card.complete,.player-row.header,.recruit-row.header,.class-rankings-row.you,.crt-row.crt-you,.portal-roster-pos-header.needs) {
+      background:rgba(var(--theme-accent-rgb),0.12);
+      border-color:rgba(var(--theme-accent-rgb),0.62);
+      color:var(--theme-text);
+    }
+    body[data-theme] :is(.player-row,.recruit-row,.rotation-row,.standing-row,.departure-row,.reporter-row,.crt-row,.class-rankings-row,.recruit-top-offer-row,.portal-roster-row,.sched-game) {
+      border-color:rgba(var(--theme-text-rgb),0.14);
+      color:rgba(var(--theme-text-rgb),0.72);
+    }
+    body[data-theme] .settings-row input[type="range"]::-webkit-slider-runnable-track,
+    body[data-theme] .recruit-offer-slider::-webkit-slider-runnable-track {
+      background:var(--theme-dark);
+      border-color:rgba(var(--theme-text-rgb),0.32);
+    }
+    body[data-theme] .settings-row input[type="range"]::-webkit-slider-thumb,
+    body[data-theme] .recruit-offer-slider::-webkit-slider-thumb {
+      background:var(--theme-accent);
+      border-color:var(--theme-text);
+    }
+    body[data-theme] .settings-row input[type="range"]::-moz-range-track,
+    body[data-theme] .recruit-offer-slider::-moz-range-track {
+      background:var(--theme-dark);
+      border-color:rgba(var(--theme-text-rgb),0.32);
+    }
+    body[data-theme] .settings-row input[type="range"]::-moz-range-thumb,
+    body[data-theme] .recruit-offer-slider::-moz-range-thumb {
+      background:var(--theme-accent);
+      border-color:var(--theme-text);
     }
 
     /* ── court layer (home only) ── */
@@ -2145,6 +2447,46 @@
       font-size:clamp(6px,0.78vw,8px);
       margin-top:-8px;
     }
+    .prestige-update-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+    .prestige-update-card {
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(22,18,9,0.28);
+      padding:14px;
+      display:grid;
+      gap:10px;
+    }
+    .prestige-update-card.user {
+      border-color:rgba(192,138,24,0.6);
+      background:rgba(192,138,24,0.1);
+    }
+    .prestige-update-row {
+      display:grid;
+      grid-template-columns:1.45fr .45fr .45fr .45fr;
+      gap:8px;
+      align-items:center;
+      color:rgba(237,224,184,0.72);
+      font-size:clamp(5px,0.72vw,8px);
+      border-top:1px solid rgba(237,224,184,0.12);
+      padding-top:8px;
+    }
+    .prestige-update-row:first-of-type { border-top:0; padding-top:0; }
+    .prestige-update-row.header {
+      color:rgba(192,138,24,0.9);
+      font-size:clamp(5px,0.62vw,7px);
+      letter-spacing:1px;
+    }
+    .prestige-delta-up { color:#63c36b; }
+    .prestige-delta-down { color:#d85f4e; }
+    .prestige-delta-even { color:rgba(237,224,184,0.48); }
+    .prestige-sum-line {
+      color:rgba(237,224,184,0.5);
+      font-size:clamp(5px,0.7vw,8px);
+      line-height:1.7;
+    }
     .departures-section-label {
       color:rgba(192,138,24,0.9);
       font-size:clamp(6px,0.72vw,8px);
@@ -2899,6 +3241,9 @@
       .recruiting-screen {
         padding:24px 28px 20px;
       }
+      .prestige-update-grid {
+        grid-template-columns:1fr;
+      }
       .tournament-screen {
         padding:14px 12px;
         overflow-y:auto;
@@ -3110,6 +3455,46 @@
   <canvas id="grain"></canvas>
   <canvas id="border-canvas"></canvas>
   <div id="version">VER 1.00</div>
+  <button id="settings-gear" type="button" title="Settings" aria-label="Open settings">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="8" cy="8" r="2.4"/>
+      <path d="M8 1.5v2 M8 12.5v2 M1.5 8h2 M12.5 8h2 M3.3 3.3l1.4 1.4 M11.3 11.3l1.4 1.4 M12.7 3.3l-1.4 1.4 M4.7 11.3l-1.4 1.4"/>
+    </svg>
+  </button>
+  <div id="settings-overlay" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="settings-shell">
+      <div class="settings-title" id="settings-title">* SETTINGS *</div>
+
+      <div class="settings-section">
+        <div class="settings-label">
+          <span>SOUND EFFECTS</span>
+          <button class="settings-toggle" id="settings-sfx-toggle" type="button">ON</button>
+        </div>
+        <div class="settings-row">
+          <input type="range" id="settings-sfx-vol" min="0" max="100" step="1" value="50" aria-label="SFX volume"/>
+          <span class="settings-value" id="settings-sfx-val">50</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">
+          <span>MUSIC</span>
+          <button class="settings-toggle" id="settings-music-toggle" type="button">ON</button>
+        </div>
+        <div class="settings-row">
+          <input type="range" id="settings-music-vol" min="0" max="100" step="1" value="60" aria-label="Music volume"/>
+          <span class="settings-value" id="settings-music-val">60</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label"><span>THEME</span></div>
+        <div class="theme-grid" id="settings-theme-grid"></div>
+      </div>
+
+      <button class="settings-close" id="settings-close" type="button">CLOSE</button>
+    </div>
+  </div>
 
   <!-- Court layer — hidden on selection screens -->
   <div id="court-layer">
@@ -3353,6 +3738,27 @@
     </div>
   </div>
 
+  <!-- PRESTIGE UPDATE -->
+  <div id="prestige-update-screen" class="screen-panel departures-screen hidden">
+    <div class="departures-shell">
+      <div class="departures-title">PRESTIGE UPDATE</div>
+      <div class="departures-subtitle" id="prestige-update-subtitle"></div>
+      <div class="prestige-sum-line" id="prestige-update-sum"></div>
+      <div id="prestige-update-user"></div>
+      <div class="prestige-update-grid">
+        <div class="prestige-update-card">
+          <div class="departures-section-label">TOP RISERS</div>
+          <div id="prestige-risers-list"></div>
+        </div>
+        <div class="prestige-update-card">
+          <div class="departures-section-label">TOP FALLERS</div>
+          <div id="prestige-fallers-list"></div>
+        </div>
+      </div>
+      <button class="departures-continue-btn" type="button" onclick="finishPrestigeUpdate()">► NEXT SEASON</button>
+    </div>
+  </div>
+
   <!-- DEPARTURES -->
   <div id="departures-screen" class="screen-panel departures-screen hidden">
     <div class="departures-shell">
@@ -3404,7 +3810,7 @@
           <div class="roster-title">OFFSEASON TRAINING</div>
           <div class="recruiting-subtitle" id="offseason-training-subtitle"></div>
         </div>
-        <button class="roster-action-btn" type="button" onclick="finishOffseasonTraining()">NEXT SEASON</button>
+        <button class="roster-action-btn" type="button" onclick="goToPrestigeUpdate()">NEXT SEASON</button>
       </div>
       <div class="roster-grid" id="offseason-training-grid"></div>
     </div>
@@ -3713,12 +4119,29 @@ let portalHoursState = null;
 let portalWorkAnimId = null;
 let portalAdvanceInProgress = false;
 let portalSetupInProgress = false;
+let portalFinishInProgress = false;
 let pendingRetentionPlayers = [];
 let retentionNILCommits = [];
 let departuresAwaitingRetention = false;
 const PORTAL_TOTAL_WEEKS = 5;
 const PORTAL_ROSTER_CAP = 13;
 const OFFSEASON_FEATURES_ENABLED = true;
+const PRESTIGE_TOTAL_TARGET = 18245;
+const PRESTIGE_STORAGE_KEY = 'teamPrestigeOverrides';
+const NIL_BUDGET_LIMITS = getBaseNILBudgetLimits();
+const GENERATED_SAVE_PREFIXES = [
+  'schedule:',
+  'leagueSchedule:',
+  'standings:',
+  'playerStats:',
+  'recruitingClass:',
+  'recruitingClassVersion:',
+  'transferPortal:',
+  'portalHours:',
+  'recruitingHours:',
+  'conferenceTournament:'
+];
+const BASE_TEAM_ECONOMICS = captureBaseTeamEconomics();
 let statsMode = 'team';
 let statsSelectedConf = null;
 let statsSelectedTeam = null;
@@ -3824,27 +4247,16 @@ function reclaimSaveStorageSpace(storage, targetKey) {
     'pressPersonality',
     'pressAnswers',
     'recruitingRunId',
+    PRESTIGE_STORAGE_KEY,
     'playerConf',
     'playerTeam'
   ]);
-
-  const generatedPrefixes = [
-    'schedule:',
-    'leagueSchedule:',
-    'standings:',
-    'playerStats:',
-    'recruitingClass:',
-    'recruitingClassVersion:',
-    'transferPortal:',
-    'portalHours:',
-    'recruitingHours:'
-  ];
 
   const keys = [];
   for (let i = 0; i < storage.length; i++) keys.push(storage.key(i));
   keys.forEach(key => {
     if (!key || key === targetKey || keepKeys.has(key)) return;
-    if (generatedPrefixes.some(prefix => key.startsWith(prefix))) {
+    if (GENERATED_SAVE_PREFIXES.some(prefix => key.startsWith(prefix))) {
       try { storage.removeItem(key); } catch (err) {}
     }
   });
@@ -3860,6 +4272,9 @@ function reclaimSaveStorageSpace(storage, targetKey) {
   }
   if (targetKey !== `leagueSchedule:${currentSeason}`) {
     try { storage.removeItem(`leagueSchedule:${currentSeason}`); } catch (err) {}
+  }
+  if (targetKey !== `conferenceTournament:${currentSeason}`) {
+    try { storage.removeItem(`conferenceTournament:${currentSeason}`); } catch (err) {}
   }
 
   if (targetKey !== 'allRosters' && allRosters) {
@@ -3910,6 +4325,144 @@ function loadGameJSON(key, fallback = null) {
   }
 }
 
+function removeGeneratedSaveDataFromStorage(storage) {
+  if (!storage) return;
+  const keys = [];
+  try {
+    for (let i = 0; i < storage.length; i++) keys.push(storage.key(i));
+  } catch (err) {
+    return;
+  }
+  keys.forEach(key => {
+    if (!key) return;
+    if (
+      GENERATED_SAVE_PREFIXES.some(prefix => key.startsWith(prefix)) ||
+      [
+        'allRosters',
+        'rosterGenerationVersion',
+        'lastBoxScore',
+        'coachProfile',
+        'resourceDecision',
+        'pressPersonality',
+        'pressAnswers',
+        'recruitingRunId',
+        'playerConf',
+        'playerTeam'
+      ].includes(key) ||
+      key.startsWith('gameplan:')
+    ) {
+      try { storage.removeItem(key); } catch (err) {}
+    }
+  });
+}
+
+function clearGeneratedSaveDataForNewGame() {
+  removeGeneratedSaveDataFromStorage(localStorage);
+  removeGeneratedSaveDataFromStorage(sessionStorage);
+  selectedConf = null;
+  selectedTeam = null;
+  coachStep = 'info';
+  cutsceneStep = 'door';
+  resourceDecision = null;
+  pressPersonality = null;
+  pressQuestionIndex = 0;
+  activeReporterIndex = null;
+  pressAnswers = [];
+  pressAwaitingNext = false;
+  recruitingRunId = '';
+  allRosters = null;
+  recruitingClass = null;
+  cachedSchedule = null;
+  leagueSchedule = null;
+  standingsState = null;
+  playerStatsState = null;
+  tournamentState = null;
+  tournamentSimInProgress = false;
+  conferenceTournamentState = null;
+  conferenceTournamentSimInProgress = false;
+  transferPortal = [];
+  portalWeek = 1;
+  portalHoursState = null;
+  portalFinishInProgress = false;
+  recruitingHoursState = null;
+  pendingRetentionPlayers = [];
+  retentionNILCommits = [];
+  departuresAwaitingRetention = false;
+  gameplan = null;
+  gameplanKey = null;
+}
+
+function captureBaseTeamEconomics() {
+  const values = {};
+  Object.entries(CONFERENCES || {}).forEach(([conf, teams]) => {
+    values[conf] = {};
+    teams.forEach(team => {
+      const data = (((TEAM_DATA || {})[conf] || {})[team] || {});
+      values[conf][team] = {
+        prestige:clamp(Math.round(Number(data.p) || 0), 0, 100),
+        nil:Math.max(0, Number(data.n) || 0)
+      };
+    });
+  });
+  return values;
+}
+
+function getBaseNILBudgetLimits() {
+  const values = [];
+  Object.entries(CONFERENCES || {}).forEach(([conf, teams]) => {
+    teams.forEach(team => {
+      values.push(Math.max(0, Number(((((TEAM_DATA || {})[conf] || {})[team] || {}).n)) || 0));
+    });
+  });
+  return {
+    min:values.length ? Math.min(...values) : 0,
+    max:values.length ? Math.max(...values) : 22
+  };
+}
+
+function getBaseTeamEconomics(conf, team) {
+  return (((BASE_TEAM_ECONOMICS || {})[conf] || {})[team]) || { prestige:50, nil:0 };
+}
+
+function getNILFromPrestigeBaseline(conf, team, prestige) {
+  const base = getBaseTeamEconomics(conf, team);
+  const basePrestige = Math.max(1, Number(base.prestige) || 1);
+  const baseNIL = Math.max(0, Number(base.nil) || 0);
+  const prestigeRatio = Math.max(0, Number(prestige) || 0) / basePrestige;
+  const scaled = baseNIL * prestigeRatio * prestigeRatio;
+  return Math.round(clamp(scaled, NIL_BUDGET_LIMITS.min, NIL_BUDGET_LIMITS.max) * 100) / 100;
+}
+
+function applySavedPrestigeOverrides() {
+  const saved = loadGameJSON(PRESTIGE_STORAGE_KEY, null);
+  if (!saved || typeof saved !== 'object') return;
+  Object.entries(saved).forEach(([conf, teams]) => {
+    if (!TEAM_DATA[conf] || !teams || typeof teams !== 'object') return;
+    Object.entries(teams).forEach(([team, value]) => {
+      if (!TEAM_DATA[conf][team]) return;
+      const prestige = typeof value === 'object' && value ? value.p : value;
+      const nil = typeof value === 'object' && value ? value.n : getNILFromPrestigeBaseline(conf, team, prestige);
+      TEAM_DATA[conf][team].p = clamp(Math.round(Number(prestige) || 0), 0, 100);
+      TEAM_DATA[conf][team].n = Math.max(0, Number(nil) || 0);
+    });
+  });
+}
+
+function savePrestigeOverrides() {
+  const values = {};
+  Object.entries(CONFERENCES || {}).forEach(([conf, teams]) => {
+    values[conf] = {};
+    teams.forEach(team => {
+      const data = (((TEAM_DATA || {})[conf] || {})[team] || {});
+      values[conf][team] = {
+        p:clamp(Math.round(Number(data.p) || 0), 0, 100),
+        n:Math.max(0, Number(data.n) || 0)
+      };
+    });
+  });
+  saveGameJSON(PRESTIGE_STORAGE_KEY, values);
+}
+
 function compactRosterPlayer(player) {
   const compact = {
     name:player.name,
@@ -3923,6 +4476,7 @@ function compactRosterPlayer(player) {
     tendencies:player.tendencies || makeTendencies(player.position)
   };
   if (player.recruitedFreshman) compact.recruitedFreshman = true;
+  if (player.recruitedByOriginalSchool) compact.recruitedByOriginalSchool = true;
   if (player.originalConf) compact.originalConf = player.originalConf;
   if (player.originalTeam) compact.originalTeam = player.originalTeam;
   return compact;
@@ -4111,10 +4665,270 @@ function expandRecruitingClassFromStorage(saved) {
 }
 
 /* ═══════════════════════════════════════════
+   SOUND EFFECTS (Web Audio, procedurally generated)
+═══════════════════════════════════════════ */
+const Sfx = (() => {
+  let ctx = null;
+  let master = null;
+  let muted = false;
+  let volume = 0.5;
+  try {
+    muted = localStorage.getItem('sfxMuted') === '1';
+    const v = parseFloat(localStorage.getItem('sfxVolume'));
+    if (!isNaN(v)) volume = Math.max(0, Math.min(1, v));
+  } catch(_) {}
+
+  function applyGain() { if (master) master.gain.value = muted ? 0 : volume; }
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    applyGain();
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function setMuted(v) {
+    muted = !!v;
+    try { localStorage.setItem('sfxMuted', muted ? '1' : '0'); } catch(_) {}
+    applyGain();
+  }
+  function setVolume(v) {
+    volume = Math.max(0, Math.min(1, Number(v) || 0));
+    try { localStorage.setItem('sfxVolume', String(volume)); } catch(_) {}
+    applyGain();
+  }
+  function getVolume() { return volume; }
+
+  function tone(opts) {
+    const c = ensure();
+    if (!c || muted) return;
+    const t0 = c.currentTime;
+    const dur = opts.dur || 0.08;
+    const osc = c.createOscillator();
+    osc.type = opts.type || 'square';
+    const f0 = opts.freq || 440;
+    const f1 = opts.freqEnd != null ? opts.freqEnd : f0;
+    osc.frequency.setValueAtTime(f0, t0);
+    if (f1 !== f0) osc.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t0 + dur);
+    const g = c.createGain();
+    const peak = opts.gain != null ? opts.gain : 0.25;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(peak, t0 + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(master);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  }
+
+  function noise(opts) {
+    const c = ensure();
+    if (!c || muted) return;
+    const t0 = c.currentTime;
+    const dur = opts.dur || 0.12;
+    const buf = c.createBuffer(1, Math.ceil(c.sampleRate * dur), c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) {
+      const env = Math.exp(-(i / c.sampleRate) * (opts.decay || 18));
+      d[i] = (Math.random() * 2 - 1) * env;
+    }
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const filt = c.createBiquadFilter();
+    filt.type = opts.filterType || 'bandpass';
+    filt.frequency.value = opts.freq || 1200;
+    filt.Q.value = opts.q != null ? opts.q : 1;
+    const g = c.createGain();
+    g.gain.value = opts.gain != null ? opts.gain : 0.4;
+    src.connect(filt); filt.connect(g); g.connect(master);
+    src.start(t0);
+    src.stop(t0 + dur + 0.02);
+  }
+
+  return {
+    isMuted: () => muted,
+    setMuted,
+    setVolume,
+    getVolume,
+    toggle: () => { setMuted(!muted); return muted; },
+    click:    () => tone({ type:'square',   freq:880,  freqEnd:740, dur:0.05, gain:0.18 }),
+    back:     () => tone({ type:'square',   freq:380,  freqEnd:220, dur:0.07, gain:0.20 }),
+    nav:      () => { tone({ type:'triangle', freq:520, freqEnd:780, dur:0.10, gain:0.22 }); setTimeout(()=>tone({type:'triangle',freq:780,freqEnd:1040,dur:0.08,gain:0.18}), 60); },
+    toggleSfx:() => tone({ type:'square',   freq:660,  freqEnd:660, dur:0.04, gain:0.14 }),
+    select:   () => { tone({ type:'square', freq:660, dur:0.06, gain:0.20 }); setTimeout(()=>tone({type:'square',freq:990,dur:0.08,gain:0.20}), 50); },
+    error:    () => { tone({ type:'sawtooth', freq:200, freqEnd:120, dur:0.18, gain:0.22 }); },
+    success:  () => { tone({ type:'triangle', freq:600, dur:0.08, gain:0.22 });
+                      setTimeout(()=>tone({ type:'triangle', freq:800, dur:0.08, gain:0.22 }), 70);
+                      setTimeout(()=>tone({ type:'triangle', freq:1100, dur:0.12, gain:0.22 }), 140); },
+    simStart: () => {
+      // ascending whistle-style
+      tone({ type:'triangle', freq:520, freqEnd:980, dur:0.18, gain:0.22 });
+      noise({ freq:1800, q:6, dur:0.12, gain:0.18 });
+    },
+    simTick:  () => tone({ type:'square', freq:520, freqEnd:760, dur:0.035, gain:0.10 }),
+    simDone:  () => {
+      // buzzer
+      const c = ensure();
+      if (!c || muted) return;
+      const t0 = c.currentTime;
+      for (let i = 0; i < 3; i++) {
+        const o = c.createOscillator();
+        o.type = 'sawtooth';
+        o.frequency.value = 320 + i * 4;
+        const g = c.createGain();
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(0.18, t0 + 0.01);
+        g.gain.setValueAtTime(0.18, t0 + 0.5);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.6);
+        o.connect(g); g.connect(master);
+        o.start(t0); o.stop(t0 + 0.62);
+      }
+    },
+    swish:    () => noise({ filterType:'highpass', freq:3200, dur:0.16, decay:14, gain:0.22 }),
+    whistle:  () => tone({ type:'sine', freq:1800, freqEnd:2400, dur:0.22, gain:0.18 }),
+    pageFlip: () => noise({ filterType:'highpass', freq:1500, dur:0.18, decay:10, gain:0.18 })
+  };
+})();
+
+// Music module - controls game-soundtrack audio element
+const Music = (() => {
+  let muted = false;
+  let volume = 0.6;
+  try {
+    muted = localStorage.getItem('musicMuted') === '1';
+    const v = parseFloat(localStorage.getItem('musicVolume'));
+    if (!isNaN(v)) volume = Math.max(0, Math.min(1, v));
+  } catch(_) {}
+
+  function el() { return document.getElementById('game-soundtrack'); }
+  function apply() {
+    const a = el();
+    if (!a) return;
+    a.volume = muted ? 0 : volume;
+    if (muted && !a.paused) a.pause();
+  }
+  function start() {
+    const a = el();
+    if (!a || muted) return;
+    a.volume = volume;
+    a.loop = true;
+    a.dataset.userStarted = '1';
+    if (a.ended) a.currentTime = 0;
+    const p = a.play();
+    if (p && p.catch) {
+      p.catch(() => {
+        try {
+          a.currentTime = 0;
+          a.load();
+        } catch(_) {}
+      });
+    }
+  }
+  function setMuted(v) {
+    muted = !!v;
+    try { localStorage.setItem('musicMuted', muted ? '1' : '0'); } catch(_) {}
+    apply();
+    if (!muted) start();
+  }
+  function setVolume(v) {
+    volume = Math.max(0, Math.min(1, Number(v) || 0));
+    try { localStorage.setItem('musicVolume', String(volume)); } catch(_) {}
+    apply();
+  }
+  return {
+    isMuted: () => muted,
+    getVolume: () => volume,
+    setMuted, setVolume, apply, start
+  };
+})();
+
+// THEME system
+const THEMES = [
+  { id:'classic',   name:'Classic',    swatches:['#161209','#a82418','#c08a18','#ede0b8'] },
+  { id:'midnight',  name:'Midnight',   swatches:['#070d1a','#1f5fa8','#7cc8ff','#dff0ff'] },
+  { id:'court',     name:'Chalkboard', swatches:['#0e1f14','#1f4d2b','#e8c870','#ede0b8'] },
+  { id:'hardwood',  name:'Hardwood',   swatches:['#2a1808','#a8651c','#ffd070','#fff7e0'] },
+  { id:'neon',      name:'Neon Retro', swatches:['#08020e','#a01880','#ff40c0','#80f8ff'] }
+];
+const Theme = (() => {
+  let current = 'classic';
+  try {
+    const saved = localStorage.getItem('uiTheme');
+    if (saved && THEMES.some(t => t.id === saved)) current = saved;
+  } catch(_) {}
+  function apply(id) {
+    if (!THEMES.some(t => t.id === id)) return;
+    current = id;
+    if (id === 'classic') document.body.removeAttribute('data-theme');
+    else document.body.setAttribute('data-theme', id);
+    try { localStorage.setItem('uiTheme', id); } catch(_) {}
+    if (typeof window.refreshThemePaint === 'function') {
+      requestAnimationFrame(window.refreshThemePaint);
+    }
+  }
+  return { get: () => current, apply, list: THEMES };
+})();
+
+function getThemeCssValue(name, fallback) {
+  const target = document.body || document.documentElement;
+  const value = getComputedStyle(target).getPropertyValue(name).trim();
+  return value || fallback;
+}
+
+function getThemePalette() {
+  const textRgb = getThemeCssValue('--theme-text-rgb', '237,224,184');
+  const accentRgb = getThemeCssValue('--theme-accent-rgb', '192,138,24');
+  const primaryRgb = getThemeCssValue('--theme-primary-rgb', '168,36,24');
+  const darkRgb = getThemeCssValue('--theme-dark-rgb', '58,36,0');
+  const panelRgb = getThemeCssValue('--theme-panel-rgb', '28,22,12');
+  return {
+    bg:getThemeCssValue('--theme-bg', '#161209'),
+    panel:getThemeCssValue('--theme-panel', '#1c160c'),
+    primary:getThemeCssValue('--theme-primary', '#a82418'),
+    accent:getThemeCssValue('--theme-accent', '#c08a18'),
+    text:getThemeCssValue('--theme-text', '#ede0b8'),
+    dark:getThemeCssValue('--theme-dark', '#3a2400'),
+    deep:getThemeCssValue('--theme-deep', '#350a04'),
+    textA:a => `rgba(${textRgb},${a})`,
+    accentA:a => `rgba(${accentRgb},${a})`,
+    primaryA:a => `rgba(${primaryRgb},${a})`,
+    darkA:a => `rgba(${darkRgb},${a})`,
+    panelA:a => `rgba(${panelRgb},${a})`
+  };
+}
+
+// Apply saved theme/music settings on load
+document.addEventListener('DOMContentLoaded', () => {
+  Theme.apply(Theme.get());
+  Music.apply();
+});
+
+// Document-level button sound delegation
+document.addEventListener('pointerdown', (e) => {
+  const btn = e.target.closest('button, .option-btn, .opt-btn');
+  if (!btn) return;
+  if (btn.disabled) return;
+  // Prefer specific class cues, fall back to generic click
+  if (btn.classList.contains('back-btn')) Sfx.back();
+  else if (btn.classList.contains('option-btn') || btn.classList.contains('opt-btn')) Sfx.toggleSfx();
+  else if (btn.classList.contains('dash-btn')) Sfx.nav();
+  else {
+    const txt = (btn.textContent || '').toUpperCase();
+    if (/SIMULATE|SIM TO|SIM\b/.test(txt)) Sfx.simStart();
+    else if (/CONTINUE|NEXT|FINISH|CONFIRM|SAVE/.test(txt)) Sfx.select();
+    else Sfx.click();
+  }
+}, true);
+
+/* ═══════════════════════════════════════════
    SCREEN TRANSITIONS
 ═══════════════════════════════════════════ */
 function playCrumpleSound() {
   try {
+    if (typeof Sfx !== 'undefined' && Sfx.isMuted()) return;
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     const ctx = new AC();
@@ -4187,6 +5001,7 @@ function goToConf() {
   if (typeof playGameSoundtrack === 'function') playGameSoundtrack();
   const homeBtn = document.getElementById('start-btn');
   if (homeBtn) homeBtn.disabled = false;
+  if (currentScreen === 'home') clearGeneratedSaveDataForNewGame();
   flash(() => {
     confCursor = 0;
     showPanel('conf');
@@ -4602,8 +5417,10 @@ function simulateUserConferenceTournamentRound() {
   if (roundIndex < 0) return;
   getPlayableConferenceTournamentGames(tournament, roundIndex).forEach(item => {
     simulateConferenceTournamentGame(tournament, item);
+    if (typeof Sfx !== 'undefined') Sfx.simTick();
   });
   if (tournament.complete) conferenceTournamentState.reviewPhase = 'user-bracket';
+  if (typeof Sfx !== 'undefined') Sfx.simDone();
   saveConferenceTournamentState();
   renderConferenceTournamentPage();
 }
@@ -4614,6 +5431,7 @@ function simulateUserConferenceTournament() {
   if (!tournament || tournament.complete) return;
   simulateSingleConferenceTournament(tournament);
   conferenceTournamentState.reviewPhase = 'user-bracket';
+  if (typeof Sfx !== 'undefined') Sfx.simDone();
   saveConferenceTournamentState();
   renderConferenceTournamentPage();
 }
@@ -5014,10 +5832,12 @@ function simulateTournamentGameQueue(games, done) {
   const next = () => {
     const item = games.shift();
     if (!item) {
+      if (typeof Sfx !== 'undefined') Sfx.simDone();
       done();
       return;
     }
     simulateTournamentGameItem(item);
+    if (typeof Sfx !== 'undefined') Sfx.simTick();
     renderTournamentBracket();
     setTimeout(next, 180);
   };
@@ -5085,6 +5905,358 @@ function advanceTournamentWinner(item, winner) {
   nextGame.teams[gameIndex % 2] = winner;
 }
 
+function getLeaguePrestigeSum() {
+  return Object.entries(CONFERENCES || {}).reduce((total, [conf, teams]) => {
+    return total + teams.reduce((sum, team) => {
+      return sum + clamp(Math.round(Number((((TEAM_DATA || {})[conf] || {})[team] || {}).p) || 0), 0, 100);
+    }, 0);
+  }, 0);
+}
+
+function getNationalExpectedWins(seed) {
+  return ({
+    1:3.35, 2:2.55, 3:2.05, 4:1.65,
+    5:1.25, 6:1.05, 7:0.85, 8:0.72,
+    9:0.62, 10:0.5, 11:0.4, 12:0.32,
+    13:0.2, 14:0.12, 15:0.08, 16:0.04
+  })[Number(seed) || 16] || 0.04;
+}
+
+function getNationalTournamentSummary() {
+  const summary = {};
+  if (!tournamentState) return summary;
+  const ensureTeam = team => {
+    if (!team || !team.team || !team.conf) return null;
+    const key = getTeamKey(team.conf, team.team);
+    if (!summary[key]) {
+      summary[key] = {
+        made:true,
+        seed:Number(team.seed) || null,
+        wins:0,
+        result:'R64'
+      };
+    } else if (!summary[key].seed && team.seed) {
+      summary[key].seed = Number(team.seed) || null;
+    }
+    return summary[key];
+  };
+  const registerGame = game => {
+    if (!game) return;
+    (game.teams || []).forEach(ensureTeam);
+    if (game.complete && game.winner) {
+      const winner = ensureTeam(game.winner);
+      if (winner) winner.wins += 1;
+    }
+  };
+  (tournamentState.regions || []).forEach(region => {
+    (region.rounds || []).forEach(round => (round || []).forEach(registerGame));
+  });
+  (tournamentState.finalFour || []).forEach(registerGame);
+  registerGame(tournamentState.championship);
+  Object.entries(summary).forEach(([key, entry]) => {
+    entry.result = ['R64','R32','Sweet 16','Elite 8','Final Four','Runner-up','Champion'][Math.min(6, entry.wins)] || 'R64';
+    if (tournamentState.champion && key === getTeamKey(tournamentState.champion.conf, tournamentState.champion.team)) {
+      entry.result = 'Champion';
+      entry.wins = Math.max(entry.wins, 6);
+    }
+  });
+  return summary;
+}
+
+function getConferenceTournamentSummary() {
+  const summary = {};
+  const state = conferenceTournamentState || loadConferenceTournamentState();
+  if (!state || !Array.isArray(state.conferences)) return summary;
+  state.conferences.forEach(tournament => {
+    const teamCount = Number(tournament.teamCount) || (CONFERENCES[tournament.conf] || []).length || 1;
+    const ensureTeam = team => {
+      if (!team || !team.team || !team.conf) return null;
+      const key = getTeamKey(team.conf, team.team);
+      if (!summary[key]) {
+        summary[key] = {
+          made:true,
+          seed:Number(team.seed) || null,
+          teamCount,
+          wins:0,
+          champion:false,
+          result:'Played'
+        };
+      } else {
+        if (!summary[key].seed && team.seed) summary[key].seed = Number(team.seed) || null;
+        summary[key].teamCount = Math.max(summary[key].teamCount || 1, teamCount);
+      }
+      return summary[key];
+    };
+    (tournament.rounds || []).forEach(round => {
+      (round || []).forEach(game => {
+        (game.teams || []).forEach(ensureTeam);
+        if (game.complete && game.winner && !game.bye) {
+          const winner = ensureTeam(game.winner);
+          if (winner) winner.wins += 1;
+        }
+      });
+    });
+    if (tournament.champion) {
+      const champion = ensureTeam(tournament.champion);
+      if (champion) {
+        champion.champion = true;
+        champion.result = 'Champion';
+      }
+    }
+  });
+  Object.values(summary).forEach(entry => {
+    if (!entry.champion) {
+      entry.result = entry.wins >= 3 ? 'Finalist/Semifinalist' : (entry.wins > 0 ? `${entry.wins} win${entry.wins === 1 ? '' : 's'}` : 'No wins');
+    }
+  });
+  return summary;
+}
+
+function getPrestigeDeltaCap(record) {
+  let cap = 3;
+  if (record.nationalWins >= 5) cap = 5;
+  else if (record.nationalWins >= 4 && record.oldPrestige < 75) cap = 5;
+  else if (record.confChampion && record.confSeed >= 5 && record.oldPrestige < 65) cap = 4;
+  if (record.oldPrestige >= 85 && record.winPct < 0.5) cap = 5;
+  else if (record.oldPrestige >= 80 && !record.nationalMade && record.winPct < 0.6) cap = Math.max(cap, 4);
+  return cap;
+}
+
+function buildPrestigeRecords() {
+  ensureStandingsState();
+  syncConferenceRecordsFromLeagueSchedule();
+  const national = getNationalTournamentSummary();
+  const conference = getConferenceTournamentSummary();
+  const records = [];
+  Object.entries(CONFERENCES || {}).forEach(([conf, teams]) => {
+    teams.forEach(team => {
+      const key = getTeamKey(conf, team);
+      const standing = standingsState && standingsState.teams ? standingsState.teams[key] : null;
+      const oldPrestige = clamp(Math.round(Number((((TEAM_DATA || {})[conf] || {})[team] || {}).p) || 0), 0, 100);
+      const oldNIL = Math.max(0, Number((((TEAM_DATA || {})[conf] || {})[team] || {}).n) || 0);
+      const wins = Number((standing || {}).wins) || 0;
+      const losses = Number((standing || {}).losses) || 0;
+      const games = Math.max(1, wins + losses);
+      const winPct = wins / games;
+      const expectedWinPct = 0.28 + oldPrestige * 0.0044;
+      const regularScore = (winPct - expectedWinPct) * 7;
+      const confInfo = conference[key] || {};
+      const confSeed = Number(confInfo.seed) || (CONFERENCES[conf] || []).length || 1;
+      const confTeamCount = Number(confInfo.teamCount) || (CONFERENCES[conf] || []).length || 1;
+      const confWins = Number(confInfo.wins) || 0;
+      const expectedConfWins = Math.max(0, Math.min(3, ((confTeamCount - confSeed) / Math.max(1, confTeamCount)) * 2.2));
+      let confScore = (confWins - expectedConfWins) * 0.45;
+      if (confInfo.champion) confScore += 0.6 + (confSeed >= 5 ? 0.5 : 0);
+      const natInfo = national[key] || {};
+      const nationalWins = Number(natInfo.wins) || 0;
+      let nationalScore = natInfo.made ? (nationalWins - getNationalExpectedWins(natInfo.seed)) * 0.8 : 0;
+      if (nationalWins >= 6) nationalScore += 1.5;
+      else if (nationalWins === 5) nationalScore += 0.8;
+      else if (nationalWins === 4) nationalScore += 0.4;
+      if (!natInfo.made && oldPrestige >= 80) nationalScore -= 1.2;
+      else if (!natInfo.made && oldPrestige >= 70) nationalScore -= 0.7;
+      const score = regularScore + confScore + nationalScore;
+      const record = {
+        key,
+        conf,
+        team,
+        oldPrestige,
+        wins,
+        losses,
+        winPct,
+        confWins:Number((standing || {}).confWins) || 0,
+        confLosses:Number((standing || {}).confLosses) || 0,
+        confSeed,
+        confChampion:!!confInfo.champion,
+        nationalMade:!!natInfo.made,
+        nationalWins,
+        nationalResult:natInfo.result || 'Missed',
+        score,
+        delta:0,
+        cap:3,
+        newPrestige:oldPrestige,
+        oldNIL,
+        newNIL:oldNIL,
+        nilDelta:0
+      };
+      record.cap = getPrestigeDeltaCap(record);
+      record.delta = clamp(Math.round(score), -record.cap, record.cap);
+      record.newPrestige = clamp(record.oldPrestige + record.delta, 0, 100);
+      record.delta = record.newPrestige - record.oldPrestige;
+      records.push(record);
+    });
+  });
+  return records;
+}
+
+function normalizePrestigeDeltas(records) {
+  let correction = PRESTIGE_TOTAL_TARGET - records.reduce((sum, r) => sum + r.oldPrestige + r.delta, 0);
+  let guard = 0;
+  while (correction !== 0 && guard < 20000) {
+    const candidates = records
+      .filter(r => correction > 0
+        ? r.delta < r.cap && r.oldPrestige + r.delta < 100
+        : r.delta > -r.cap && r.oldPrestige + r.delta > 0)
+      .sort((a, b) => correction > 0 ? b.score - a.score || b.oldPrestige - a.oldPrestige : a.score - b.score || a.oldPrestige - b.oldPrestige);
+    if (!candidates.length) break;
+    for (const record of candidates) {
+      if (correction === 0) break;
+      record.delta += correction > 0 ? 1 : -1;
+      correction += correction > 0 ? -1 : 1;
+      guard++;
+    }
+  }
+  records.forEach(record => {
+    record.newPrestige = clamp(record.oldPrestige + record.delta, 0, 100);
+    record.delta = record.newPrestige - record.oldPrestige;
+    record.newNIL = getNILFromPrestigeBaseline(record.conf, record.team, record.newPrestige);
+    record.nilDelta = record.newNIL - record.oldNIL;
+  });
+  return correction;
+}
+
+function logPrestigeRebalance(records, beforeSum, afterSum, unresolvedCorrection) {
+  const rows = records
+    .slice()
+    .sort((a, b) => b.delta - a.delta || b.score - a.score || a.conf.localeCompare(b.conf) || a.team.localeCompare(b.team))
+    .map(record => ({
+      conf:record.conf,
+      team:record.team,
+      record:`${record.wins}-${record.losses}`,
+      conferenceRecord:`${record.confWins}-${record.confLosses}`,
+      conferenceTournament:record.confChampion ? `Champion (#${record.confSeed})` : `#${record.confSeed}`,
+      nationalTournament:record.nationalResult,
+      score:Number(record.score.toFixed(2)),
+      oldPrestige:record.oldPrestige,
+      delta:record.delta,
+      newPrestige:record.newPrestige,
+      oldNIL:formatNIL(record.oldNIL),
+      nilDelta:formatNILDelta(record.nilDelta),
+      newNIL:formatNIL(record.newNIL)
+    }));
+  console.group(`Prestige rebalance after Season ${seasonNumber} tournament`);
+  console.log(`Prestige sum before: ${beforeSum}`);
+  console.table(rows);
+  console.log(`Prestige sum after: ${afterSum}`);
+  console.log(`Target prestige sum: ${PRESTIGE_TOTAL_TARGET}`);
+  if (unresolvedCorrection) console.warn(`Prestige rebalance could not resolve ${unresolvedCorrection} points because teams hit movement/prestige caps.`);
+  console.groupEnd();
+}
+
+function rebalancePrestigeAfterTournament() {
+  if (!tournamentState || !tournamentState.champion) return null;
+  if (tournamentState.prestigeRebalanced) return tournamentState.prestigeRebalanceReport || null;
+  const beforeSum = getLeaguePrestigeSum();
+  const records = buildPrestigeRecords();
+  const unresolvedCorrection = normalizePrestigeDeltas(records);
+  records.forEach(record => {
+    if (!TEAM_DATA[record.conf]) TEAM_DATA[record.conf] = {};
+    if (!TEAM_DATA[record.conf][record.team]) TEAM_DATA[record.conf][record.team] = {};
+    TEAM_DATA[record.conf][record.team].p = record.newPrestige;
+    TEAM_DATA[record.conf][record.team].n = record.newNIL;
+  });
+  const afterSum = getLeaguePrestigeSum();
+  savePrestigeOverrides();
+  tournamentState.prestigeRebalanced = true;
+  tournamentState.prestigeRebalanceReport = {
+    records,
+    beforeSum,
+    afterSum,
+    unresolvedCorrection
+  };
+  logPrestigeRebalance(records, beforeSum, afterSum, unresolvedCorrection);
+  return tournamentState.prestigeRebalanceReport;
+}
+
+function formatPrestigeDelta(delta) {
+  const value = Math.round(Number(delta) || 0);
+  if (value > 0) return `+${value}`;
+  return String(value);
+}
+
+function formatNILDelta(delta) {
+  const value = Number(delta) || 0;
+  if (Math.abs(value) < 0.05) return '$0';
+  return `${value > 0 ? '+' : '-'}${formatNIL(Math.abs(value))}`;
+}
+
+function getPrestigeDeltaClass(delta) {
+  const value = Math.round(Number(delta) || 0);
+  if (value > 0) return 'prestige-delta-up';
+  if (value < 0) return 'prestige-delta-down';
+  return 'prestige-delta-even';
+}
+
+function renderPrestigeUpdateRows(records) {
+  if (!records || !records.length) {
+    return `<div class="prestige-update-row"><span style="grid-column:1/-1;color:rgba(237,224,184,0.42)">NO PRESTIGE CHANGES</span></div>`;
+  }
+  return `
+    <div class="prestige-update-row header">
+      <div>TEAM</div><div>OLD</div><div>Δ</div><div>NEW</div>
+    </div>
+    ${records.map(record => `
+      <div class="prestige-update-row">
+        <div><strong>${escapeAttr(record.team)}</strong><br><span style="color:rgba(237,224,184,0.42)">${escapeAttr(record.conf)} · ${escapeAttr(record.record || `${record.wins}-${record.losses}`)} · ${escapeAttr(record.nationalResult || 'Missed')}</span></div>
+        <div>${record.oldPrestige}</div>
+        <div class="${getPrestigeDeltaClass(record.delta)}">${formatPrestigeDelta(record.delta)}</div>
+        <div>${record.newPrestige}</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function goToPrestigeUpdate() {
+  const report = rebalancePrestigeAfterTournament();
+  if (!report) {
+    finishPrestigeUpdate();
+    return;
+  }
+  renderPrestigeUpdate(report);
+  flash(() => showPanel('prestige-update'));
+}
+
+function renderPrestigeUpdate(report) {
+  const records = (report.records || []).map(record => ({
+    ...record,
+    record:`${record.wins}-${record.losses}`
+  }));
+  const risers = records
+    .slice()
+    .sort((a, b) => b.delta - a.delta || b.score - a.score || a.team.localeCompare(b.team))
+    .slice(0, 5);
+  const fallers = records
+    .slice()
+    .sort((a, b) => a.delta - b.delta || a.score - b.score || a.team.localeCompare(b.team))
+    .slice(0, 5);
+  const user = records.find(record => record.conf === selectedConf && record.team === selectedTeam);
+  const subtitle = document.getElementById('prestige-update-subtitle');
+  const sumLine = document.getElementById('prestige-update-sum');
+  const userBox = document.getElementById('prestige-update-user');
+  const risersList = document.getElementById('prestige-risers-list');
+  const fallersList = document.getElementById('prestige-fallers-list');
+  if (subtitle) subtitle.textContent = `SEASON ${seasonNumber} PROGRAM REPUTATION CHANGES`;
+  if (sumLine) {
+    sumLine.textContent = `LEAGUE PRESTIGE SUM: ${report.beforeSum} -> ${report.afterSum} / TARGET ${PRESTIGE_TOTAL_TARGET}`;
+  }
+  if (userBox) {
+    userBox.innerHTML = user ? `
+      <div class="prestige-update-card user">
+        <div class="departures-section-label">YOUR TEAM</div>
+        ${renderPrestigeUpdateRows([user])}
+        <div class="prestige-sum-line">NIL: ${formatNIL(user.oldNIL)} -> ${formatNIL(user.newNIL)} (${formatNILDelta(user.nilDelta)})</div>
+      </div>
+    ` : '';
+  }
+  if (risersList) risersList.innerHTML = renderPrestigeUpdateRows(risers);
+  if (fallersList) fallersList.innerHTML = renderPrestigeUpdateRows(fallers);
+}
+
+function finishPrestigeUpdate() {
+  resetForNextSeason();
+  goToDashboard();
+}
+
 function processSeasonDepartures() {
   const userDeparting = [];
   transferPortal = [];
@@ -5130,7 +6302,7 @@ function processSeasonDepartures() {
         const isTopAtPos = player.overall >= bestByPos[player.position];
         const baseTransferChance = isTopAtPos ? Math.min(0.5, 1 - winPct) : 0.9;
         const rawTransferChance = baseTransferChance * getTransferGradeMultiplier(player.grade);
-        const transferChance = getOriginalSchoolAdjustedTransferChance(player, conf, team, rawTransferChance);
+        const transferChance = getOriginalSchoolAdjustedTransferChance(player, conf, team, rawTransferChance, isTopAtPos, winPct);
         if (Math.random() < transferChance) {
           transferPortal.push({
             ...player,
@@ -5183,15 +6355,17 @@ function getTransferGradeMultiplier(grade) {
 
 function isPlayerAtOriginalSchool(player, conf, team) {
   return !!player
+    && (player.recruitedByOriginalSchool || player.recruitedFreshman)
     && player.originalConf === conf
     && player.originalTeam === team;
 }
 
-function getOriginalSchoolAdjustedTransferChance(player, conf, team, transferChance) {
+function getOriginalSchoolAdjustedTransferChance(player, conf, team, transferChance, isExpectedStarter, boostApplyChance = 1) {
   const normalizedTransferChance = clamp(Number(transferChance) || 0, 0, 1);
+  if (!isExpectedStarter) return normalizedTransferChance;
   if (!isPlayerAtOriginalSchool(player, conf, team)) return normalizedTransferChance;
-  const doubledStayChance = Math.min(1, (1 - normalizedTransferChance) * 2);
-  return 1 - doubledStayChance;
+  if (Math.random() >= clamp(Number(boostApplyChance) || 0, 0, 1)) return normalizedTransferChance;
+  return normalizedTransferChance / Math.max(1, 2 - normalizedTransferChance);
 }
 
 function getPlayerRetentionFairValue(player) {
@@ -5696,14 +6870,33 @@ function renderPortalDetailCard(player) {
   `;
 }
 
-function finishPortalGoDashboard() {
-  applyPortalCommits();
-  applyRecruitingCommits();
-  clearOffseasonRecruitingStorage();
-  const trainingResults = runOffseasonTraining();
-  saveAllRosters();
-  renderOffseasonTraining(trainingResults);
-  flash(() => showPanel('offseason-training'));
+async function finishPortalGoDashboard() {
+  if (portalFinishInProgress) return;
+  portalFinishInProgress = true;
+  const btn = document.getElementById('portal-next-season-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'FINAL CHECKS...';
+  }
+  try {
+    await finalizePortal();
+    portalWeek = Math.max(portalWeek, PORTAL_TOTAL_WEEKS + 1);
+    savePortalState();
+    applyPortalCommits();
+    applyRecruitingCommits();
+    ensurePostPortalRosterMinimums();
+    clearOffseasonRecruitingStorage();
+    const trainingResults = runOffseasonTraining();
+    saveAllRosters();
+    renderOffseasonTraining(trainingResults);
+    flash(() => showPanel('offseason-training'));
+  } finally {
+    portalFinishInProgress = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '► OFFSEASON TRAINING';
+    }
+  }
 }
 
 function closePortalDetail() {
@@ -6235,9 +7428,15 @@ function pickPortalAuditPlayer(conf, team, position) {
 
 function createPortalFallbackPlayer(position) {
   const overall = randInt(45, 58);
+  const potential = clamp(overall + randInt(4, 12), overall, 80);
   const homeState = randomChoice(Object.keys(STATE_HOMETOWNS));
   const hometown = randomChoice(STATE_HOMETOWNS[homeState]);
   const usedNames = new Set(transferPortal.map(p => p.name));
+  Object.values(allRosters || {}).forEach(confTeams => {
+    Object.values(confTeams || {}).forEach(entry => {
+      getRosterFromEntry(entry).forEach(p => usedNames.add(p.name));
+    });
+  });
   const names = namePool || {
     first:['Aaron','Caleb','Darius','Elijah','Gavin','Isaiah','Jalen','Marcus'],
     last:['Anderson','Bennett','Carter','Davis','Evans','Garcia','Harris','Jackson']
@@ -6247,7 +7446,7 @@ function createPortalFallbackPlayer(position) {
     position,
     grade:'Freshman',
     overall,
-    potential:clamp(overall + randInt(4, 12), overall, 80),
+    potential,
     attributes:makeAttributes(overall, 60),
     homeState,
     hometown,
@@ -6264,6 +7463,43 @@ function createPortalFallbackPlayer(position) {
   };
   transferPortal.push(player);
   return player;
+}
+
+function ensurePostPortalRosterMinimums() {
+  const added = [];
+  getPortalTeamsByPrestige().forEach(({ conf, team }) => {
+    RECRUIT_POSITIONS.forEach(position => {
+      let guard = 0;
+      while ((getPortalCPUPositionCounts(team, conf)[position] || 0) < 2 && getPortalCPUTeamFinalCount(team, conf) < PORTAL_ROSTER_CAP && guard < 3) {
+        const player = createPortalFallbackPlayer(position);
+        const isUserTeam = conf === selectedConf && team === selectedTeam;
+        commitPortalPlayer(player, {
+          isPlayer:isUserTeam,
+          team,
+          conf,
+          amount:0,
+          interest:1
+        });
+        added.push({ conf, team, position, name:player.name, overall:player.overall, isUserTeam });
+        guard++;
+      }
+    });
+  });
+  if (added.length) {
+    applyPortalCommits();
+    const userRoster = getTeamRoster(selectedConf, selectedTeam);
+    const userCounts = RECRUIT_POSITIONS.reduce((counts, position) => {
+      counts[position] = userRoster.filter(p => p.position === position).length;
+      return counts;
+    }, {});
+    console.log('POST-PORTAL ROSTER MINIMUMS', {
+      addedCount:added.length,
+      userAdded:added.filter(p => p.isUserTeam),
+      userRosterCount:userRoster.length,
+      userPositionCounts:userCounts
+    });
+  }
+  return added;
 }
 
 function getNextPortalId() {
@@ -6300,6 +7536,7 @@ function applyPortalCommits() {
       homeState: p.homeState,
       hometown: p.hometown,
       tendencies: p.tendencies || makeTendencies(p.position),
+      recruitedByOriginalSchool: !!p.recruitedByOriginalSchool,
       originalConf: p.originalConf || p.fromConf,
       originalTeam: p.originalTeam || p.fromTeam
     });
@@ -6333,6 +7570,7 @@ function applyRecruitingCommits() {
       tendencies:r.tendencies || makeTendencies(r.position),
       originalConf:targetConf,
       originalTeam:targetTeam,
+      recruitedByOriginalSchool:true,
       recruitedFreshman:true
     });
     if (Array.isArray(entry)) allRosters[targetConf][targetTeam] = roster;
@@ -6485,6 +7723,7 @@ function resetForNextSeason() {
   departuresAwaitingRetention = false;
   portalWeek = 1;
   portalHoursState = null;
+  portalFinishInProgress = false;
   portalStarFilter = 'all';
   portalPositionFilter = 'all';
   portalBookmarksFilter = false;
@@ -9354,26 +10593,27 @@ function drawDashboardScene() {
 }
 
 function drawSceneBackground(ctx) {
+  const t = getThemePalette();
   // back wall texture (subtle vertical paneling)
-  ctx.fillStyle = 'rgba(237,224,184,0.04)';
+  ctx.fillStyle = t.textA(0.04);
   for (let x = 30; x < SCENE_W; x += 78) {
     ctx.fillRect(x, 0, 1, FLOOR_Y);
   }
   // floor
-  ctx.fillStyle = 'rgba(168,36,24,0.18)';
+  ctx.fillStyle = t.primaryA(0.18);
   ctx.fillRect(0, FLOOR_Y, SCENE_W, 2);
   ctx.fillStyle = 'rgba(8,7,4,0.55)';
   ctx.fillRect(0, FLOOR_Y + 2, SCENE_W, SCENE_H - FLOOR_Y - 2);
-  ctx.fillStyle = 'rgba(192,138,24,0.10)';
+  ctx.fillStyle = t.accentA(0.10);
   for (let x = 0; x < SCENE_W; x += 60) {
     ctx.fillRect(x, FLOOR_Y + 2, 1, SCENE_H - FLOOR_Y - 2);
   }
   // chalkboard
-  ctx.fillStyle = '#3a2400';
+  ctx.fillStyle = t.dark;
   ctx.fillRect(36, 22, 130, 76);
   ctx.fillStyle = '#0f1410';
   ctx.fillRect(40, 26, 122, 68);
-  ctx.fillStyle = 'rgba(237,224,184,0.55)';
+  ctx.fillStyle = t.textA(0.55);
   // X's
   ctx.fillRect(54, 42, 2, 2); ctx.fillRect(56, 44, 2, 2); ctx.fillRect(58, 46, 2, 2);
   ctx.fillRect(58, 42, 2, 2); ctx.fillRect(56, 44, 2, 2); ctx.fillRect(54, 46, 2, 2);
@@ -9385,22 +10625,22 @@ function drawSceneBackground(ctx) {
   ctx.fillRect(126, 64, 8, 1); ctx.fillRect(126, 72, 8, 1);
   ctx.fillRect(126, 65, 1, 7); ctx.fillRect(133, 65, 1, 7);
   // arrow play line
-  ctx.fillStyle = 'rgba(237,224,184,0.4)';
+  ctx.fillStyle = t.textA(0.4);
   for (let i = 0; i < 30; i++) {
     ctx.fillRect(60 + i * 2, 78 - Math.floor(Math.sin(i * 0.4) * 6), 1, 1);
   }
   // window/poster on right wall above desk
-  ctx.fillStyle = '#3a2400';
+  ctx.fillStyle = t.dark;
   ctx.fillRect(DESK_LEFT - 4, 24, 80, 90);
-  ctx.fillStyle = '#a82418';
+  ctx.fillStyle = t.primary;
   ctx.fillRect(DESK_LEFT, 28, 72, 82);
-  ctx.fillStyle = '#ede0b8';
+  ctx.fillStyle = t.text;
   ctx.fillRect(DESK_LEFT + 14, 36, 44, 6);
   ctx.fillRect(DESK_LEFT + 8, 50, 56, 2);
   // basketball graphic on poster
-  ctx.fillStyle = '#c08a18';
+  ctx.fillStyle = t.accent;
   ctx.fillRect(DESK_LEFT + 26, 64, 20, 20);
-  ctx.fillStyle = '#350a04';
+  ctx.fillStyle = t.deep;
   ctx.fillRect(DESK_LEFT + 26, 72, 20, 1);
   ctx.fillRect(DESK_LEFT + 35, 64, 1, 20);
 }
@@ -9496,17 +10736,18 @@ function drawCoachInScene(ctx) {
 
 function drawCoachOverlays(ctx) {
   const a = dashboardCoachAnim;
+  const t = getThemePalette();
   // yelling marks above head
   if (a.state === 'yelling') {
     const headTopY = FLOOR_Y - 220 + (48 - 12);
     const headLeft = a.x - 90 + 58;
-    ctx.fillStyle = '#c08a18';
+    ctx.fillStyle = t.accent;
     // Exclamation mark shaking
     const shake = (a.frame % 4 < 2) ? 1 : -1;
     ctx.fillRect(headLeft + 28 + shake, headTopY - 28, 4, 14);
     ctx.fillRect(headLeft + 28 + shake, headTopY - 10, 4, 4);
     // anger lines around head
-    ctx.fillStyle = 'rgba(192,138,24,0.7)';
+    ctx.fillStyle = t.accentA(0.7);
     ctx.fillRect(headLeft - 6, headTopY - 4, 6, 1);
     ctx.fillRect(headLeft - 8, headTopY - 8, 8, 1);
     ctx.fillRect(headLeft + 64, headTopY - 4, 6, 1);
@@ -9515,7 +10756,7 @@ function drawCoachOverlays(ctx) {
   // walking dust puff
   if (a.walking && a.frame % 4 === 0) {
     const dustX = a.x - a.facing * 18;
-    ctx.fillStyle = 'rgba(192,138,24,0.35)';
+    ctx.fillStyle = t.accentA(0.35);
     ctx.fillRect(dustX, FLOOR_Y - 4, 4, 2);
     ctx.fillRect(dustX + 2, FLOOR_Y - 6, 2, 2);
   }
@@ -9527,7 +10768,7 @@ function drawCoach(canvasId = 'coach-canvas', profile = coachProfile, anim = nul
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = false;
-  ctx.fillStyle = 'rgba(192,138,24,0.12)';
+  ctx.fillStyle = getThemePalette().accentA(0.12);
   ctx.fillRect(35, 215, 110, 8);
   _drawCoachPixels(ctx, profile, {
     pose:anim ? (anim.pose || 'idle') : 'idle',
@@ -10812,6 +12053,7 @@ function renderPressAnswer(response) {
    SCHEDULER
 ═══════════════════════════════════════════ */
 let seasonNumber = 1;
+applySavedPrestigeOverrides();
 let cachedSchedule = null;
 let leagueSchedule = null;
 
@@ -11358,13 +12600,14 @@ const bctx = borderEl.getContext('2d');
 function drawBorder() {
   borderEl.width = window.innerWidth; borderEl.height = window.innerHeight;
   const M = 14;
-  roughRect(bctx, M,   M,   window.innerWidth-M*2,    window.innerHeight-M*2,    'rgba(192,138,24,0.55)', 3, 11);
-  roughRect(bctx, M+5, M+5, window.innerWidth-M*2-10, window.innerHeight-M*2-10, 'rgba(168,36,24,0.3)',   2, 77);
+  const t = getThemePalette();
+  roughRect(bctx, M,   M,   window.innerWidth-M*2,    window.innerHeight-M*2,    t.accentA(0.55), 3, 11);
+  roughRect(bctx, M+5, M+5, window.innerWidth-M*2-10, window.innerHeight-M*2-10, t.primaryA(0.3),   2, 77);
   const corners = [[M+2,M+2],[window.innerWidth-M-28,M+2],[M+2,window.innerHeight-M-28],[window.innerWidth-M-28,window.innerHeight-M-28]];
   for (const [cx,cy] of corners) {
     const r2 = seededRand(cx+cy);
     const j = () => (r2()-0.5)*2;
-    bctx.strokeStyle = 'rgba(192,138,24,0.4)'; bctx.lineWidth = 2;
+    bctx.strokeStyle = t.accentA(0.4); bctx.lineWidth = 2;
     bctx.beginPath();
     bctx.moveTo(cx+j(),cy+j()); bctx.lineTo(cx+22+j(),cy+j());
     bctx.moveTo(cx+j(),cy+j()); bctx.lineTo(cx+j(),cy+22+j());
@@ -11381,7 +12624,7 @@ function drawBtnBorder() {
   const w = btnEl.offsetWidth + 10, h = btnEl.offsetHeight + 10;
   btnBorderEl.width = w; btnBorderEl.height = h;
   btnBorderEl.style.width = w+'px'; btnBorderEl.style.height = h+'px';
-  roughRect(btnCtx, 2, 2, w-4, h-4, 'rgba(237,224,184,0.65)', 2.5, 33);
+  roughRect(btnCtx, 2, 2, w-4, h-4, getThemePalette().textA(0.65), 2.5, 33);
 }
 requestAnimationFrame(drawBtnBorder);
 
@@ -11393,22 +12636,25 @@ function drawCourt() {
   courtEl.width = W; courtEl.height = H;
   courtEl.style.width = '100%'; courtEl.style.height = '32vh';
   const r = seededRand(99); const j = (a=2) => (r()-0.5)*a;
-  const plankC = ['#6b3d18','#724218','#693b16','#704010'];
+  const t = getThemePalette();
+  const plankC = document.body.dataset.theme
+    ? [t.panel, t.dark, t.primaryA(0.62), t.panelA(0.92)]
+    : ['#6b3d18','#724218','#693b16','#704010'];
   for (let x = 0; x < W; x += 72) {
     cc.fillStyle = plankC[Math.floor(x/72) % plankC.length];
     cc.fillRect(x, 0, 72, H);
-    cc.strokeStyle = '#3a1e08'; cc.lineWidth = 1.5;
+    cc.strokeStyle = document.body.dataset.theme ? t.darkA(0.78) : '#3a1e08'; cc.lineWidth = 1.5;
     cc.beginPath(); cc.moveTo(x+j(),0); cc.lineTo(x+j(),H); cc.stroke();
   }
-  cc.strokeStyle = '#8c5520'; cc.lineWidth = 4;
+  cc.strokeStyle = document.body.dataset.theme ? t.accentA(0.42) : '#8c5520'; cc.lineWidth = 4;
   cc.beginPath();
   for (let x=0;x<=W;x+=20) { const y=j(2.5); x===0?cc.moveTo(x,y):cc.lineTo(x,y); }
   cc.stroke();
-  cc.strokeStyle='rgba(200,150,60,0.28)'; cc.lineWidth=3;
+  cc.strokeStyle=document.body.dataset.theme ? t.accentA(0.28) : 'rgba(200,150,60,0.28)'; cc.lineWidth=3;
   cc.beginPath();
   for (let y=0;y<=H;y+=12) { const x=W/2+j(2); y===0?cc.moveTo(x,y):cc.lineTo(x,y); }
   cc.stroke();
-  cc.strokeStyle='rgba(200,150,60,0.22)'; cc.lineWidth=3;
+  cc.strokeStyle=document.body.dataset.theme ? t.accentA(0.22) : 'rgba(200,150,60,0.22)'; cc.lineWidth=3;
   cc.beginPath();
   for (let a=0;a<=Math.PI;a+=0.15) {
     const px=W/2+Math.cos(a)*(110+j(3)), py=Math.sin(a)*(110+j(3));
@@ -11417,7 +12663,7 @@ function drawCourt() {
   cc.stroke();
   for (const side of [-1,1]) {
     const lx = side===-1 ? 0 : W-130;
-    cc.strokeStyle='rgba(200,150,60,0.22)'; cc.lineWidth=2;
+    cc.strokeStyle=document.body.dataset.theme ? t.accentA(0.22) : 'rgba(200,150,60,0.22)'; cc.lineWidth=2;
     cc.strokeRect(lx+j(),j(),130+j(3),90+j(3));
     cc.beginPath();
     cc.arc(lx+(side===-1?130:0)+j(), 45+j(), 40, -Math.PI/2, Math.PI/2);
@@ -11465,20 +12711,118 @@ function drawHoop(id) {
   const canvas = document.getElementById(id);
   const ctx = canvas.getContext('2d');
   const p = 4;
+  const t = getThemePalette();
   ctx.fillStyle='#444'; ctx.fillRect(0,0,p*2,p*26);
-  ctx.fillStyle='#d4c8a0'; ctx.fillRect(p*2,0,p*4,p*12);
-  ctx.strokeStyle='#3a3020'; ctx.lineWidth=2;
+  ctx.fillStyle=t.textA(0.86); ctx.fillRect(p*2,0,p*4,p*12);
+  ctx.strokeStyle=t.dark; ctx.lineWidth=2;
   ctx.strokeRect(p*2+2,2,p*4-4,p*12-4);
-  ctx.strokeStyle='rgba(168,36,24,0.7)'; ctx.lineWidth=2;
+  ctx.strokeStyle=t.primaryA(0.7); ctx.lineWidth=2;
   ctx.strokeRect(p*3,p*3,p*2,p*3);
   ctx.fillStyle='#555'; ctx.fillRect(p*6,p*6,p*5,p*2);
-  ctx.fillStyle='#b82418';
+  ctx.fillStyle=t.primary;
   ctx.fillRect(p*11,p*6,p*6,p*2); ctx.fillRect(p*16,p*8,p*2,p*2);
-  ctx.fillStyle='rgba(237,224,184,0.55)';
+  ctx.fillStyle=t.textA(0.55);
   for (let i=0;i<5;i++) ctx.fillRect(p*11+i*(p-1+2),p*10,2,p*2+(i%2)*p);
   ctx.fillRect(p*11+2,p*14,p*4,2);
 }
 drawHoop('hoop-l'); drawHoop('hoop-r');
+
+function refreshThemedCanvases() {
+  drawBorder();
+  drawBtnBorder();
+  drawCourt();
+  drawHoop('hoop-l');
+  drawHoop('hoop-r');
+  drawCoach('coach-canvas');
+  drawDashboardScene();
+}
+window.refreshThemePaint = refreshThemedCanvases;
+Theme.apply(Theme.get());
+Music.apply();
+
+/* Settings panel */
+(function setupSettingsPanel(){
+  const gear = document.getElementById('settings-gear');
+  const overlay = document.getElementById('settings-overlay');
+  const closeBtn = document.getElementById('settings-close');
+  if (!gear || !overlay) return;
+
+  const sfxToggle = document.getElementById('settings-sfx-toggle');
+  const sfxSlider = document.getElementById('settings-sfx-vol');
+  const sfxVal    = document.getElementById('settings-sfx-val');
+  const musicToggle = document.getElementById('settings-music-toggle');
+  const musicSlider = document.getElementById('settings-music-vol');
+  const musicVal    = document.getElementById('settings-music-val');
+  const themeGrid   = document.getElementById('settings-theme-grid');
+
+  function syncSfx() {
+    const m = Sfx.isMuted();
+    sfxToggle.textContent = m ? 'OFF' : 'ON';
+    sfxToggle.classList.toggle('off', m);
+    const pct = Math.round(Sfx.getVolume() * 100);
+    sfxSlider.value = pct;
+    sfxVal.textContent = pct;
+  }
+  function syncMusic() {
+    const m = Music.isMuted();
+    musicToggle.textContent = m ? 'OFF' : 'ON';
+    musicToggle.classList.toggle('off', m);
+    const pct = Math.round(Music.getVolume() * 100);
+    musicSlider.value = pct;
+    musicVal.textContent = pct;
+  }
+  function buildThemes() {
+    themeGrid.innerHTML = THEMES.map(t => `
+      <button class="theme-card${Theme.get() === t.id ? ' active' : ''}" type="button" data-theme="${t.id}">
+        ${t.name}
+        <div class="theme-swatches">
+          ${t.swatches.map(c => `<span class="theme-swatch" style="background:${c}"></span>`).join('')}
+        </div>
+      </button>
+    `).join('');
+    themeGrid.querySelectorAll('.theme-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        Theme.apply(card.dataset.theme);
+        buildThemes();
+        Sfx.select();
+      });
+    });
+  }
+
+  sfxToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    Sfx.toggle();
+    syncSfx();
+    if (!Sfx.isMuted()) Sfx.click();
+  });
+  sfxSlider.addEventListener('input', () => {
+    Sfx.setVolume(sfxSlider.value / 100);
+    sfxVal.textContent = sfxSlider.value;
+  });
+  sfxSlider.addEventListener('change', () => Sfx.click());
+
+  musicToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    Music.setMuted(!Music.isMuted());
+    syncMusic();
+  });
+  musicSlider.addEventListener('input', () => {
+    Music.setVolume(musicSlider.value / 100);
+    musicVal.textContent = musicSlider.value;
+  });
+
+  function open() {
+    syncSfx(); syncMusic(); buildThemes();
+    overlay.classList.add('show');
+  }
+  function close() { overlay.classList.remove('show'); }
+
+  gear.addEventListener('click', (e) => { e.stopPropagation(); open(); });
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('show')) close(); });
+})();
 
 /* Pixel crowd */
 const crowdEl = document.getElementById('crowd');

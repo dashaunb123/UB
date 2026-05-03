@@ -14,3 +14,5 @@ Progress:
 
 TODO:
 - User should hard refresh before testing to ensure the browser is not running a cached script.
+- Settings/theme pass: added shared CSS theme variables, broad themed overrides for common UI panels/buttons/rows/text, and canvas repaint hooks for border/court/hoops/dashboard scene when theme changes.
+- Settings/music pass: changed music unmute to actively start/resume the soundtrack from the settings click instead of depending on prior autoplay state.
