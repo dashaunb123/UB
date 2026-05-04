@@ -10,6 +10,7 @@
 */
 
 const SIM_TRACE_ENABLED = false;
+let superSimBatchInProgress = false;
 
 function simTrace(label, data = {}) {
   if (!SIM_TRACE_ENABLED || typeof console === 'undefined') return;
@@ -91,7 +92,13 @@ function playGameSoundtrack() {
   }
 }
 
-function startMultiGameSuperSim(count) {
+async function startMultiGameSuperSim(count) {
+  if (superSimBatchInProgress) {
+    simTrace('startMultiGameSuperSim:already-in-progress');
+    return;
+  }
+  // Always re-derive remaining games from the schedule, so we sim only what's actually unplayed.
+  currentGameIndex = getNextUnplayedGameIndex();
   const remainingGames = (cachedSchedule || []).length - currentGameIndex;
   simTrace('startMultiGameSuperSim:enter', { requestedCount:count, remainingGames });
   if (remainingGames <= 0) {
@@ -101,16 +108,157 @@ function startMultiGameSuperSim(count) {
   const gamesToSim = Math.max(1, Math.min(Number(count) || 1, remainingGames));
   ensureDefaultGameplanSaved();
   stopGameTimer();
-  activeGame = createGameState(cachedSchedule[currentGameIndex]);
-  activeGame.superSimRemaining = gamesToSim;
-  simTrace('startMultiGameSuperSim:activeGame-created', { gamesToSim, scheduleGame:activeGame.scheduleGame });
-  renderGameScreen();
-  flash(() => {
-    showPanel('game');
-    renderGameScreen();
-    simTrace('startMultiGameSuperSim:calling-simGameToEnd');
-    simGameToEnd();
-  });
+  superSimBatchInProgress = true;
+  activeGame = null;
+  showSuperSimProgress(0, gamesToSim);
+  await yieldToSuperSimProgress();
+  if (typeof beginStandingsBatch === 'function') beginStandingsBatch();
+  if (typeof beginSimSaveBatch === 'function') beginSimSaveBatch();
+  let simmed = 0;
+  try {
+    while (simmed < gamesToSim) {
+      // Re-derive each iteration so we never re-sim a played game and never infinite-loop on a stuck one.
+      const idx = getNextUnplayedGameIndex();
+      if (idx >= (cachedSchedule || []).length) {
+        simTrace('startMultiGameSuperSim:no-more-unplayed', { simmed });
+        break;
+      }
+      currentGameIndex = idx;
+      const scheduleGame = cachedSchedule[idx];
+      updateSuperSimProgress(simmed, gamesToSim);
+      await yieldToSuperSimProgress();
+      try {
+        simulateUserScheduleGameSilently(scheduleGame);
+      } catch (err) {
+        simTraceError('startMultiGameSuperSim:user-game-failed', err, { idx, scheduleGame });
+        // Force-advance past the broken game so the batch can continue.
+        if (scheduleGame && !scheduleGame.result) {
+          scheduleGame.result = { homeScore:0, awayScore:0, error:true };
+          if (typeof saveCachedSchedule === 'function') saveCachedSchedule();
+        }
+      }
+      try {
+        await simulateRemainderWeekGamesForSuperSim(scheduleGame);
+      } catch (err) {
+        simTraceError('startMultiGameSuperSim:remainder-failed', err, { idx, scheduleGame });
+      }
+      // Make sure currentGameIndex actually moved forward.
+      const after = getNextUnplayedGameIndex();
+      if (after <= idx) {
+        simTrace('startMultiGameSuperSim:index-stuck', { idx, after });
+        currentGameIndex = idx + 1;
+      } else {
+        currentGameIndex = after;
+      }
+      simmed++;
+      updateSuperSimProgress(simmed, gamesToSim);
+      await yieldToSuperSimProgress();
+    }
+  } catch (err) {
+    simTraceError('startMultiGameSuperSim:fatal', err, { simmed, gamesToSim });
+  } finally {
+    try { if (typeof endStandingsBatch === 'function') endStandingsBatch(); } catch (_) {}
+    try { if (typeof endSimSaveBatch === 'function') endSimSaveBatch(); } catch (_) {}
+    superSimBatchInProgress = false;
+    activeGame = null;
+    hideSuperSimProgress();
+    try { goToDashboard(); } catch (_) {}
+  }
+}
+
+function showSuperSimProgress(current, total) {
+  if (typeof showPortalWorkProgress === 'function') {
+    showPortalWorkProgress('SIMULATING GAMES', current, total);
+  }
+}
+
+function updateSuperSimProgress(current, total) {
+  if (typeof updatePortalWorkProgress === 'function') {
+    updatePortalWorkProgress('SIMULATING GAMES', current, total);
+  }
+}
+
+function hideSuperSimProgress() {
+  if (typeof hidePortalWorkProgress === 'function') hidePortalWorkProgress();
+}
+
+function yieldToSuperSimProgress() {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+function simulateUserScheduleGameSilently(scheduleGame) {
+  if (!scheduleGame || scheduleGame.result) {
+    currentGameIndex = getNextUnplayedGameIndex();
+    return null;
+  }
+  const state = createGameState(scheduleGame);
+  state.backgroundSim = true;
+  state.silentSuperSim = true;
+  let guard = 0;
+  while (!state.complete && guard < 5000) {
+    simulatePossession(state);
+    guard++;
+  }
+  if (!state.complete) {
+    console.warn('[SIM TRACE]', 'silent super sim guard exhausted before game completed', {
+      guard,
+      scheduleGame,
+      period:state.period,
+      clock:state.clock,
+      score:state.scores
+    });
+  }
+  const lgGame = findLeagueGame(state.scheduleGame.date, state.homeTeam, state.awayTeam);
+  if (lgGame && state.scheduleGame.result) {
+    lgGame.result = {
+      homeScore:state.scheduleGame.result.homeScore,
+      awayScore:state.scheduleGame.result.awayScore
+    };
+    lgGame.statsRecorded = true;
+    saveLeagueSchedule();
+  }
+  saveCachedSchedule();
+  currentGameIndex = getNextUnplayedGameIndex();
+  return state.scheduleGame.result || null;
+}
+
+async function simulateRemainderWeekGamesForSuperSim(scheduleGame) {
+  ensureStandingsState();
+  ensureLeagueSchedule();
+  const date = scheduleGame.date;
+  const weekKey = date || `GAME-${currentGameIndex}`;
+  if (standingsState.weeksSimmed && standingsState.weeksSimmed[weekKey]) return 0;
+  const games = (leagueSchedule && leagueSchedule.byDate && leagueSchedule.byDate[date])
+    ? leagueSchedule.byDate[date]
+    : [];
+  const rng = mulberry32(strHash(`${seasonNumber || 1}|${date}|league-week`));
+  let count = 0;
+  for (let i = 0; i < games.length; i++) {
+    const g = games[i];
+    if (!g.date) g.date = date;
+    if (g.home === selectedTeam || g.away === selectedTeam) continue;
+    const gameId = typeof getStatGameId === 'function' ? getStatGameId(date, g.home, g.away) : '';
+    if (g.result) {
+      if (!g.statsRecorded && typeof addSyntheticGameToPlayerStats === 'function' && Number.isFinite(g.result.homeScore) && Number.isFinite(g.result.awayScore)) {
+        addSyntheticGameToPlayerStats(g.home, g.away, g.result.homeScore, g.result.awayScore, rng, gameId);
+        g.statsRecorded = true;
+      }
+    } else {
+      simulateBackgroundGame(g, rng, gameId);
+      count++;
+    }
+    if (i % 8 === 7) await yieldToSuperSimProgress();
+  }
+  standingsState.weeksSimmed[weekKey] = count;
+  if (typeof isStandingsBatchActive !== 'function' || !isStandingsBatchActive()) {
+    saveGameJSON(getStandingsStateKey(), standingsState);
+  }
+  saveLeagueSchedule();
+  const offseasonEnabled = typeof OFFSEASON_FEATURES_ENABLED === 'undefined' ? true : OFFSEASON_FEATURES_ENABLED;
+  if (offseasonEnabled && typeof simulateCPURecruitingWeek === 'function') {
+    simulateCPURecruitingWeek(weekKey);
+  }
+  return count;
 }
 
 function createGameState(scheduleGame) {
@@ -503,14 +651,14 @@ function finishGame(state) {
   const winnerSide = state.scores.home > state.scores.away ? 'home' : 'away';
   const loserSide = winnerSide === 'home' ? 'away' : 'home';
   const margin = Math.abs(state.scores.home - state.scores.away);
-  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin, !!state.scheduleGame.isConf);
+  const statGameId = typeof getStatGameId === 'function' ? getStatGameId(state.scheduleGame.date, state.homeTeam, state.awayTeam) : '';
+  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin, !!state.scheduleGame.isConf, statGameId);
   state.resultApplied = true;
   state.scheduleGame.result = {
     homeScore:state.scores.home,
     awayScore:state.scores.away
   };
   const lgGame = findLeagueGame(state.scheduleGame.date, state.homeTeam, state.awayTeam);
-  const statGameId = typeof getStatGameId === 'function' ? getStatGameId(state.scheduleGame.date, state.homeTeam, state.awayTeam) : '';
   if (lgGame) {
     lgGame.result = {
       homeScore:state.scores.home,
@@ -554,13 +702,13 @@ function finishBackgroundGame(state) {
   const winnerSide = state.scores.home > state.scores.away ? 'home' : 'away';
   const loserSide = winnerSide === 'home' ? 'away' : 'home';
   const margin = Math.abs(state.scores.home - state.scores.away);
-  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin, !!state.scheduleGame.isConf);
+  const statGameId = typeof getStatGameId === 'function' ? getStatGameId(state.scheduleGame.date, state.homeTeam, state.awayTeam) : '';
+  applyGameResultToStandings(state[`${winnerSide}Team`], state[`${loserSide}Team`], margin, !!state.scheduleGame.isConf, statGameId);
   state.resultApplied = true;
   state.scheduleGame.result = {
     homeScore:state.scores.home,
     awayScore:state.scores.away
   };
-  const statGameId = typeof getStatGameId === 'function' ? getStatGameId(state.scheduleGame.date, state.homeTeam, state.awayTeam) : '';
   if (typeof addBoxScoreToPlayerStats === 'function') addBoxScoreToPlayerStats(makeBoxScore(state), statGameId);
   state.scheduleGame.statsRecorded = true;
 }
@@ -641,48 +789,56 @@ function simulateRemainderWeekGames(scheduleGame) {
   simTrace('simulateRemainderWeekGames:games-loaded', { date, weekKey, totalGames:games.length });
   const rng = mulberry32(strHash(`${seasonNumber || 1}|${date}|league-week`));
   let count = 0;
-  for (const g of games) {
-    if (g.home === selectedTeam || g.away === selectedTeam) continue;
-    const gameId = typeof getStatGameId === 'function' ? getStatGameId(date, g.home, g.away) : '';
-    if (g.result) {
-      simTrace('simulateRemainderWeekGames:existing-result', {
+  if (typeof beginStandingsBatch === 'function') beginStandingsBatch();
+  if (typeof beginSimSaveBatch === 'function') beginSimSaveBatch();
+  try {
+    for (const g of games) {
+      if (!g.date) g.date = date;
+      if (g.home === selectedTeam || g.away === selectedTeam) continue;
+      const gameId = typeof getStatGameId === 'function' ? getStatGameId(date, g.home, g.away) : '';
+      if (g.result) {
+        simTrace('simulateRemainderWeekGames:existing-result', {
+          date,
+          home:g.home,
+          away:g.away,
+          statsRecorded:!!g.statsRecorded,
+          result:g.result
+        });
+        if (!g.statsRecorded && typeof addSyntheticGameToPlayerStats === 'function' && Number.isFinite(g.result.homeScore) && Number.isFinite(g.result.awayScore)) {
+          addSyntheticGameToPlayerStats(g.home, g.away, g.result.homeScore, g.result.awayScore, rng, gameId);
+          g.statsRecorded = true;
+        }
+        continue;
+      }
+      simTrace('simulateRemainderWeekGames:background-start', {
         date,
         home:g.home,
         away:g.away,
-        statsRecorded:!!g.statsRecorded,
+        gameId,
+        countBefore:count
+      });
+      try {
+        simulateBackgroundGame(g, rng, gameId);
+      } catch (err) {
+        simTraceError('simulateRemainderWeekGames:background-failed', err, {
+          date,
+          home:g.home,
+          away:g.away,
+          gameId
+        });
+        throw err;
+      }
+      simTrace('simulateRemainderWeekGames:background-done', {
+        date,
+        home:g.home,
+        away:g.away,
         result:g.result
       });
-      if (!g.statsRecorded && typeof addSyntheticGameToPlayerStats === 'function' && Number.isFinite(g.result.homeScore) && Number.isFinite(g.result.awayScore)) {
-        addSyntheticGameToPlayerStats(g.home, g.away, g.result.homeScore, g.result.awayScore, rng, gameId);
-        g.statsRecorded = true;
-      }
-      continue;
+      count++;
     }
-    simTrace('simulateRemainderWeekGames:background-start', {
-      date,
-      home:g.home,
-      away:g.away,
-      gameId,
-      countBefore:count
-    });
-    try {
-      simulateBackgroundGame(g, rng, gameId);
-    } catch (err) {
-      simTraceError('simulateRemainderWeekGames:background-failed', err, {
-        date,
-        home:g.home,
-        away:g.away,
-        gameId
-      });
-      throw err;
-    }
-    simTrace('simulateRemainderWeekGames:background-done', {
-      date,
-      home:g.home,
-      away:g.away,
-      result:g.result
-    });
-    count++;
+  } finally {
+    if (typeof endStandingsBatch === 'function') endStandingsBatch();
+    if (typeof endSimSaveBatch === 'function') endSimSaveBatch();
   }
   standingsState.weeksSimmed[weekKey] = count;
   simTrace('simulateRemainderWeekGames:standings-week-marked', { weekKey, count });

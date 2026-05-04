@@ -16,3 +16,6 @@ TODO:
 - User should hard refresh before testing to ensure the browser is not running a cached script.
 - Settings/theme pass: added shared CSS theme variables, broad themed overrides for common UI panels/buttons/rows/text, and canvas repaint hooks for border/court/hoops/dashboard scene when theme changes.
 - Settings/music pass: changed music unmute to actively start/resume the soundtrack from the settings click instead of depending on prior autoplay state.
+- Power Index balancing pass: standings now store season-start `basePower` and a per-game resume log, then recompute visible Power Index from base strength, opponent quality, margins, record, and schedule strength instead of letting weak wins stack unlimited incremental boosts. Standings rows now show `PI`.
+- Super sim pass: dashboard super sim now runs silently behind the existing progress overlay with `SIMULATING GAMES` and `X / Y`, chunks CPU week simulation with async yields, avoids showing game scores/feed, and returns to dashboard when complete.
+- Power Index performance fix: standings updates are now batched during CPU week sims and super-sim runs, so full Power Index recompute/storage writes happen once per batch instead of once per CPU game. League schedule resume rebuild is cached by result signature.

@@ -1611,7 +1611,7 @@
     }
     .standing-row {
       display:grid;
-      grid-template-columns:48px 1fr auto auto auto;
+      grid-template-columns:48px 1fr auto auto auto auto;
       gap:12px;
       align-items:center;
       border:2px solid rgba(237,224,184,0.12);
@@ -7628,8 +7628,12 @@ function runOffseasonTraining() {
         const oldOverall = Math.round(Number(player.overall) || 0);
         const oldPotential = Math.max(oldOverall, Math.round(Number(player.potential) || oldOverall));
         const yearsLeft = getPlayerYearsLeft(oldGrade);
-        const targetGain = Math.max(0, Math.ceil((oldPotential - oldOverall) / Math.max(1, yearsLeft)));
+        const remainingGap = Math.max(0, oldPotential - oldOverall);
         const newGrade = advancePlayerGrade(oldGrade);
+        // Players entering their senior year hit max potential; otherwise progress gradually.
+        const targetGain = newGrade === 'Senior'
+          ? remainingGap
+          : Math.max(0, Math.ceil(remainingGap / Math.max(1, yearsLeft)));
         player.grade = newGrade;
         const gained = trainPlayerTowardOverall(player, oldOverall + targetGain);
         if (gained > 0 || oldGrade !== newGrade) {
@@ -7652,7 +7656,9 @@ function runOffseasonTraining() {
 }
 
 function getPlayerYearsLeft(grade) {
-  return ({ Freshman:4, Sophomore:3, Junior:2, Senior:1 })[grade] || 1;
+  // Number of remaining offseason training cycles before the player enters their senior year.
+  // Tuned so steady gains across cycles bring a player to potential entering senior year.
+  return ({ Freshman:3, Sophomore:2, Junior:1, Senior:1 })[grade] || 1;
 }
 
 function advancePlayerGrade(grade) {
@@ -7888,6 +7894,7 @@ function getScheduleStateKey() {
 }
 
 function saveCachedSchedule() {
+  if (simSaveBatchDepth > 0) { simSaveDirty.cachedSchedule = true; return; }
   if (cachedSchedule) saveGameJSON(getScheduleStateKey(), cachedSchedule);
 }
 
@@ -7898,7 +7905,7 @@ function loadCachedSchedule() {
 }
 
 function getNextUnplayedGameIndex() {
-  const idx = (cachedSchedule || []).findIndex(g => !g.result);
+  const idx = (cachedSchedule || []).findIndex(g => g && !g.result);
   return idx < 0 ? (cachedSchedule || []).length : idx;
 }
 function quickSim()  {
@@ -9311,6 +9318,7 @@ function ensurePlayerStatsState() {
 }
 
 function savePlayerStatsState() {
+  if (simSaveBatchDepth > 0) { simSaveDirty.playerStats = true; return; }
   ensurePlayerStatsState();
   saveGameJSON(getPlayerStatsKey(), playerStatsState);
 }
@@ -9593,6 +9601,7 @@ function buildInitialStandingsState() {
   Object.entries(allRosters || {}).forEach(([conf, confTeams]) => {
     Object.entries(confTeams || {}).forEach(([team, entry]) => {
       const roster = getRosterFromEntry(entry);
+      const basePower = getTeamIndexScore(roster, conf, team);
       teams[getTeamKey(conf, team)] = {
         conf,
         team,
@@ -9600,7 +9609,9 @@ function buildInitialStandingsState() {
         losses:0,
         confWins:0,
         confLosses:0,
-        power:getTeamIndexScore(roster, conf, team)
+        basePower,
+        power:basePower,
+        games:[]
       };
     });
   });
@@ -9622,6 +9633,7 @@ function ensureStandingsState() {
     Object.entries(confTeams || {}).forEach(([team, entry]) => {
       const roster = getRosterFromEntry(entry);
       const key = getTeamKey(conf, team);
+      const basePower = getTeamIndexScore(roster, conf, team);
       if (!standingsState.teams[key]) {
         standingsState.teams[key] = {
           conf,
@@ -9630,12 +9642,17 @@ function ensureStandingsState() {
           losses:0,
           confWins:0,
           confLosses:0,
-          power:getTeamIndexScore(roster, conf, team)
+          basePower,
+          power:basePower,
+          games:[]
         };
       }
       const entryState = standingsState.teams[key];
       if (typeof entryState.confWins !== 'number') entryState.confWins = 0;
       if (typeof entryState.confLosses !== 'number') entryState.confLosses = 0;
+      if (typeof entryState.basePower !== 'number' || entryState.basePower <= 0) entryState.basePower = basePower;
+      if (typeof entryState.power !== 'number' || entryState.power <= 0) entryState.power = entryState.basePower;
+      if (!Array.isArray(entryState.games)) entryState.games = [];
     });
   });
   saveGameJSON(getStandingsStateKey(), standingsState);
@@ -9643,30 +9660,57 @@ function ensureStandingsState() {
 
 function syncConferenceRecordsFromLeagueSchedule() {
   if (!standingsState || !standingsState.teams || !leagueSchedule || leagueSchedule.season !== (seasonNumber || 1)) return;
-  const hasConferenceResults = Object.values(leagueSchedule.byDate || {}).some(games =>
-    (games || []).some(game => game && game.isConf && game.result)
-  );
-  if (!hasConferenceResults) return;
+  const resultSignature = getLeagueScheduleResultSignature();
+  if (!resultSignature) return;
+  if (standingsState.resumeSyncedResultSignature === resultSignature) return;
+  rebuildStandingsResumeFromLeagueSchedule();
+  standingsState.resumeSyncedResultSignature = resultSignature;
+  saveGameJSON(getStandingsStateKey(), standingsState);
+}
+
+function getLeagueScheduleResultSignature() {
+  if (!leagueSchedule || !leagueSchedule.byDate) return '';
+  const parts = [];
+  Object.entries(leagueSchedule.byDate || {}).forEach(([date, games]) => {
+    (games || []).forEach(game => {
+      if (!game || !game.result) return;
+      parts.push(`${date}:${game.home}:${game.away}:${Number(game.result.homeScore) || 0}-${Number(game.result.awayScore) || 0}`);
+    });
+  });
+  return parts.length ? parts.join('|') : '';
+}
+
+function rebuildStandingsResumeFromLeagueSchedule() {
+  if (!standingsState || !standingsState.teams || !leagueSchedule || leagueSchedule.season !== (seasonNumber || 1)) return;
   Object.values(standingsState.teams).forEach(entry => {
+    entry.wins = 0;
+    entry.losses = 0;
     entry.confWins = 0;
     entry.confLosses = 0;
+    entry.games = [];
   });
-  Object.values(leagueSchedule.byDate || {}).forEach(games => {
+  Object.entries(leagueSchedule.byDate || {}).forEach(([date, games]) => {
     (games || []).forEach(game => {
-      if (!game || !game.isConf || !game.result) return;
+      if (!game || !game.result) return;
       const home = getTeamStandingEntryNoEnsure(game.home);
       const away = getTeamStandingEntryNoEnsure(game.away);
       if (!home || !away) return;
-      const homeWon = Number(game.result.homeScore) > Number(game.result.awayScore);
+      const homeScore = Number(game.result.homeScore) || 0;
+      const awayScore = Number(game.result.awayScore) || 0;
+      if (homeScore === awayScore) return;
+      const homeWon = homeScore > awayScore;
+      const margin = Math.abs(homeScore - awayScore);
+      const gameId = typeof getStatGameId === 'function'
+        ? getStatGameId(date, game.home, game.away)
+        : `${seasonNumber || 1}::${date}::${game.home}::${game.away}`;
       if (homeWon) {
-        home.confWins = (Number(home.confWins) || 0) + 1;
-        away.confLosses = (Number(away.confLosses) || 0) + 1;
+        applyStandingResumeResult(home, away, margin, !!game.isConf, gameId);
       } else {
-        away.confWins = (Number(away.confWins) || 0) + 1;
-        home.confLosses = (Number(home.confLosses) || 0) + 1;
+        applyStandingResumeResult(away, home, margin, !!game.isConf, gameId);
       }
     });
   });
+  recomputeStandingsPowerIndexes();
 }
 
 function getTeamStandingEntryNoEnsure(teamName) {
@@ -9709,23 +9753,158 @@ function getWinPowerIncrease(winnerPower, loserPower) {
   return Math.max(1, Math.round(winnerPower * 0.1));
 }
 
-function applyGameResultToStandings(winnerTeam, loserTeam, margin, isConferenceGame = false) {
-  ensureStandingsState();
-  const winner = getTeamStandingEntry(winnerTeam);
-  const loser = getTeamStandingEntry(loserTeam);
-  if (!winner || !loser) return;
-  const winnerPower = Math.max(1, Number(winner.power) || 1);
-  const loserPower = Math.max(1, Number(loser.power) || 1);
-  const baseDecrease = (loserPower / winnerPower) * (loserPower / 5);
-  winner.wins += 1;
-  loser.losses += 1;
+function applyStandingResumeResult(winner, loser, margin, isConferenceGame = false, gameId = '') {
+  if (!winner || !loser) return false;
+  if (!Array.isArray(winner.games)) winner.games = [];
+  if (!Array.isArray(loser.games)) loser.games = [];
+  const id = gameId || `${seasonNumber || 1}::${winner.team}::${loser.team}::${winner.games.length + loser.games.length}`;
+  if (winner.games.some(game => game.id === id) || loser.games.some(game => game.id === id)) return false;
+  winner.wins = (Number(winner.wins) || 0) + 1;
+  loser.losses = (Number(loser.losses) || 0) + 1;
   if (isConferenceGame) {
     winner.confWins = (Number(winner.confWins) || 0) + 1;
     loser.confLosses = (Number(loser.confLosses) || 0) + 1;
   }
-  winner.power += getWinPowerIncrease(winnerPower, loserPower);
-  loser.power = Math.max(1, loser.power - Math.round(baseDecrease * getLossScale(margin) * getOpponentLossScale(winnerPower, loserPower)));
-  saveGameJSON(getStandingsStateKey(), standingsState);
+  winner.games.push({
+    id,
+    opponent:loser.team,
+    opponentConf:loser.conf,
+    result:'W',
+    margin:Math.max(0, Math.round(Number(margin) || 0)),
+    isConf:!!isConferenceGame
+  });
+  loser.games.push({
+    id,
+    opponent:winner.team,
+    opponentConf:winner.conf,
+    result:'L',
+    margin:Math.max(0, Math.round(Number(margin) || 0)),
+    isConf:!!isConferenceGame
+  });
+  return true;
+}
+
+function getOpponentBasePower(game) {
+  const key = getTeamKey(game.opponentConf || getTeamConf(game.opponent), game.opponent);
+  const opponent = standingsState && standingsState.teams ? standingsState.teams[key] : null;
+  return Math.max(1, Number(opponent ? opponent.basePower : 0) || getAverageBasePower());
+}
+
+function getAverageBasePower() {
+  const entries = standingsState && standingsState.teams ? Object.values(standingsState.teams) : [];
+  if (!entries.length) return 1;
+  return Math.max(1, sum(entries.map(entry => Math.max(1, Number(entry.basePower) || Number(entry.power) || 1))) / entries.length);
+}
+
+function getGameResumeDelta(entry, game, averageBasePower) {
+  const basePower = Math.max(1, Number(entry.basePower) || Number(entry.power) || 1);
+  const opponentBase = getOpponentBasePower(game);
+  const opponentRatio = opponentBase / basePower;
+  const margin = Math.max(0, Number(game.margin) || 0);
+  const marginFactor = 0.75 + Math.min(1.25, margin / 20) * 0.5;
+  if (game.result === 'W') {
+    let rate = 0.0004;
+    if (opponentRatio >= 1.2) rate = 0.02;
+    else if (opponentRatio >= 1.05) rate = 0.012;
+    else if (opponentRatio >= 0.92) rate = 0.006;
+    else if (opponentRatio >= 0.78) rate = 0.0015;
+    return basePower * rate * marginFactor;
+  }
+  let rate = 0.001;
+  if (opponentRatio < 0.78) rate = 0.024;
+  else if (opponentRatio < 0.92) rate = 0.014;
+  else if (opponentRatio < 1.05) rate = 0.007;
+  else if (opponentRatio < 1.2) rate = 0.003;
+  return -basePower * rate * marginFactor;
+}
+
+function recomputeStandingsPowerIndexes() {
+  if (!standingsState || !standingsState.teams) return;
+  const entries = Object.values(standingsState.teams);
+  const averageBasePower = getAverageBasePower();
+  entries.forEach(entry => {
+    const basePower = Math.max(1, Number(entry.basePower) || Number(entry.power) || 1);
+    const games = Array.isArray(entry.games) ? entry.games : [];
+    const gameCount = Math.max(1, games.length);
+    const winPct = getOverallWinPct(entry);
+    const averageOpponentBase = games.length
+      ? sum(games.map(game => getOpponentBasePower(game))) / games.length
+      : averageBasePower;
+    const sosRatio = averageOpponentBase / averageBasePower;
+    const recordAdjustment = basePower * clamp((winPct - 0.5) * 0.06, -0.04, 0.04);
+    const scheduleAdjustment = basePower * clamp((sosRatio - 1) * 0.1, -0.045, 0.055);
+    const resumeAdjustment = sum(games.map(game => getGameResumeDelta(entry, game, averageBasePower)));
+    const volumeScale = Math.min(1, gameCount / 12);
+    entry.power = Math.max(1, Math.round(basePower + (recordAdjustment + scheduleAdjustment + resumeAdjustment) * volumeScale));
+  });
+}
+
+let standingsBatchDepth = 0;
+let standingsPowerDirty = false;
+
+let simSaveBatchDepth = 0;
+const simSaveDirty = { playerStats:false, cachedSchedule:false, leagueSchedule:false, standings:false };
+
+function beginSimSaveBatch() {
+  simSaveBatchDepth++;
+}
+function isSimSaveBatchActive() { return simSaveBatchDepth > 0; }
+function endSimSaveBatch() {
+  simSaveBatchDepth = Math.max(0, simSaveBatchDepth - 1);
+  if (simSaveBatchDepth > 0) return;
+  if (simSaveDirty.playerStats && playerStatsState) {
+    saveGameJSON(getPlayerStatsKey(), playerStatsState);
+  }
+  if (simSaveDirty.cachedSchedule && cachedSchedule) {
+    saveGameJSON(getScheduleStateKey(), cachedSchedule);
+  }
+  if (simSaveDirty.leagueSchedule && leagueSchedule) {
+    saveGameJSON(getLeagueScheduleKey(), compactLeagueSchedule(leagueSchedule));
+  }
+  if (simSaveDirty.standings && standingsState) {
+    saveGameJSON(getStandingsStateKey(), standingsState);
+  }
+  simSaveDirty.playerStats = false;
+  simSaveDirty.cachedSchedule = false;
+  simSaveDirty.leagueSchedule = false;
+  simSaveDirty.standings = false;
+}
+
+function beginStandingsBatch() {
+  standingsBatchDepth++;
+}
+
+function isStandingsBatchActive() {
+  return standingsBatchDepth > 0;
+}
+
+function endStandingsBatch() {
+  standingsBatchDepth = Math.max(0, standingsBatchDepth - 1);
+  if (standingsBatchDepth === 0 && standingsPowerDirty) {
+    recomputeStandingsPowerIndexes();
+    standingsPowerDirty = false;
+    if (standingsState) {
+      if (simSaveBatchDepth > 0) simSaveDirty.standings = true;
+      else saveGameJSON(getStandingsStateKey(), standingsState);
+    }
+  }
+}
+
+function applyGameResultToStandings(winnerTeam, loserTeam, margin, isConferenceGame = false, gameId = '') {
+  ensureStandingsState();
+  const winner = getTeamStandingEntry(winnerTeam);
+  const loser = getTeamStandingEntry(loserTeam);
+  if (!winner || !loser) return;
+  const changed = applyStandingResumeResult(winner, loser, margin, isConferenceGame, gameId);
+  if (!changed) return;
+  standingsState.resumeSyncedResultSignature = '';
+  if (standingsBatchDepth > 0) {
+    standingsPowerDirty = true;
+    return;
+  }
+  recomputeStandingsPowerIndexes();
+  if (simSaveBatchDepth > 0) simSaveDirty.standings = true;
+  else saveGameJSON(getStandingsStateKey(), standingsState);
 }
 
 function getConfWinPct(entry) {
@@ -9742,8 +9921,13 @@ function getOverallWinPct(entry) {
   return total ? wins / total : 0;
 }
 
+function formatPowerIndex(value) {
+  return Math.round(Number(value) || 0).toLocaleString();
+}
+
 function getRankedTeams(limit, mode = 'national', conf = selectedConf) {
   ensureStandingsState();
+  if (!leagueSchedule && typeof ensureLeagueSchedule === 'function') ensureLeagueSchedule();
   syncConferenceRecordsFromLeagueSchedule();
   let ranked = Object.values(standingsState.teams || {});
   if (mode === 'conference') {
@@ -9798,6 +9982,7 @@ function renderStandings() {
       <div class="standing-rank">#${i + 1}</div>
       <div class="standing-team">${escapeAttr(entry.team)}</div>
       <div class="standing-conf">${escapeAttr(entry.conf)}</div>
+      <div class="standing-record">PI ${formatPowerIndex(entry.power)}</div>
       <div class="standing-record">CONF ${(Number(entry.confWins) || 0)}-${(Number(entry.confLosses) || 0)}</div>
       <div class="standing-record">ALL ${entry.wins}-${entry.losses}</div>
     </div>
@@ -12152,6 +12337,7 @@ function compactLeagueSchedule(schedule) {
 }
 
 function saveLeagueSchedule() {
+  if (simSaveBatchDepth > 0) { simSaveDirty.leagueSchedule = true; return; }
   if (leagueSchedule) saveGameJSON(getLeagueScheduleKey(), compactLeagueSchedule(leagueSchedule));
 }
 
