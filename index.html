@@ -3123,9 +3123,16 @@
       width:100%;
       height:100%;
       display:grid;
-      grid-template-rows:auto 1fr;
+      grid-template-rows:auto auto 1fr;
       gap:8px;
       min-height:0;
+    }
+    .tournament-season-title {
+      color:#ede0b8;
+      font-size:clamp(9px,1.3vw,14px);
+      line-height:1.4;
+      text-align:center;
+      text-shadow:2px 2px 0 #a82418, 4px 4px 0 #350a04;
     }
     .tournament-actions {
       display:flex;
@@ -3793,6 +3800,16 @@
       </div>
 
       <div class="settings-section">
+        <div class="settings-label"><span>CUSTOM NAMES</span></div>
+        <div class="saves-info" id="settings-name-pack-status" style="margin:0 0 8px;">GENERIC DEFAULTS ACTIVE</div>
+        <input id="settings-name-pack-file" type="file" accept="application/json,.json" style="display:none;"/>
+        <div class="saves-footer" style="margin-top:0;">
+          <button class="settings-close" id="settings-upload-name-pack" type="button" style="margin:0;background:#1f4d78;border-color:#bfe2ff;">UPLOAD JSON</button>
+          <button class="settings-close" id="settings-clear-name-pack" type="button" style="margin:0;background:#5c1818;border-color:#ffd0c0;">RESET</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
         <div class="settings-label"><span>SAVE FILES</span></div>
         <button class="settings-close" id="settings-open-saves" type="button" style="margin:6px auto 0;background:#1f4d78;border-color:#bfe2ff;">MANAGE SAVES</button>
       </div>
@@ -3922,7 +3939,7 @@
     </div>
     <div class="sched-shell">
       <div class="sched-header">
-        <span class="sched-eyebrow">* SEASON <span id="sched-season-num">1</span> SCHEDULE *</span>
+        <span class="sched-eyebrow">* <span id="sched-season-num">2026</span> SCHEDULE *</span>
         <span class="sched-title" id="sched-title"></span>
       </div>
       <div class="sched-body" id="sched-body"></div>
@@ -3975,7 +3992,7 @@
     <div class="dash-shell">
       <div class="dash-header">
         <div class="dash-team-block">
-          <span class="dash-eyebrow">* SEASON HUB *</span>
+          <span class="dash-eyebrow" id="dash-season-label">* 2026 SEASON HUB *</span>
           <span class="dash-title" id="dash-team-name"></span>
           <span class="dash-conf" id="dash-conf-name"></span>
         </div>
@@ -4080,6 +4097,7 @@
         <button class="tournament-action-btn" type="button" onclick="simulateTournament()">SIMULATE TOURNAMENT</button>
         <button class="tournament-continue-btn" id="tournament-continue-btn" type="button" onclick="goToDepartures()" style="display:none;">► CONTINUE</button>
       </div>
+      <div class="tournament-season-title" id="tournament-season-title">2026 NATIONAL TOURNAMENT</div>
       <div class="bracket-board" id="bracket-board"></div>
     </div>
   </div>
@@ -4281,6 +4299,9 @@
 <script src="teams.js"></script>
 <script>
 /* Team and conference data lives in teams.js. */
+const TEAM_NAME_PACK_STORAGE_KEY = 'customTeamNamePack';
+applySavedTeamNamePack();
+
 const STATE_HOMETOWNS = {
   "Alabama":["Birmingham","Montgomery","Mobile","Huntsville","Tuscaloosa"],
   "Alaska":["Anchorage","Fairbanks","Juneau","Sitka","Wasilla"],
@@ -4370,6 +4391,131 @@ function lightenCoachColor(hex, amt) {
   const g = clamp(((n>>8)&255) + amt);
   const b = clamp((n&255) + amt);
   return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function sanitizeTeamNamePackName(value, fallback) {
+  const text = String(value || '').trim();
+  return text ? text.slice(0, 64) : fallback;
+}
+
+function makeUniqueTeamName(base, used) {
+  let name = base;
+  let n = 2;
+  while (used.has(name)) {
+    name = `${base} ${n}`;
+    n++;
+  }
+  used.add(name);
+  return name;
+}
+
+function normalizeTeamNamePack(raw) {
+  const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  if (!data || typeof data !== 'object') throw new Error('Name pack must be a JSON object.');
+  let conferences = [];
+  if (Array.isArray(data.conferences)) {
+    conferences = data.conferences.map(conf => {
+      const teams = Array.isArray(conf.teams)
+        ? conf.teams.map(team => ({
+            id:sanitizeTeamNamePackName(team.id, ''),
+            name:sanitizeTeamNamePackName(team.name, team.id || '')
+          }))
+        : Object.entries(conf.teams || {}).map(([id, name]) => ({
+            id:sanitizeTeamNamePackName(id, ''),
+            name:sanitizeTeamNamePackName(name, id)
+          }));
+      return {
+        id:sanitizeTeamNamePackName(conf.id, ''),
+        name:sanitizeTeamNamePackName(conf.name, conf.id || ''),
+        teams
+      };
+    });
+  } else {
+    conferences = Object.entries(data).map(([id, value]) => {
+      const conf = value && typeof value === 'object' ? value : { name:value, teams:{} };
+      const teams = Object.entries(conf.teams || {}).map(([teamId, teamName]) => ({
+        id:sanitizeTeamNamePackName(teamId, ''),
+        name:sanitizeTeamNamePackName(teamName, teamId)
+      }));
+      return {
+        id:sanitizeTeamNamePackName(id, ''),
+        name:sanitizeTeamNamePackName(conf.name, id),
+        teams
+      };
+    });
+  }
+  if (!conferences.length) throw new Error('Name pack must include at least one conference.');
+  return { format:'university-basketball-team-names', version:1, conferences };
+}
+
+function applyTeamNamePack(pack) {
+  const normalized = normalizeTeamNamePack(pack);
+  const confPackById = new Map(normalized.conferences.map(conf => [conf.id, conf]));
+  const confEntries = Object.entries(CONFERENCES || {});
+  const nextConferences = {};
+  const nextTeamData = {};
+  const usedConfs = new Set();
+  confEntries.forEach(([confId, teams], confIndex) => {
+    const confPack = confPackById.get(confId) || normalized.conferences[confIndex] || null;
+    const confName = makeUniqueTeamName(sanitizeTeamNamePackName(confPack && confPack.name, confId), usedConfs);
+    const teamPackById = new Map(((confPack && confPack.teams) || []).map(team => [team.id, team]));
+    const teamPackList = (confPack && confPack.teams) || [];
+    const usedTeams = new Set();
+    nextConferences[confName] = [];
+    nextTeamData[confName] = {};
+    (teams || []).forEach((teamId, teamIndex) => {
+      const teamPack = teamPackById.get(teamId) || teamPackList[teamIndex] || null;
+      const teamName = makeUniqueTeamName(sanitizeTeamNamePackName(teamPack && teamPack.name, teamId), usedTeams);
+      nextConferences[confName].push(teamName);
+      nextTeamData[confName][teamName] = Object.assign({}, (((TEAM_DATA || {})[confId] || {})[teamId] || { p:50, n:1, o:70 }));
+    });
+  });
+
+  Object.keys(CONFERENCES).forEach(key => delete CONFERENCES[key]);
+  Object.assign(CONFERENCES, nextConferences);
+  Object.keys(TEAM_DATA).forEach(key => delete TEAM_DATA[key]);
+  Object.assign(TEAM_DATA, nextTeamData);
+  if (Array.isArray(CONF_NAMES)) {
+    CONF_NAMES.splice(0, CONF_NAMES.length, ...Object.keys(CONFERENCES));
+  }
+  return normalized;
+}
+
+function applySavedTeamNamePack() {
+  let raw = null;
+  try { raw = localStorage.getItem(TEAM_NAME_PACK_STORAGE_KEY); } catch (_) {}
+  if (!raw) return false;
+  try {
+    applyTeamNamePack(JSON.parse(raw));
+    return true;
+  } catch (err) {
+    console.warn('custom team name pack failed:', err);
+    try { localStorage.removeItem(TEAM_NAME_PACK_STORAGE_KEY); } catch (_) {}
+    return false;
+  }
+}
+
+function hasSavedTeamNamePack() {
+  try { return !!localStorage.getItem(TEAM_NAME_PACK_STORAGE_KEY); } catch (_) { return false; }
+}
+
+function saveTeamNamePack(pack) {
+  const normalized = normalizeTeamNamePack(pack);
+  localStorage.setItem(TEAM_NAME_PACK_STORAGE_KEY, JSON.stringify(normalized));
+  return normalized;
+}
+
+function clearSavedTeamNamePack() {
+  try { localStorage.removeItem(TEAM_NAME_PACK_STORAGE_KEY); } catch (_) {}
+}
+
+function getTeamNamePackStatusText() {
+  return hasSavedTeamNamePack() ? 'CUSTOM NAME PACK LOADED' : 'GENERIC DEFAULTS ACTIVE';
+}
+
+function getGenericIdIndex(id, prefix) {
+  const match = String(id || '').match(new RegExp(`^${prefix}\\\\s+(\\\\d+)$`, 'i'));
+  return match ? Math.max(0, parseInt(match[1], 10) - 1) : -1;
 }
 
 const PERSONALITIES = [
@@ -4484,6 +4630,7 @@ const PORTAL_ROSTER_CAP = 13;
 const OFFSEASON_FEATURES_ENABLED = true;
 const AUTO_RECRUITING_KEY = 'autoRecruitingEnabled';
 const SEASON_AUTO_SAVE_KEY = 'seasonAutoSaveEnabled';
+const START_YEAR = 2026;
 const PRESTIGE_TOTAL_TARGET = 18245;
 const PRESTIGE_STORAGE_KEY = 'teamPrestigeOverrides';
 const NIL_BUDGET_LIMITS = getBaseNILBudgetLimits();
@@ -4680,6 +4827,8 @@ function reclaimSaveStorageSpace(storage, targetKey) {
     ns('coachProfile'),
     ns('coachHistory'),
     ns('resourceDecision'),
+    ns('resourceDecisionEffectsApplied'),
+    ns('resourceNILBoost'),
     ns('pressPersonality'),
     ns('pressAnswers'),
     ns('recruitingRunId'),
@@ -4772,6 +4921,18 @@ function getCareerStateKey() {
   return 'careerState';
 }
 
+function getSeasonYear(season = seasonNumber) {
+  return START_YEAR + Math.max(0, (Number(season) || 1) - 1);
+}
+
+function getSeasonYearLabel(season = seasonNumber) {
+  return String(getSeasonYear(season));
+}
+
+function getSeasonLabel(season = seasonNumber) {
+  return `${getSeasonYearLabel(season)} SEASON`;
+}
+
 function saveCareerState(screenOverride) {
   const state = {
     season:Number(typeof seasonNumber !== 'undefined' ? seasonNumber : 1) || 1,
@@ -4827,6 +4988,8 @@ function removeGeneratedSaveDataFromStorage(storage) {
     'coachProfile',
     'coachHistory',
     'resourceDecision',
+    'resourceDecisionEffectsApplied',
+    'resourceNILBoost',
     'pressPersonality',
     'pressAnswers',
     'recruitingRunId',
@@ -5697,6 +5860,8 @@ function goToCoachBuilder(step = 'info') {
 function goToDashboard() {
   document.getElementById('dash-team-name').textContent = selectedTeam || '';
   document.getElementById('dash-conf-name').textContent = selectedConf || '';
+  const seasonLabel = document.getElementById('dash-season-label');
+  if (seasonLabel) seasonLabel.textContent = `* ${getSeasonLabel()} HUB *`;
   renderDashboardRecord();
   if (!cachedSchedule) {
     cachedSchedule = loadCachedSchedule() || generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
@@ -5898,7 +6063,7 @@ function renderCoachHistory() {
     const conf = season.conferenceChampion ? 'Conference champion' : (season.conferenceResult || 'Conference tournament');
     return `
       <div class="office-season-row">
-        <strong>S${Number(season.season) || ''}</strong>
+        <strong>${getSeasonYearLabel(season.season)}</strong>
         <div>${Number(season.wins) || 0}-${Number(season.losses) || 0}</div>
         <div>${escapeAttr(conf)}<br>${escapeAttr(tourney)}</div>
       </div>
@@ -5921,7 +6086,7 @@ function renderNextGame() {
     stopDashboardCoachAnimation();
     body.innerHTML =
         `<div class="ng-season-complete">` +
-          `<div class="ng-complete-label">REGULAR SEASON COMPLETE</div>` +
+          `<div class="ng-complete-label">${getSeasonYearLabel()} REGULAR SEASON COMPLETE</div>` +
           `<div class="ng-complete-title">POSTSEASON READY</div>` +
         `<button class="ng-tournament-btn" type="button" onclick="startConferenceTournaments()">START CONFERENCE TOURNAMENTS</button>` +
       `</div>`;
@@ -5937,7 +6102,7 @@ function renderNextGame() {
   body.innerHTML =
     `<div class="ng-body">` +
       `<div class="ng-meta-row">` +
-        `<span class="ng-game-num">GAME ${gameNum} / ${total}</span>` +
+        `<span class="ng-game-num">${getSeasonYearLabel()} · GAME ${gameNum} / ${total}</span>` +
         `<span class="ng-type-tag ${typeClass}">${typeLabel}</span>` +
       `</div>` +
       `<div class="ng-date-row">${game.date} &nbsp;·&nbsp; ${haLabel}</div>` +
@@ -6130,8 +6295,8 @@ function renderConferenceTournamentPage() {
 
   if (title) {
     title.textContent = phase === 'user-bracket'
-      ? `${(selectedConf || '').toUpperCase()} TOURNAMENT BRACKET`
-      : (phase === 'winners' ? 'CONFERENCE TOURNAMENT WINNERS' : 'CONFERENCE TOURNAMENTS');
+      ? `${getSeasonYearLabel()} ${(selectedConf || '').toUpperCase()} TOURNAMENT BRACKET`
+      : (phase === 'winners' ? `${getSeasonYearLabel()} CONFERENCE TOURNAMENT WINNERS` : `${getSeasonYearLabel()} CONFERENCE TOURNAMENTS`);
   }
   if (subtitle) {
     subtitle.textContent = phase === 'user-bracket'
@@ -6640,6 +6805,7 @@ function logNationalTournamentDebug(event, data = {}) {
     event,
     data:{
       season:seasonNumber || 1,
+      seasonYear:getSeasonYearLabel(),
       roundIndex:tournamentState ? tournamentState.roundIndex : null,
       champion:tournamentState && tournamentState.champion ? serializeTournamentDebugTeam(tournamentState.champion) : null,
       ...data
@@ -6860,6 +7026,8 @@ function renderTournamentBracket() {
   if (!board) return;
   if (!tournamentState) tournamentState = buildTournamentState();
   tournamentState = normalizeTournamentState(tournamentState);
+  const title = document.getElementById('tournament-season-title');
+  if (title) title.textContent = `${getSeasonYearLabel()} NATIONAL TOURNAMENT`;
   const continueBtn = document.getElementById('tournament-continue-btn');
   if (continueBtn) continueBtn.style.display = tournamentState.champion ? 'inline-block' : 'none';
   if (tournamentState.champion) maybeRunNationalTournamentCompleteAutoSave();
@@ -7413,7 +7581,7 @@ function logPrestigeRebalance(records, beforeSum, afterSum, unresolvedCorrection
       nilDelta:formatNILDelta(record.nilDelta),
       newNIL:formatNIL(record.newNIL)
     }));
-  console.group(`Prestige rebalance after Season ${seasonNumber} tournament`);
+  console.group(`Prestige rebalance after ${getSeasonYearLabel()} tournament`);
   console.log(`Prestige sum before: ${beforeSum}`);
   console.table(rows);
   console.log(`Prestige sum after: ${afterSum}`);
@@ -7516,7 +7684,7 @@ function renderPrestigeUpdate(report) {
   const userBox = document.getElementById('prestige-update-user');
   const risersList = document.getElementById('prestige-risers-list');
   const fallersList = document.getElementById('prestige-fallers-list');
-  if (subtitle) subtitle.textContent = `SEASON ${seasonNumber} PROGRAM REPUTATION CHANGES`;
+  if (subtitle) subtitle.textContent = `${getSeasonYearLabel()} PROGRAM REPUTATION CHANGES`;
   if (sumLine) {
     sumLine.textContent = `LEAGUE PRESTIGE SUM: ${report.beforeSum} -> ${report.afterSum} / TARGET ${PRESTIGE_TOTAL_TARGET}`;
   }
@@ -7731,7 +7899,7 @@ function areOffseasonFeaturesEnabled() {
 function renderDeparturesScreen(departing) {
   const subtitle = document.getElementById('departures-subtitle');
   const list = document.getElementById('departures-list');
-  if (subtitle) subtitle.textContent = `${selectedTeam} — END OF SEASON ROSTER CHANGES`;
+  if (subtitle) subtitle.textContent = `${selectedTeam} — ${getSeasonYearLabel()} END OF SEASON ROSTER CHANGES`;
 
   const players = Array.isArray(departing) ? departing : [];
   const draft = players.filter(p => p.reason === 'DRAFT');
@@ -7804,7 +7972,7 @@ function renderRetentionOffers() {
   const subtitle = document.getElementById('departures-subtitle');
   const list = document.getElementById('departures-list');
   const btn = document.getElementById('departures-continue-btn');
-  if (subtitle) subtitle.textContent = `${selectedTeam} — RETAIN RETURNING PLAYERS`;
+  if (subtitle) subtitle.textContent = `${selectedTeam} — ${getSeasonYearLabel()} RETAIN RETURNING PLAYERS`;
   if (btn) {
     btn.textContent = pendingRetentionPlayers.length ? '► FINISH RETENTION' : '► TRANSFER PORTAL';
   }
@@ -8063,7 +8231,7 @@ function renderTransferPortal() {
   normalizeTransferPortalStars();
   const remainingCount = transferPortal.filter(p => !p.signed && !p.committedTo).length;
   const subtitle = document.getElementById('portal-subtitle');
-  if (subtitle) subtitle.textContent = `${remainingCount} AVAILABLE / ${transferPortal.length} TOTAL`;
+  if (subtitle) subtitle.textContent = `${getSeasonYearLabel()} TRANSFER PORTAL — ${remainingCount} AVAILABLE / ${transferPortal.length} TOTAL`;
   renderPortalRoster();
 
   const weekBadge = document.getElementById('portal-week-badge');
@@ -9464,7 +9632,7 @@ function trainPlayerTowardOverall(player, targetOverall) {
 
 function renderOffseasonTraining(results) {
   const subtitle = document.getElementById('offseason-training-subtitle');
-  if (subtitle) subtitle.textContent = `${selectedTeam} PLAYERS DEVELOPED BEFORE SEASON ${seasonNumber + 1}`;
+  if (subtitle) subtitle.textContent = `${selectedTeam} PLAYERS DEVELOPED BEFORE THE ${getSeasonYearLabel(seasonNumber + 1)} SEASON`;
   const grid = document.getElementById('offseason-training-grid');
   const userResults = (results || []).filter(r => r.conf === selectedConf && r.team === selectedTeam);
   grid.innerHTML = `
@@ -9837,6 +10005,7 @@ async function prepareRosters() {
   namePool = await loadNamePool();
   allRosters = generateAllRosters(namePool);
   recruitingClass = generateRecruitingClass(namePool);
+  applyResourceDecisionEffects(recruitingClass);
   saveAllRosters();
   saveGameSetItem('rosterGenerationVersion', ROSTER_GENERATION_VERSION);
   saveRecruitingClass();
@@ -10010,7 +10179,7 @@ function makePlayerName(names, usedNames) {
 
 function renderRoster() {
   const roster = getTeamRoster(selectedConf, selectedTeam);
-  document.getElementById('roster-title').textContent = `${selectedTeam} ROSTER`;
+  document.getElementById('roster-title').textContent = `${selectedTeam} ${getSeasonYearLabel()} ROSTER`;
   const grid = document.getElementById('roster-grid');
   grid.innerHTML = `
     <div class="player-row header">
@@ -10266,7 +10435,7 @@ function maybeRunSeasonStartAutoSave() {
   if ((Number(currentGameIndex) || 0) !== 0) return false;
   const season = Number(seasonNumber) || 1;
   if (Number(saveGameGetItem(getLastSeasonAutoSavedKey())) === season) return false;
-  runAutoSaveToActiveSlot(`${selectedTeam} S${season}`);
+  runAutoSaveToActiveSlot(`${selectedTeam} ${getSeasonYearLabel(season)}`);
   saveGameSetItem(getLastSeasonAutoSavedKey(), String(season));
   return true;
 }
@@ -10277,7 +10446,7 @@ function maybeRunAutoSaveCheckpoint(name, fallbackName) {
   const season = Number(seasonNumber) || 1;
   const key = getAutoSaveCheckpointKey(name);
   if (Number(saveGameGetItem(key)) === season) return false;
-  if (!runAutoSaveToActiveSlot(fallbackName || `${selectedTeam} S${season}`)) return false;
+  if (!runAutoSaveToActiveSlot(fallbackName || `${selectedTeam} ${getSeasonYearLabel(season)}`)) return false;
   saveGameSetItem(key, String(season));
   return true;
 }
@@ -10286,12 +10455,12 @@ function maybeRunRegularSeasonCompleteAutoSave() {
   const totalGames = cachedSchedule && cachedSchedule.length ? cachedSchedule.length : 0;
   if (!totalGames) return false;
   if ((Number(currentGameIndex) || 0) < totalGames) return false;
-  return maybeRunAutoSaveCheckpoint('regularSeasonComplete', `${selectedTeam} regular season complete`);
+  return maybeRunAutoSaveCheckpoint('regularSeasonComplete', `${selectedTeam} ${getSeasonYearLabel()} regular season complete`);
 }
 
 function maybeRunNationalTournamentCompleteAutoSave() {
   if (!tournamentState || !tournamentState.champion) return false;
-  return maybeRunAutoSaveCheckpoint('nationalTournamentComplete', `${selectedTeam} post tournament`);
+  return maybeRunAutoSaveCheckpoint('nationalTournamentComplete', `${selectedTeam} ${getSeasonYearLabel()} post tournament`);
 }
 
 function runAutoSaveToActiveSlot(fallbackName) {
@@ -10306,7 +10475,65 @@ function runAutoSaveToActiveSlot(fallbackName) {
 
 function getTeamNILBudgetDollars() {
   const teamNILVal = ((TEAM_DATA[selectedConf] || {})[selectedTeam] || {}).n;
-  return Math.max(0, Math.round((Number(teamNILVal) || 0) * 1000000));
+  return Math.max(0, Math.round((Number(teamNILVal) || 0) * 1000000) + getResourceNILBoostDollars());
+}
+
+function getResourceDecisionEffectsKey() {
+  return 'resourceDecisionEffectsApplied';
+}
+
+function getResourceNILBoostKey() {
+  return 'resourceNILBoost';
+}
+
+function getResourceNILBoostDollars() {
+  const boost = loadGameJSON(getResourceNILBoostKey(), null);
+  if (!boost || Number(boost.season) !== (seasonNumber || 1)) return 0;
+  return Math.max(0, Math.round(Number(boost.amount) || 0));
+}
+
+function markRecruitFullyScouted(recruit) {
+  if (!recruit) return;
+  recruit.overallRevealed = true;
+  recruit.potentialRevealed = true;
+  recruit.guessedMotivations = {};
+  (recruit.motivations || []).forEach((_, i) => {
+    recruit.guessedMotivations[i] = (recruit.topMotivations || []).includes(i) ? 'correct' : 'wrong';
+  });
+}
+
+function applyScoutResourceBoost(recruits) {
+  const pool = Array.isArray(recruits) ? recruits : [];
+  if (!pool.length) return 0;
+  const count = Math.max(1, Math.round(pool.length * 0.2));
+  const rng = mulberry32(strHash(`resource-scouts|${seasonNumber || 1}|${selectedConf || ''}|${selectedTeam || ''}`));
+  const shuffled = pool.slice();
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  shuffled.slice(0, count).forEach(markRecruitFullyScouted);
+  return count;
+}
+
+function applyNilResourceBoost() {
+  if (!selectedConf || !selectedTeam) return 0;
+  saveGameJSON(getResourceNILBoostKey(), {
+    season:seasonNumber || 1,
+    amount:500000
+  });
+  return 500000;
+}
+
+function applyResourceDecisionEffects(recruits) {
+  if (!resourceDecision) return;
+  if (saveGameGetItem(getResourceDecisionEffectsKey()) === resourceDecision) return;
+  if (resourceDecision === 'scouts') {
+    applyScoutResourceBoost(recruits);
+  } else if (resourceDecision === 'nilFund') {
+    applyNilResourceBoost();
+  }
+  saveGameSetItem(getResourceDecisionEffectsKey(), resourceDecision);
 }
 
 function isUserTeam(conf, team) {
@@ -10452,7 +10679,8 @@ function renderRecruiting() {
   const recruits = ensureRecruitingClass();
   const filteredRecruits = getFilteredRecruits(recruits);
   const hours = getRecruitingHoursRemaining();
-  document.getElementById('recruiting-title').textContent = `RECRUITING`;
+  document.getElementById('recruiting-title').textContent = `${getSeasonYearLabel()} RECRUITING`;
+  document.getElementById('recruiting-subtitle').textContent = `${selectedTeam} SIGNING CLASS`;
   document.getElementById('recruiting-hours-badge').textContent = `${hours} / 100 HRS`;
   const bmCount = (ensureRecruitingClass() || []).filter(r => r.bookmarked).length;
   const userSignedCount = (ensureRecruitingClass() || []).filter(isRecruitSignedByUser).length;
@@ -11501,7 +11729,7 @@ function renderStats() {
     const conf = statsSelectedConf || selectedConf;
     const team = statsSelectedTeam || selectedTeam;
     const teams = CONFERENCES[conf] || [];
-    title.textContent = `${team || 'TEAM'} STATS`;
+    title.textContent = `${team || 'TEAM'} ${getSeasonYearLabel()} STATS`;
     filters.innerHTML =
       `<span>CONFERENCE</span><select class="stats-select" onchange="updateStatsConf(this.value)">${CONF_NAMES.map(c => `<option value="${escapeAttr(c)}"${c === conf ? ' selected' : ''}>${escapeAttr(c)}</option>`).join('')}</select>` +
       `<span>TEAM</span><select class="stats-select" onchange="updateStatsTeam(this.value)">${teams.map(t => `<option value="${escapeAttr(t)}"${t === team ? ' selected' : ''}>${escapeAttr(t)}</option>`).join('')}</select>`;
@@ -11510,7 +11738,7 @@ function renderStats() {
   }
 
   const label = { points:'POINTS', assists:'ASSISTS', rebounds:'REBOUNDS' }[statsMode] || 'POINTS';
-  title.textContent = `NATIONAL ${label} LEADERS`;
+  title.textContent = `${getSeasonYearLabel()} NATIONAL ${label} LEADERS`;
   const minGames = getNationalLeaderMinGames();
   filters.innerHTML = `<span>MINIMUM ${minGames} GAMES PLAYED</span>`;
   const key = statsMode === 'assists' ? 'apg' : statsMode === 'rebounds' ? 'rpg' : 'ppg';
@@ -11955,7 +12183,7 @@ function renderStandings() {
   const rankedTeams = getRankedTeams(limit, mode, conf);
   const eyebrow = document.querySelector('.standings-eyebrow');
   const title = document.querySelector('.standings-title');
-  if (eyebrow) eyebrow.textContent = mode === 'conference' ? `* ${conf.toUpperCase()} STANDINGS *` : '* NATIONAL RANKINGS *';
+  if (eyebrow) eyebrow.textContent = mode === 'conference' ? `* ${getSeasonYearLabel()} ${conf.toUpperCase()} STANDINGS *` : `* ${getSeasonYearLabel()} NATIONAL RANKINGS *`;
   if (title) {
     title.textContent = mode === 'conference'
       ? `${conf.toUpperCase()}`
@@ -12153,7 +12381,7 @@ function syncGameplanWithRoster() {
 
 function renderGameplan() {
   ensureGameplan();
-  document.getElementById('gameplan-title').textContent = `${selectedTeam} GAMEPLAN`;
+  document.getElementById('gameplan-title').textContent = `${selectedTeam} ${getSeasonYearLabel()} GAMEPLAN`;
   document.getElementById('gameplan-note').textContent = 'Each position must total exactly 30 minutes before you can save.';
   renderGameplanStyles();
   renderGameplanRotation();
@@ -14096,9 +14324,9 @@ function renderCutscene() {
     drawAthleticDirector();
     drawCoach('cutscene-coach-canvas');
     speaker.textContent = 'ATHLETIC DIRECTOR';
-    text.textContent = 'Just like every other program in the nation we have a limited number of resources. Would you rather spend money on scouts or add to the NIL fund?';
+    text.textContent = 'Just like every other program in the nation we have a limited number of resources. Scouts will fully scout 20% of this recruiting class. NIL fund gives you a one-time $500K boost. Where do you want it?';
     actions.appendChild(makeCutsceneButton('SCOUTS', () => saveResourceDecision('scouts')));
-    actions.appendChild(makeCutsceneButton('NIL FUND', () => saveResourceDecision('nilFund')));
+    actions.appendChild(makeCutsceneButton('NIL FUND +$500K', () => saveResourceDecision('nilFund')));
   } else if (cutsceneStep === 'press') {
     frame.dataset.scene = 'office';
     drawAthleticDirector();
@@ -14521,7 +14749,7 @@ function goToSchedule() {
 
 function renderSchedule() {
   document.getElementById('sched-conf-badge').textContent = selectedConf || '';
-  document.getElementById('sched-season-num').textContent = seasonNumber;
+  document.getElementById('sched-season-num').textContent = getSeasonYearLabel();
   document.getElementById('sched-title').textContent = (selectedTeam || 'SCHEDULE').toUpperCase();
 
   const body = document.getElementById('sched-body');
@@ -14990,6 +15218,10 @@ Music.apply();
   const themeGrid   = document.getElementById('settings-theme-grid');
   const autoRecruitToggle = document.getElementById('settings-auto-recruit-toggle');
   const seasonAutoSaveToggle = document.getElementById('settings-season-auto-save-toggle');
+  const namePackStatus = document.getElementById('settings-name-pack-status');
+  const namePackFile = document.getElementById('settings-name-pack-file');
+  const uploadNamePackBtn = document.getElementById('settings-upload-name-pack');
+  const clearNamePackBtn = document.getElementById('settings-clear-name-pack');
 
   function syncSfx() {
     const m = Sfx.isMuted();
@@ -15037,6 +15269,10 @@ Music.apply();
     seasonAutoSaveToggle.textContent = enabled ? 'ON' : 'OFF';
     seasonAutoSaveToggle.classList.toggle('off', !enabled);
   }
+  function syncNamePackStatus() {
+    if (!namePackStatus) return;
+    namePackStatus.textContent = getTeamNamePackStatusText();
+  }
 
   sfxToggle.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -15076,9 +15312,52 @@ Music.apply();
       if (typeof Sfx !== 'undefined') Sfx.select();
     });
   }
-
+  if (uploadNamePackBtn && namePackFile) {
+    uploadNamePackBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      namePackFile.click();
+    });
+    namePackFile.addEventListener('change', () => {
+      const file = namePackFile.files && namePackFile.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          saveTeamNamePack(JSON.parse(String(reader.result || '{}')));
+          if (typeof Sfx !== 'undefined') Sfx.success && Sfx.success();
+          window.alert('Custom names loaded. The page will reload so the name pack can apply cleanly.');
+          location.reload();
+        } catch (err) {
+          if (typeof Sfx !== 'undefined') Sfx.error && Sfx.error();
+          window.alert(`Name pack could not be loaded: ${err.message || err}`);
+        } finally {
+          namePackFile.value = '';
+          syncNamePackStatus();
+        }
+      };
+      reader.onerror = () => {
+        if (typeof Sfx !== 'undefined') Sfx.error && Sfx.error();
+        window.alert('Name pack could not be read.');
+        namePackFile.value = '';
+      };
+      reader.readAsText(file);
+    });
+  }
+  if (clearNamePackBtn) {
+    clearNamePackBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!hasSavedTeamNamePack()) {
+        syncNamePackStatus();
+        return;
+      }
+      if (!window.confirm('Reset to generic conference and team names? The page will reload.')) return;
+      clearSavedTeamNamePack();
+      if (typeof Sfx !== 'undefined') Sfx.back && Sfx.back();
+      location.reload();
+    });
+  }
   function open() {
-    syncSfx(); syncMusic(); syncAutoRecruiting(); syncSeasonAutoSave(); buildThemes();
+    syncSfx(); syncMusic(); syncAutoRecruiting(); syncSeasonAutoSave(); syncNamePackStatus(); buildThemes();
     overlay.classList.add('show');
   }
   function close() { overlay.classList.remove('show'); }
@@ -15212,7 +15491,7 @@ function renderSavesList() {
     const name = meta && meta.name ? meta.name : (empty ? 'EMPTY' : `Save ${slot}`);
     const teamLine = empty ? '— no save data —'
       : `${(meta && meta.team) || '?'}${meta && meta.conf ? ' · ' + meta.conf : ''}`;
-    const detailLine = empty ? '' : `Season ${meta ? meta.season : '?'} · ${meta ? (meta.record || '') : ''} · ${meta ? formatSaveTime(meta.savedAt) : ''}`;
+    const detailLine = empty ? '' : `${meta ? getSeasonYearLabel(meta.season) : '????'} · ${meta ? (meta.record || '') : ''} · ${meta ? formatSaveTime(meta.savedAt) : ''}`;
     return `
       <div class="${classes.join(' ')}" data-slot="${slot}">
         <div class="save-slot-num">${slot}</div>

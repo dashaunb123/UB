@@ -13,2318 +13,2318 @@
    TEAM + CONFERENCE DATA
 ═══════════════════════════════════════════ */
 const CONFERENCES = {
-  "ACC": [
-    "Boston College",
-    "California",
-    "Clemson",
-    "Duke",
-    "Florida State",
-    "Georgia Tech",
-    "Louisville",
-    "Miami (FL)",
-    "North Carolina",
-    "North Carolina State",
-    "Notre Dame",
-    "Pittsburgh",
-    "SMU",
-    "Stanford",
-    "Syracuse",
-    "Virginia",
-    "Virginia Tech",
-    "Wake Forest"
+  "Conference 1": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13",
+    "Team 14",
+    "Team 15",
+    "Team 16",
+    "Team 17",
+    "Team 18"
   ],
-  "America East": [
-    "Albany",
-    "Binghamton",
-    "Bryant",
-    "Maine",
-    "New Hampshire",
-    "NJIT",
-    "UMass-Lowell",
-    "UMBC",
-    "Vermont"
+  "Conference 2": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9"
   ],
-  "American": [
-    "Charlotte",
-    "East Carolina",
-    "FAU",
-    "Memphis",
-    "North Texas",
-    "Rice",
-    "South Florida",
-    "Temple",
-    "Tulane",
-    "Tulsa",
-    "UAB",
-    "UTSA",
-    "Wichita State"
+  "Conference 3": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13"
   ],
-  "ASUN": [
-    "Austin Peay",
-    "Bellarmine",
-    "Central Arkansas",
-    "Eastern Kentucky",
-    "FGCU",
-    "Jacksonville",
-    "Lipscomb",
-    "North Alabama",
-    "North Florida",
-    "Queens",
-    "Stetson",
-    "West Georgia"
+  "Conference 4": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12"
   ],
-  "Atlantic 10": [
-    "Davidson",
-    "Dayton",
-    "Duquesne",
-    "Fordham",
-    "George Mason",
-    "George Washington",
-    "La Salle",
-    "Loyola-Chicago",
-    "Rhode Island",
-    "Richmond",
-    "Saint Bonaventure",
-    "Saint Joseph's",
-    "Saint Louis",
-    "VCU"
+  "Conference 5": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13",
+    "Team 14"
   ],
-  "Big 12": [
-    "Arizona",
-    "Arizona State",
-    "Baylor",
-    "BYU",
-    "Cincinnati",
-    "Colorado",
-    "Houston",
-    "Iowa State",
-    "Kansas",
-    "Kansas State",
-    "Oklahoma State",
-    "TCU",
-    "Texas Tech",
-    "UCF",
-    "Utah",
-    "West Virginia"
+  "Conference 6": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13",
+    "Team 14",
+    "Team 15",
+    "Team 16"
   ],
-  "Big East": [
-    "Butler",
-    "Connecticut",
-    "Creighton",
-    "DePaul",
-    "Georgetown",
-    "Marquette",
-    "Providence",
-    "Saint John's",
-    "Seton Hall",
-    "Villanova",
-    "Xavier"
+  "Conference 7": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11"
   ],
-  "Big Sky": [
-    "Eastern Washington",
-    "Idaho",
-    "Idaho State",
-    "Montana",
-    "Montana State",
-    "Northern Arizona",
-    "Northern Colorado",
-    "Portland State",
-    "Sacramento State",
-    "Weber State"
+  "Conference 8": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10"
   ],
-  "Big South": [
-    "Charleston Southern",
-    "Gardner-Webb",
-    "High Point",
-    "Longwood",
-    "Presbyterian College",
-    "Radford",
-    "South Carolina Upstate",
-    "UNC Asheville",
-    "Winthrop"
+  "Conference 9": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9"
   ],
-  "Big Ten": [
-    "Illinois",
-    "Indiana",
-    "Iowa",
-    "Maryland",
-    "Michigan",
-    "Michigan State",
-    "Minnesota",
-    "Nebraska",
-    "Northwestern",
-    "Ohio State",
-    "Oregon",
-    "Penn State",
-    "Purdue",
-    "Rutgers",
-    "UCLA",
-    "USC",
-    "Washington",
-    "Wisconsin"
+  "Conference 10": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13",
+    "Team 14",
+    "Team 15",
+    "Team 16",
+    "Team 17",
+    "Team 18"
   ],
-  "Big West": [
-    "Cal Poly",
-    "Cal State Bakersfield",
-    "Cal State Fullerton",
-    "Cal State Northridge",
-    "Hawaii",
-    "Long Beach State",
-    "UC Davis",
-    "UC Irvine",
-    "UC Riverside",
-    "UC San Diego",
-    "UC Santa Barbara"
+  "Conference 11": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11"
   ],
-  "Coastal Athletic": [
-    "Campbell",
-    "Charleston",
-    "Drexel",
-    "Elon",
-    "Hampton",
-    "Hofstra",
-    "Monmouth",
-    "North Carolina A&T",
-    "Northeastern",
-    "Stony Brook",
-    "Towson",
-    "UNCW",
-    "William & Mary"
+  "Conference 12": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13"
   ],
-  "Conference USA": [
-    "Delaware",
-    "FIU",
-    "Jacksonville State",
-    "Kennesaw State",
-    "Liberty",
-    "Louisiana Tech",
-    "Middle Tennessee",
-    "Missouri State",
-    "New Mexico State",
-    "Sam Houston State",
-    "UTEP",
-    "Western Kentucky"
+  "Conference 13": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12"
   ],
-  "Horizon League": [
-    "Cleveland State",
-    "Detroit",
-    "Green Bay",
-    "IU Indianapolis",
-    "Milwaukee",
-    "Northern Kentucky",
-    "Oakland",
-    "Purdue Fort Wayne",
-    "Robert Morris",
-    "Wright State",
-    "Youngstown State"
+  "Conference 14": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11"
   ],
-  "Ivy League": [
-    "Brown",
-    "Columbia",
-    "Cornell",
-    "Dartmouth",
-    "Harvard",
-    "Penn",
-    "Princeton",
-    "Yale"
+  "Conference 15": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8"
   ],
-  "MAAC": [
-    "Canisius",
-    "Fairfield",
-    "Iona",
-    "Manhattan",
-    "Marist",
-    "Merrimack",
-    "Mount Saint Mary's",
-    "Niagara",
-    "Quinnipiac",
-    "Rider",
-    "Sacred Heart",
-    "Saint Peter's",
-    "Siena"
+  "Conference 16": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13"
   ],
-  "MEAC": [
-    "Coppin State",
-    "Delaware State",
-    "Howard",
-    "Maryland Eastern Shore",
-    "Morgan State",
-    "Norfolk State",
-    "North Carolina Central",
-    "South Carolina State"
+  "Conference 17": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8"
   ],
-  "Mid-American": [
-    "Akron",
-    "Ball State",
-    "Bowling Green",
-    "Buffalo",
-    "Central Michigan",
-    "Eastern Michigan",
-    "Kent State",
-    "Miami (OH)",
-    "Northern Illinois",
-    "Ohio",
-    "Toledo",
-    "UMass",
-    "Western Michigan"
+  "Conference 18": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13"
   ],
-  "Missouri Valley": [
-    "Belmont",
-    "Bradley",
-    "Drake",
-    "Evansville",
-    "Illinois State",
-    "Indiana State",
-    "Murray State",
-    "Northern Iowa",
-    "Southern Illinois",
-    "UIC",
-    "Valparaiso"
+  "Conference 19": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11"
   ],
-  "Mountain West": [
-    "Air Force",
-    "Boise State",
-    "Colorado State",
-    "Fresno State",
-    "Grand Canyon",
-    "Nevada",
-    "New Mexico",
-    "San Diego State",
-    "San Jose State",
-    "UNLV",
-    "Utah State",
-    "Wyoming"
+  "Conference 20": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12"
   ],
-  "NEC": [
-    "Central Connecticut",
-    "Chicago State",
-    "Fairleigh Dickinson",
-    "Le Moyne",
-    "Long Island",
-    "Mercyhurst",
-    "New Haven",
-    "Saint Francis (PA)",
-    "Stonehill",
-    "Wagner"
+  "Conference 21": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10"
   ],
-  "Ohio Valley": [
-    "Eastern Illinois",
-    "Lindenwood",
-    "Little Rock",
-    "Morehead State",
-    "SIUE",
-    "Southeast Missouri",
-    "Southern Indiana",
-    "Tennessee State",
-    "Tennessee Tech",
-    "Tennessee-Martin",
-    "Western Illinois"
+  "Conference 22": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11"
   ],
-  "Patriot League": [
-    "American",
-    "Army",
-    "Boston University",
-    "Bucknell",
-    "Colgate",
-    "Holy Cross",
-    "Lafayette",
-    "Lehigh",
-    "Loyola-Maryland",
-    "Navy"
+  "Conference 23": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10"
   ],
-  "SEC": [
-    "Alabama",
-    "Arkansas",
-    "Auburn",
-    "Florida",
-    "Georgia",
-    "Kentucky",
-    "LSU",
-    "Mississippi State",
-    "Missouri",
-    "Oklahoma",
-    "Ole Miss",
-    "South Carolina",
-    "Tennessee",
-    "Texas",
-    "Texas A&M",
-    "Vanderbilt"
+  "Conference 24": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13",
+    "Team 14",
+    "Team 15",
+    "Team 16"
   ],
-  "Southern": [
-    "Chattanooga",
-    "East Tennessee State",
-    "Furman",
-    "Mercer",
-    "Samford",
-    "The Citadel",
-    "UNCG",
-    "VMI",
-    "Western Carolina",
-    "Wofford"
+  "Conference 25": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10"
   ],
-  "Southland": [
-    "East Texas A&M",
-    "Houston Christian",
-    "Incarnate Word",
-    "Lamar",
-    "McNeese",
-    "New Orleans",
-    "Nicholls",
-    "Northwestern State",
-    "Southeastern Louisiana",
-    "Stephen F. Austin",
-    "Texas A&M-Corpus Christi",
-    "UTRGV"
+  "Conference 26": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12"
   ],
-  "Sun Belt": [
-    "Appalachian State",
-    "Arkansas State",
-    "Coastal Carolina",
-    "Georgia Southern",
-    "Georgia State",
-    "James Madison",
-    "Louisiana",
-    "Marshall",
-    "Old Dominion",
-    "South Alabama",
-    "Southern Miss",
-    "Texas State",
-    "Troy",
-    "ULM"
+  "Conference 27": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12",
+    "Team 13",
+    "Team 14"
   ],
-  "SWAC": [
-    "Alabama A&M",
-    "Alabama State",
-    "Alcorn State",
-    "Arkansas-Pine Bluff",
-    "Bethune-Cookman",
-    "Florida A&M",
-    "Grambling State",
-    "Jackson State",
-    "Mississippi Valley State",
-    "Prairie View A&M",
-    "Southern",
-    "Texas Southern"
+  "Conference 28": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12"
   ],
-  "Summit League": [
-    "Denver",
-    "North Dakota",
-    "North Dakota State",
-    "Omaha",
-    "Oral Roberts",
-    "Saint Thomas",
-    "South Dakota",
-    "South Dakota State",
-    "UMKC"
+  "Conference 29": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9"
   ],
-  "West Coast": [
-    "Gonzaga",
-    "Loyola-Marymount",
-    "Oregon State",
-    "Pacific",
-    "Pepperdine",
-    "Portland",
-    "Saint Mary's College",
-    "San Diego",
-    "San Francisco",
-    "Santa Clara",
-    "Seattle University",
-    "Washington State"
+  "Conference 30": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7",
+    "Team 8",
+    "Team 9",
+    "Team 10",
+    "Team 11",
+    "Team 12"
   ],
-  "Western Athletic": [
-    "Abilene Christian",
-    "California Baptist",
-    "Southern Utah",
-    "Tarleton State",
-    "UTA",
-    "Utah Tech",
-    "Utah Valley"
+  "Conference 31": [
+    "Team 1",
+    "Team 2",
+    "Team 3",
+    "Team 4",
+    "Team 5",
+    "Team 6",
+    "Team 7"
   ]
 };
 
 const TEAM_DATA = {
-  "ACC": {
-    "Boston College": {
+  "Conference 1": {
+    "Team 1": {
       "p": 79,
       "n": 8.5,
       "o": 76
     },
-    "California": {
+    "Team 2": {
       "p": 72,
       "n": 7.5,
       "o": 84
     },
-    "Clemson": {
+    "Team 3": {
       "p": 74,
       "n": 7.8,
       "o": 87
     },
-    "Duke": {
+    "Team 4": {
       "p": 100,
       "n": 15,
       "o": 99
     },
-    "Florida State": {
+    "Team 5": {
       "p": 76,
       "n": 8.1,
       "o": 85
     },
-    "Georgia Tech": {
+    "Team 6": {
       "p": 72,
       "n": 7.5,
       "o": 73
     },
-    "Louisville": {
+    "Team 7": {
       "p": 89,
       "n": 12,
       "o": 93
     },
-    "Miami (FL)": {
+    "Team 8": {
       "p": 75,
       "n": 8.1,
       "o": 87
     },
-    "North Carolina": {
+    "Team 9": {
       "p": 99,
       "n": 13.5,
       "o": 94
     },
-    "North Carolina State": {
+    "Team 10": {
       "p": 77,
       "n": 8.2,
       "o": 88
     },
-    "Notre Dame": {
+    "Team 11": {
       "p": 76,
       "n": 8.4,
       "o": 81
     },
-    "Pittsburgh": {
+    "Team 12": {
       "p": 76,
       "n": 8.1,
       "o": 79
     },
-    "SMU": {
+    "Team 13": {
       "p": 72,
       "n": 7.8,
       "o": 87
     },
-    "Stanford": {
+    "Team 14": {
       "p": 75,
       "n": 8.1,
       "o": 85
     },
-    "Syracuse": {
+    "Team 15": {
       "p": 84,
       "n": 9.6,
       "o": 82
     },
-    "Virginia": {
+    "Team 16": {
       "p": 83,
       "n": 9.3,
       "o": 92
     },
-    "Virginia Tech": {
+    "Team 17": {
       "p": 72,
       "n": 7.5,
       "o": 84
     },
-    "Wake Forest": {
+    "Team 18": {
       "p": 75,
       "n": 7.9,
       "o": 85
     }
   },
-  "America East": {
-    "Albany": {
+  "Conference 2": {
+    "Team 1": {
       "p": 30,
       "n": 0.6,
       "o": 62
     },
-    "Binghamton": {
+    "Team 2": {
       "p": 33,
       "n": 0.65,
       "o": 60
     },
-    "Bryant": {
+    "Team 3": {
       "p": 33,
       "n": 0.65,
       "o": 60
     },
-    "Maine": {
+    "Team 4": {
       "p": 31,
       "n": 0.6,
       "o": 61
     },
-    "New Hampshire": {
+    "Team 5": {
       "p": 30,
       "n": 0.6,
       "o": 61
     },
-    "NJIT": {
+    "Team 6": {
       "p": 26,
       "n": 0.55,
       "o": 61
     },
-    "UMass-Lowell": {
+    "Team 7": {
       "p": 27,
       "n": 0.55,
       "o": 61
     },
-    "UMBC": {
+    "Team 8": {
       "p": 34,
       "n": 0.65,
       "o": 69
     },
-    "Vermont": {
+    "Team 9": {
       "p": 58,
       "n": 1.5,
       "o": 70
     }
   },
-  "American": {
-    "Charlotte": {
+  "Conference 3": {
+    "Team 1": {
       "p": 57,
       "n": 3.05,
       "o": 73
     },
-    "East Carolina": {
+    "Team 2": {
       "p": 53,
       "n": 2.85,
       "o": 68
     },
-    "FAU": {
+    "Team 3": {
       "p": 62,
       "n": 2.9,
       "o": 79
     },
-    "Memphis": {
+    "Team 4": {
       "p": 82,
       "n": 5,
       "o": 79
     },
-    "North Texas": {
+    "Team 5": {
       "p": 58,
       "n": 3.1,
       "o": 75
     },
-    "Rice": {
+    "Team 6": {
       "p": 49,
       "n": 2.65,
       "o": 68
     },
-    "South Florida": {
+    "Team 7": {
       "p": 50,
       "n": 2.7,
       "o": 86
     },
-    "Temple": {
+    "Team 8": {
       "p": 68,
       "n": 3.6,
       "o": 76
     },
-    "Tulane": {
+    "Team 9": {
       "p": 48,
       "n": 2.6,
       "o": 70
     },
-    "Tulsa": {
+    "Team 10": {
       "p": 51,
       "n": 2.75,
       "o": 83
     },
-    "UAB": {
+    "Team 11": {
       "p": 60,
       "n": 3.2,
       "o": 78
     },
-    "UTSA": {
+    "Team 12": {
       "p": 56,
       "n": 3,
       "o": 61
     },
-    "Wichita State": {
+    "Team 13": {
       "p": 70,
       "n": 3.4,
       "o": 84
     }
   },
-  "ASUN": {
-    "Austin Peay": {
+  "Conference 4": {
+    "Team 1": {
       "p": 30,
       "n": 0.65,
       "o": 71
     },
-    "Bellarmine": {
+    "Team 2": {
       "p": 34,
       "n": 0.65,
       "o": 65
     },
-    "Central Arkansas": {
+    "Team 3": {
       "p": 30,
       "n": 0.65,
       "o": 71
     },
-    "Eastern Kentucky": {
+    "Team 4": {
       "p": 32,
       "n": 0.65,
       "o": 64
     },
-    "FGCU": {
+    "Team 5": {
       "p": 34,
       "n": 0.65,
       "o": 66
     },
-    "Jacksonville": {
+    "Team 6": {
       "p": 37,
       "n": 0.7,
       "o": 64
     },
-    "Lipscomb": {
+    "Team 7": {
       "p": 27,
       "n": 0.6,
       "o": 68
     },
-    "North Alabama": {
+    "Team 8": {
       "p": 32,
       "n": 0.65,
       "o": 61
     },
-    "North Florida": {
+    "Team 9": {
       "p": 33,
       "n": 0.65,
       "o": 61
     },
-    "Queens": {
+    "Team 10": {
       "p": 36,
       "n": 0.7,
       "o": 72
     },
-    "Stetson": {
+    "Team 11": {
       "p": 31,
       "n": 0.65,
       "o": 62
     },
-    "West Georgia": {
+    "Team 12": {
       "p": 36,
       "n": 0.7,
       "o": 63
     }
   },
-  "Atlantic 10": {
-    "Davidson": {
+  "Conference 5": {
+    "Team 1": {
       "p": 62,
       "n": 2.95,
       "o": 79
     },
-    "Dayton": {
+    "Team 2": {
       "p": 72,
       "n": 4,
       "o": 84
     },
-    "Duquesne": {
+    "Team 3": {
       "p": 56,
       "n": 2.65,
       "o": 78
     },
-    "Fordham": {
+    "Team 4": {
       "p": 51,
       "n": 2.4,
       "o": 73
     },
-    "George Mason": {
+    "Team 5": {
       "p": 60,
       "n": 2.85,
       "o": 80
     },
-    "George Washington": {
+    "Team 6": {
       "p": 58,
       "n": 2.75,
       "o": 80
     },
-    "La Salle": {
+    "Team 7": {
       "p": 59,
       "n": 2.8,
       "o": 68
     },
-    "Loyola-Chicago": {
+    "Team 8": {
       "p": 63,
       "n": 3,
       "o": 65
     },
-    "Rhode Island": {
+    "Team 9": {
       "p": 50,
       "n": 2.35,
       "o": 75
     },
-    "Richmond": {
+    "Team 10": {
       "p": 60,
       "n": 2.85,
       "o": 76
     },
-    "Saint Bonaventure": {
+    "Team 11": {
       "p": 60,
       "n": 2.85,
       "o": 76
     },
-    "Saint Joseph's": {
+    "Team 12": {
       "p": 55,
       "n": 2.6,
       "o": 78
     },
-    "Saint Louis": {
+    "Team 13": {
       "p": 63,
       "n": 3,
       "o": 86
     },
-    "VCU": {
+    "Team 14": {
       "p": 70,
       "n": 3.5,
       "o": 86
     }
   },
-  "Big 12": {
-    "Arizona": {
+  "Conference 6": {
+    "Team 1": {
       "p": 91,
       "n": 10.5,
       "o": 99
     },
-    "Arizona State": {
+    "Team 2": {
       "p": 73,
       "n": 7.9,
       "o": 84
     },
-    "Baylor": {
+    "Team 3": {
       "p": 86,
       "n": 9.9,
       "o": 89
     },
-    "BYU": {
+    "Team 4": {
       "p": 78,
       "n": 13,
       "o": 91
     },
-    "Cincinnati": {
+    "Team 5": {
       "p": 78,
       "n": 8.6,
       "o": 88
     },
-    "Colorado": {
+    "Team 6": {
       "p": 72,
       "n": 7.7,
       "o": 81
     },
-    "Houston": {
+    "Team 7": {
       "p": 88,
       "n": 10.5,
       "o": 99
     },
-    "Iowa State": {
+    "Team 8": {
       "p": 82,
       "n": 9.7,
       "o": 96
     },
-    "Kansas": {
+    "Team 9": {
       "p": 99,
       "n": 12.5,
       "o": 94
     },
-    "Kansas State": {
+    "Team 10": {
       "p": 76,
       "n": 8.3,
       "o": 81
     },
-    "Oklahoma State": {
+    "Team 11": {
       "p": 75,
       "n": 8.1,
       "o": 81
     },
-    "TCU": {
+    "Team 12": {
       "p": 73,
       "n": 7.8,
       "o": 87
     },
-    "Texas Tech": {
+    "Team 13": {
       "p": 81,
       "n": 11.5,
       "o": 92
     },
-    "UCF": {
+    "Team 14": {
       "p": 75,
       "n": 8.1,
       "o": 85
     },
-    "Utah": {
+    "Team 15": {
       "p": 73,
       "n": 7.8,
       "o": 76
     },
-    "West Virginia": {
+    "Team 16": {
       "p": 76,
       "n": 8.5,
       "o": 85
     }
   },
-  "Big East": {
-    "Butler": {
+  "Conference 7": {
+    "Team 1": {
       "p": 79,
       "n": 8.1,
       "o": 82
     },
-    "Connecticut": {
+    "Team 2": {
       "p": 96,
       "n": 11,
       "o": 98
     },
-    "Creighton": {
+    "Team 3": {
       "p": 78,
       "n": 8.3,
       "o": 82
     },
-    "DePaul": {
+    "Team 4": {
       "p": 83,
       "n": 8.7,
       "o": 79
     },
-    "Georgetown": {
+    "Team 5": {
       "p": 74,
       "n": 7.6,
       "o": 81
     },
-    "Marquette": {
+    "Team 6": {
       "p": 82,
       "n": 8,
       "o": 82
     },
-    "Providence": {
+    "Team 7": {
       "p": 78,
       "n": 8.1,
       "o": 81
     },
-    "Saint John's": {
+    "Team 8": {
       "p": 80,
       "n": 10.5,
       "o": 96
     },
-    "Seton Hall": {
+    "Team 9": {
       "p": 76,
       "n": 7.8,
       "o": 85
     },
-    "Villanova": {
+    "Team 10": {
       "p": 88,
       "n": 8,
       "o": 93
     },
-    "Xavier": {
+    "Team 11": {
       "p": 77,
       "n": 8,
       "o": 81
     }
   },
-  "Big Sky": {
-    "Eastern Washington": {
+  "Conference 8": {
+    "Team 1": {
       "p": 42,
       "n": 0.7,
       "o": 69
     },
-    "Idaho": {
+    "Team 2": {
       "p": 25,
       "n": 0.5,
       "o": 71
     },
-    "Idaho State": {
+    "Team 3": {
       "p": 31,
       "n": 0.55,
       "o": 66
     },
-    "Montana": {
+    "Team 4": {
       "p": 44,
       "n": 0.7,
       "o": 69
     },
-    "Montana State": {
+    "Team 5": {
       "p": 43,
       "n": 0.7,
       "o": 74
     },
-    "Northern Arizona": {
+    "Team 6": {
       "p": 33,
       "n": 0.6,
       "o": 63
     },
-    "Northern Colorado": {
+    "Team 7": {
       "p": 29,
       "n": 0.55,
       "o": 71
     },
-    "Portland State": {
+    "Team 8": {
       "p": 30,
       "n": 0.55,
       "o": 71
     },
-    "Sacramento State": {
+    "Team 9": {
       "p": 33,
       "n": 0.6,
       "o": 65
     },
-    "Weber State": {
+    "Team 10": {
       "p": 43,
       "n": 0.7,
       "o": 69
     }
   },
-  "Big South": {
-    "Charleston Southern": {
+  "Conference 9": {
+    "Team 1": {
       "p": 30,
       "n": 0.5,
       "o": 66
     },
-    "Gardner-Webb": {
+    "Team 2": {
       "p": 27,
       "n": 0.5,
       "o": 60
     },
-    "High Point": {
+    "Team 3": {
       "p": 48,
       "n": 0.65,
       "o": 82
     },
-    "Longwood": {
+    "Team 4": {
       "p": 29,
       "n": 0.5,
       "o": 65
     },
-    "Presbyterian College": {
+    "Team 5": {
       "p": 25,
       "n": 0.45,
       "o": 64
     },
-    "Radford": {
+    "Team 6": {
       "p": 26,
       "n": 0.45,
       "o": 64
     },
-    "South Carolina Upstate": {
+    "Team 7": {
       "p": 25,
       "n": 0.45,
       "o": 62
     },
-    "UNC Asheville": {
+    "Team 8": {
       "p": 34,
       "n": 0.55,
       "o": 67
     },
-    "Winthrop": {
+    "Team 9": {
       "p": 25,
       "n": 0.45,
       "o": 77
     }
   },
-  "Big Ten": {
-    "Illinois": {
+  "Conference 10": {
+    "Team 1": {
       "p": 83,
       "n": 9.3,
       "o": 96
     },
-    "Indiana": {
+    "Team 2": {
       "p": 91,
       "n": 15,
       "o": 90
     },
-    "Iowa": {
+    "Team 3": {
       "p": 76,
       "n": 8.7,
       "o": 91
     },
-    "Maryland": {
+    "Team 4": {
       "p": 81,
       "n": 9.5,
       "o": 76
     },
-    "Michigan": {
+    "Team 5": {
       "p": 84,
       "n": 11,
       "o": 99
     },
-    "Michigan State": {
+    "Team 6": {
       "p": 90,
       "n": 10.5,
       "o": 98
     },
-    "Minnesota": {
+    "Team 7": {
       "p": 72,
       "n": 7.9,
       "o": 81
     },
-    "Nebraska": {
+    "Team 8": {
       "p": 73,
       "n": 8.1,
       "o": 95
     },
-    "Northwestern": {
+    "Team 9": {
       "p": 70,
       "n": 7.6,
       "o": 84
     },
-    "Ohio State": {
+    "Team 10": {
       "p": 80,
       "n": 9.8,
       "o": 89
     },
-    "Oregon": {
+    "Team 11": {
       "p": 81,
       "n": 9.8,
       "o": 79
     },
-    "Penn State": {
+    "Team 12": {
       "p": 71,
       "n": 7.7,
       "o": 76
     },
-    "Purdue": {
+    "Team 13": {
       "p": 87,
       "n": 9.8,
       "o": 99
     },
-    "Rutgers": {
+    "Team 14": {
       "p": 72,
       "n": 7.9,
       "o": 76
     },
-    "UCLA": {
+    "Team 15": {
       "p": 96,
       "n": 9.5,
       "o": 94
     },
-    "USC": {
+    "Team 16": {
       "p": 78,
       "n": 9.2,
       "o": 82
     },
-    "Washington": {
+    "Team 17": {
       "p": 76,
       "n": 8.8,
       "o": 85
     },
-    "Wisconsin": {
+    "Team 18": {
       "p": 80,
       "n": 9.4,
       "o": 91
     }
   },
-  "Big West": {
-    "Cal Poly": {
+  "Conference 11": {
+    "Team 1": {
       "p": 38,
       "n": 0.8,
       "o": 67
     },
-    "Cal State Bakersfield": {
+    "Team 2": {
       "p": 36,
       "n": 0.8,
       "o": 62
     },
-    "Cal State Fullerton": {
+    "Team 3": {
       "p": 29,
       "n": 0.7,
       "o": 71
     },
-    "Cal State Northridge": {
+    "Team 4": {
       "p": 32,
       "n": 0.7,
       "o": 71
     },
-    "Hawaii": {
+    "Team 5": {
       "p": 47,
       "n": 0.95,
       "o": 77
     },
-    "Long Beach State": {
+    "Team 6": {
       "p": 48,
       "n": 0.95,
       "o": 68
     },
-    "UC Davis": {
+    "Team 7": {
       "p": 34,
       "n": 0.75,
       "o": 72
     },
-    "UC Irvine": {
+    "Team 8": {
       "p": 52,
       "n": 1.4,
       "o": 78
     },
-    "UC Riverside": {
+    "Team 9": {
       "p": 32,
       "n": 0.7,
       "o": 64
     },
-    "UC San Diego": {
+    "Team 10": {
       "p": 50,
       "n": 0.95,
       "o": 78
     },
-    "UC Santa Barbara": {
+    "Team 11": {
       "p": 49,
       "n": 0.95,
       "o": 74
     }
   },
-  "Coastal Athletic": {
-    "Campbell": {
+  "Conference 12": {
+    "Team 1": {
       "p": 38,
       "n": 0.9,
       "o": 69
     },
-    "Charleston": {
+    "Team 2": {
       "p": 57,
       "n": 1.2,
       "o": 75
     },
-    "Drexel": {
+    "Team 3": {
       "p": 37,
       "n": 0.9,
       "o": 69
     },
-    "Elon": {
+    "Team 4": {
       "p": 32,
       "n": 0.8,
       "o": 67
     },
-    "Hampton": {
+    "Team 5": {
       "p": 31,
       "n": 0.8,
       "o": 65
     },
-    "Hofstra": {
+    "Team 6": {
       "p": 31,
       "n": 0.8,
       "o": 80
     },
-    "Monmouth": {
+    "Team 7": {
       "p": 38,
       "n": 0.9,
       "o": 72
     },
-    "North Carolina A&T": {
+    "Team 8": {
       "p": 40,
       "n": 0.95,
       "o": 65
     },
-    "Northeastern": {
+    "Team 9": {
       "p": 31,
       "n": 0.8,
       "o": 63
     },
-    "Stony Brook": {
+    "Team 10": {
       "p": 34,
       "n": 0.85,
       "o": 67
     },
-    "Towson": {
+    "Team 11": {
       "p": 31,
       "n": 0.8,
       "o": 71
     },
-    "UNCW": {
+    "Team 12": {
       "p": 52,
       "n": 1.1,
       "o": 80
     },
-    "William & Mary": {
+    "Team 13": {
       "p": 39,
       "n": 0.9,
       "o": 77
     }
   },
-  "Conference USA": {
-    "Delaware": {
+  "Conference 13": {
+    "Team 1": {
       "p": 39,
       "n": 1.25,
       "o": 65
     },
-    "FIU": {
+    "Team 2": {
       "p": 45,
       "n": 1.35,
       "o": 69
     },
-    "Jacksonville State": {
+    "Team 3": {
       "p": 42,
       "n": 1.3,
       "o": 69
     },
-    "Kennesaw State": {
+    "Team 4": {
       "p": 46,
       "n": 1.4,
       "o": 74
     },
-    "Liberty": {
+    "Team 5": {
       "p": 61,
       "n": 2,
       "o": 78
     },
-    "Louisiana Tech": {
+    "Team 6": {
       "p": 56,
       "n": 1.65,
       "o": 70
     },
-    "Middle Tennessee": {
+    "Team 7": {
       "p": 47,
       "n": 1.4,
       "o": 74
     },
-    "Missouri State": {
+    "Team 8": {
       "p": 44,
       "n": 1.35,
       "o": 69
     },
-    "New Mexico State": {
+    "Team 9": {
       "p": 58,
       "n": 1.7,
       "o": 73
     },
-    "Sam Houston State": {
+    "Team 10": {
       "p": 38,
       "n": 1.2,
       "o": 77
     },
-    "UTEP": {
+    "Team 11": {
       "p": 47,
       "n": 1.4,
       "o": 67
     },
-    "Western Kentucky": {
+    "Team 12": {
       "p": 62,
       "n": 1.75,
       "o": 76
     }
   },
-  "Horizon League": {
-    "Cleveland State": {
+  "Conference 14": {
+    "Team 1": {
       "p": 46,
       "n": 1.85,
       "o": 63
     },
-    "Detroit": {
+    "Team 2": {
       "p": 45,
       "n": 1.85,
       "o": 67
     },
-    "Green Bay": {
+    "Team 3": {
       "p": 42,
       "n": 1.75,
       "o": 67
     },
-    "IU Indianapolis": {
+    "Team 4": {
       "p": 35,
       "n": 1.55,
       "o": 63
     },
-    "Milwaukee": {
+    "Team 5": {
       "p": 45,
       "n": 1.85,
       "o": 67
     },
-    "Northern Kentucky": {
+    "Team 6": {
       "p": 47,
       "n": 1.9,
       "o": 73
     },
-    "Oakland": {
+    "Team 7": {
       "p": 50,
       "n": 1.4,
       "o": 73
     },
-    "Purdue Fort Wayne": {
+    "Team 8": {
       "p": 35,
       "n": 1.55,
       "o": 66
     },
-    "Robert Morris": {
+    "Team 9": {
       "p": 35,
       "n": 1.55,
       "o": 74
     },
-    "Wright State": {
+    "Team 10": {
       "p": 47,
       "n": 1.9,
       "o": 77
     },
-    "Youngstown State": {
+    "Team 11": {
       "p": 39,
       "n": 1.65,
       "o": 67
     }
   },
-  "Ivy League": {
-    "Brown": {
+  "Conference 15": {
+    "Team 1": {
       "p": 36,
       "n": 0.95,
       "o": 64
     },
-    "Columbia": {
+    "Team 2": {
       "p": 42,
       "n": 1.05,
       "o": 72
     },
-    "Cornell": {
+    "Team 3": {
       "p": 49,
       "n": 1.2,
       "o": 75
     },
-    "Dartmouth": {
+    "Team 4": {
       "p": 39,
       "n": 1,
       "o": 66
     },
-    "Harvard": {
+    "Team 5": {
       "p": 53,
       "n": 1.25,
       "o": 75
     },
-    "Penn": {
+    "Team 6": {
       "p": 52,
       "n": 1.25,
       "o": 75
     },
-    "Princeton": {
+    "Team 7": {
       "p": 56,
       "n": 1.7,
       "o": 68
     },
-    "Yale": {
+    "Team 8": {
       "p": 54,
       "n": 1.4,
       "o": 83
     }
   },
-  "MAAC": {
-    "Canisius": {
+  "Conference 16": {
+    "Team 1": {
       "p": 33,
       "n": 0.65,
       "o": 61
     },
-    "Fairfield": {
+    "Team 2": {
       "p": 27,
       "n": 0.6,
       "o": 66
     },
-    "Iona": {
+    "Team 3": {
       "p": 53,
       "n": 0.9,
       "o": 68
     },
-    "Manhattan": {
+    "Team 4": {
       "p": 27,
       "n": 0.6,
       "o": 61
     },
-    "Marist": {
+    "Team 5": {
       "p": 35,
       "n": 0.7,
       "o": 72
     },
-    "Merrimack": {
+    "Team 6": {
       "p": 45,
       "n": 0.8,
       "o": 73
     },
-    "Mount Saint Mary's": {
+    "Team 7": {
       "p": 35,
       "n": 0.7,
       "o": 65
     },
-    "Niagara": {
+    "Team 8": {
       "p": 36,
       "n": 0.7,
       "o": 61
     },
-    "Quinnipiac": {
+    "Team 9": {
       "p": 45,
       "n": 0.8,
       "o": 69
     },
-    "Rider": {
+    "Team 10": {
       "p": 34,
       "n": 0.65,
       "o": 60
     },
-    "Sacred Heart": {
+    "Team 11": {
       "p": 31,
       "n": 0.65,
       "o": 63
     },
-    "Saint Peter's": {
+    "Team 12": {
       "p": 50,
       "n": 0.85,
       "o": 68
     },
-    "Siena": {
+    "Team 13": {
       "p": 28,
       "n": 0.6,
       "o": 71
     }
   },
-  "MEAC": {
-    "Coppin State": {
+  "Conference 17": {
+    "Team 1": {
       "p": 28,
       "n": 0.45,
       "o": 60
     },
-    "Delaware State": {
+    "Team 2": {
       "p": 29,
       "n": 0.45,
       "o": 60
     },
-    "Howard": {
+    "Team 3": {
       "p": 43,
       "n": 0.6,
       "o": 69
     },
-    "Maryland Eastern Shore": {
+    "Team 4": {
       "p": 21,
       "n": 0.4,
       "o": 60
     },
-    "Morgan State": {
+    "Team 5": {
       "p": 23,
       "n": 0.45,
       "o": 60
     },
-    "Norfolk State": {
+    "Team 6": {
       "p": 45,
       "n": 0.6,
       "o": 63
     },
-    "North Carolina Central": {
+    "Team 7": {
       "p": 29,
       "n": 0.45,
       "o": 60
     },
-    "South Carolina State": {
+    "Team 8": {
       "p": 24,
       "n": 0.45,
       "o": 60
     }
   },
-  "Mid-American": {
-    "Akron": {
+  "Conference 18": {
+    "Team 1": {
       "p": 55,
       "n": 1.4,
       "o": 83
     },
-    "Ball State": {
+    "Team 2": {
       "p": 34,
       "n": 1.1,
       "o": 63
     },
-    "Bowling Green": {
+    "Team 3": {
       "p": 42,
       "n": 1.25,
       "o": 74
     },
-    "Buffalo": {
+    "Team 4": {
       "p": 44,
       "n": 1.3,
       "o": 69
     },
-    "Central Michigan": {
+    "Team 5": {
       "p": 39,
       "n": 1.2,
       "o": 65
     },
-    "Eastern Michigan": {
+    "Team 6": {
       "p": 37,
       "n": 1.15,
       "o": 67
     },
-    "Kent State": {
+    "Team 7": {
       "p": 54,
       "n": 1.55,
       "o": 75
     },
-    "Miami (OH)": {
+    "Team 8": {
       "p": 43,
       "n": 1.3,
       "o": 82
     },
-    "Northern Illinois": {
+    "Team 9": {
       "p": 44,
       "n": 1.3,
       "o": 61
     },
-    "Ohio": {
+    "Team 10": {
       "p": 54,
       "n": 1.55,
       "o": 68
     },
-    "Toledo": {
+    "Team 11": {
       "p": 52,
       "n": 1.5,
       "o": 75
     },
-    "UMass": {
+    "Team 12": {
       "p": 58,
       "n": 1.6,
       "o": 70
     },
-    "Western Michigan": {
+    "Team 13": {
       "p": 37,
       "n": 1.15,
       "o": 65
     }
   },
-  "Missouri Valley": {
-    "Belmont": {
+  "Conference 19": {
+    "Team 1": {
       "p": 56,
       "n": 1.7,
       "o": 83
     },
-    "Bradley": {
+    "Team 2": {
       "p": 58,
       "n": 1.75,
       "o": 78
     },
-    "Drake": {
+    "Team 3": {
       "p": 62,
       "n": 2,
       "o": 70
     },
-    "Evansville": {
+    "Team 4": {
       "p": 44,
       "n": 1.35,
       "o": 63
     },
-    "Illinois State": {
+    "Team 5": {
       "p": 45,
       "n": 1.4,
       "o": 80
     },
-    "Indiana State": {
+    "Team 6": {
       "p": 55,
       "n": 1.65,
       "o": 70
     },
-    "Murray State": {
+    "Team 7": {
       "p": 58,
       "n": 1.75,
       "o": 78
     },
-    "Northern Iowa": {
+    "Team 8": {
       "p": 56,
       "n": 1.7,
       "o": 80
     },
-    "Southern Illinois": {
+    "Team 9": {
       "p": 47,
       "n": 1.45,
       "o": 77
     },
-    "UIC": {
+    "Team 10": {
       "p": 45,
       "n": 1.4,
       "o": 77
     },
-    "Valparaiso": {
+    "Team 11": {
       "p": 48,
       "n": 1.5,
       "o": 74
     }
   },
-  "Mountain West": {
-    "Air Force": {
+  "Conference 20": {
+    "Team 1": {
       "p": 61,
       "n": 2.95,
       "o": 60
     },
-    "Boise State": {
+    "Team 2": {
       "p": 66,
       "n": 3.2,
       "o": 83
     },
-    "Colorado State": {
+    "Team 3": {
       "p": 53,
       "n": 2.55,
       "o": 80
     },
-    "Fresno State": {
+    "Team 4": {
       "p": 53,
       "n": 2.55,
       "o": 75
     },
-    "Grand Canyon": {
+    "Team 5": {
       "p": 63,
       "n": 3.2,
       "o": 83
     },
-    "Nevada": {
+    "Team 6": {
       "p": 65,
       "n": 3.15,
       "o": 83
     },
-    "New Mexico": {
+    "Team 7": {
       "p": 70,
       "n": 3.4,
       "o": 86
     },
-    "San Diego State": {
+    "Team 8": {
       "p": 78,
       "n": 4.5,
       "o": 88
     },
-    "San Jose State": {
+    "Team 9": {
       "p": 56,
       "n": 2.7,
       "o": 68
     },
-    "UNLV": {
+    "Team 10": {
       "p": 72,
       "n": 3.2,
       "o": 79
     },
-    "Utah State": {
+    "Team 11": {
       "p": 66,
       "n": 3.2,
       "o": 90
     },
-    "Wyoming": {
+    "Team 12": {
       "p": 62,
       "n": 3,
       "o": 81
     }
   },
-  "NEC": {
-    "Central Connecticut": {
+  "Conference 21": {
+    "Team 1": {
       "p": 24,
       "n": 0.45,
       "o": 63
     },
-    "Chicago State": {
+    "Team 2": {
       "p": 30,
       "n": 0.5,
       "o": 60
     },
-    "Fairleigh Dickinson": {
+    "Team 3": {
       "p": 30,
       "n": 0.5,
       "o": 61
     },
-    "Le Moyne": {
+    "Team 4": {
       "p": 23,
       "n": 0.45,
       "o": 63
     },
-    "Long Island": {
+    "Team 5": {
       "p": 21,
       "n": 0.4,
       "o": 68
     },
-    "Mercyhurst": {
+    "Team 6": {
       "p": 20,
       "n": 0.4,
       "o": 64
     },
-    "New Haven": {
+    "Team 7": {
       "p": 23,
       "n": 0.45,
       "o": 61
     },
-    "Saint Francis (PA)": {
+    "Team 8": {
       "p": 24,
       "n": 0.45,
       "o": 60
     },
-    "Stonehill": {
+    "Team 9": {
       "p": 20,
       "n": 0.4,
       "o": 61
     },
-    "Wagner": {
+    "Team 10": {
       "p": 27,
       "n": 0.45,
       "o": 62
     }
   },
-  "Ohio Valley": {
-    "Eastern Illinois": {
+  "Conference 22": {
+    "Team 1": {
       "p": 30,
       "n": 0.55,
       "o": 62
     },
-    "Lindenwood": {
+    "Team 2": {
       "p": 34,
       "n": 0.6,
       "o": 66
     },
-    "Little Rock": {
+    "Team 3": {
       "p": 45,
       "n": 0.7,
       "o": 63
     },
-    "Morehead State": {
+    "Team 4": {
       "p": 47,
       "n": 0.7,
       "o": 67
     },
-    "SIUE": {
+    "Team 5": {
       "p": 27,
       "n": 0.5,
       "o": 64
     },
-    "Southeast Missouri": {
+    "Team 6": {
       "p": 28,
       "n": 0.55,
       "o": 66
     },
-    "Southern Indiana": {
+    "Team 7": {
       "p": 32,
       "n": 0.55,
       "o": 61
     },
-    "Tennessee State": {
+    "Team 8": {
       "p": 34,
       "n": 0.6,
       "o": 72
     },
-    "Tennessee Tech": {
+    "Team 9": {
       "p": 30,
       "n": 0.55,
       "o": 62
     },
-    "Tennessee-Martin": {
+    "Team 10": {
       "p": 32,
       "n": 0.55,
       "o": 68
     },
-    "Western Illinois": {
+    "Team 11": {
       "p": 30,
       "n": 0.55,
       "o": 60
     }
   },
-  "Patriot League": {
-    "American": {
+  "Conference 23": {
+    "Team 1": {
       "p": 33,
       "n": 0.65,
       "o": 66
     },
-    "Army": {
+    "Team 2": {
       "p": 41,
       "n": 0.7,
       "o": 61
     },
-    "Boston University": {
+    "Team 3": {
       "p": 42,
       "n": 0.75,
       "o": 66
     },
-    "Bucknell": {
+    "Team 4": {
       "p": 45,
       "n": 0.75,
       "o": 61
     },
-    "Colgate": {
+    "Team 5": {
       "p": 48,
       "n": 0.8,
       "o": 70
     },
-    "Holy Cross": {
+    "Team 6": {
       "p": 34,
       "n": 0.65,
       "o": 61
     },
-    "Lafayette": {
+    "Team 7": {
       "p": 28,
       "n": 0.6,
       "o": 61
     },
-    "Lehigh": {
+    "Team 8": {
       "p": 35,
       "n": 0.65,
       "o": 65
     },
-    "Loyola-Maryland": {
+    "Team 9": {
       "p": 33,
       "n": 0.65,
       "o": 62
     },
-    "Navy": {
+    "Team 10": {
       "p": 41,
       "n": 0.7,
       "o": 74
     }
   },
-  "SEC": {
-    "Alabama": {
+  "Conference 24": {
+    "Team 1": {
       "p": 83,
       "n": 9.8,
       "o": 97
     },
-    "Arkansas": {
+    "Team 2": {
       "p": 86,
       "n": 13,
       "o": 93
     },
-    "Auburn": {
+    "Team 3": {
       "p": 82,
       "n": 9.6,
       "o": 89
     },
-    "Florida": {
+    "Team 4": {
       "p": 84,
       "n": 9.8,
       "o": 97
     },
-    "Georgia": {
+    "Team 5": {
       "p": 72,
       "n": 9.4,
       "o": 87
     },
-    "Kentucky": {
+    "Team 6": {
       "p": 99,
       "n": 22,
       "o": 94
     },
-    "LSU": {
+    "Team 7": {
       "p": 76,
       "n": 9.9,
       "o": 85
     },
-    "Mississippi State": {
+    "Team 8": {
       "p": 72,
       "n": 9.2,
       "o": 79
     },
-    "Missouri": {
+    "Team 9": {
       "p": 73,
       "n": 9.5,
       "o": 84
     },
-    "Oklahoma": {
+    "Team 10": {
       "p": 78,
       "n": 9.9,
       "o": 88
     },
-    "Ole Miss": {
+    "Team 11": {
       "p": 72,
       "n": 9.2,
       "o": 81
     },
-    "South Carolina": {
+    "Team 12": {
       "p": 73,
       "n": 9.3,
       "o": 79
     },
-    "Tennessee": {
+    "Team 13": {
       "p": 86,
       "n": 10.5,
       "o": 92
     },
-    "Texas": {
+    "Team 14": {
       "p": 86,
       "n": 11,
       "o": 90
     },
-    "Texas A&M": {
+    "Team 15": {
       "p": 76,
       "n": 9.9,
       "o": 88
     },
-    "Vanderbilt": {
+    "Team 16": {
       "p": 71,
       "n": 9,
       "o": 95
     }
   },
-  "Southern": {
-    "Chattanooga": {
+  "Conference 25": {
+    "Team 1": {
       "p": 50,
       "n": 0.9,
       "o": 64
     },
-    "East Tennessee State": {
+    "Team 2": {
       "p": 51,
       "n": 0.9,
       "o": 75
     },
-    "Furman": {
+    "Team 3": {
       "p": 51,
       "n": 0.9,
       "o": 73
     },
-    "Mercer": {
+    "Team 4": {
       "p": 30,
       "n": 0.65,
       "o": 68
     },
-    "Samford": {
+    "Team 5": {
       "p": 52,
       "n": 0.95,
       "o": 70
     },
-    "The Citadel": {
+    "Team 6": {
       "p": 32,
       "n": 0.65,
       "o": 61
     },
-    "UNCG": {
+    "Team 7": {
       "p": 33,
       "n": 0.7,
       "o": 64
     },
-    "VMI": {
+    "Team 8": {
       "p": 34,
       "n": 0.7,
       "o": 60
     },
-    "Western Carolina": {
+    "Team 9": {
       "p": 30,
       "n": 0.65,
       "o": 66
     },
-    "Wofford": {
+    "Team 10": {
       "p": 30,
       "n": 0.65,
       "o": 65
     }
   },
-  "Southland": {
-    "East Texas A&M": {
+  "Conference 26": {
+    "Team 1": {
       "p": 27,
       "n": 0.55,
       "o": 62
     },
-    "Houston Christian": {
+    "Team 2": {
       "p": 25,
       "n": 0.5,
       "o": 63
     },
-    "Incarnate Word": {
+    "Team 3": {
       "p": 32,
       "n": 0.6,
       "o": 64
     },
-    "Lamar": {
+    "Team 4": {
       "p": 33,
       "n": 0.6,
       "o": 65
     },
-    "McNeese": {
+    "Team 5": {
       "p": 54,
       "n": 1.6,
       "o": 83
     },
-    "New Orleans": {
+    "Team 6": {
       "p": 33,
       "n": 0.6,
       "o": 69
     },
-    "Nicholls": {
+    "Team 7": {
       "p": 27,
       "n": 0.55,
       "o": 64
     },
-    "Northwestern State": {
+    "Team 8": {
       "p": 31,
       "n": 0.55,
       "o": 62
     },
-    "Southeastern Louisiana": {
+    "Team 9": {
       "p": 30,
       "n": 0.55,
       "o": 63
     },
-    "Stephen F. Austin": {
+    "Team 10": {
       "p": 50,
       "n": 0.75,
       "o": 80
     },
-    "Texas A&M-Corpus Christi": {
+    "Team 11": {
       "p": 25,
       "n": 0.5,
       "o": 68
     },
-    "UTRGV": {
+    "Team 12": {
       "p": 42,
       "n": 0.7,
       "o": 77
     }
   },
-  "Sun Belt": {
-    "Appalachian State": {
+  "Conference 27": {
+    "Team 1": {
       "p": 34,
       "n": 1,
       "o": 72
     },
-    "Arkansas State": {
+    "Team 2": {
       "p": 34,
       "n": 1,
       "o": 74
     },
-    "Coastal Carolina": {
+    "Team 3": {
       "p": 34,
       "n": 1,
       "o": 67
     },
-    "Georgia Southern": {
+    "Team 4": {
       "p": 39,
       "n": 1.1,
       "o": 67
     },
-    "Georgia State": {
+    "Team 5": {
       "p": 37,
       "n": 1.1,
       "o": 63
     },
-    "James Madison": {
+    "Team 6": {
       "p": 33,
       "n": 1,
       "o": 69
     },
-    "Louisiana": {
+    "Team 7": {
       "p": 42,
       "n": 1.2,
       "o": 63
     },
-    "Marshall": {
+    "Team 8": {
       "p": 39,
       "n": 1.1,
       "o": 72
     },
-    "Old Dominion": {
+    "Team 9": {
       "p": 37,
       "n": 1.1,
       "o": 66
     },
-    "South Alabama": {
+    "Team 10": {
       "p": 35,
       "n": 1.05,
       "o": 72
     },
-    "Southern Miss": {
+    "Team 11": {
       "p": 35,
       "n": 1.05,
       "o": 69
     },
-    "Texas State": {
+    "Team 12": {
       "p": 39,
       "n": 1.1,
       "o": 67
     },
-    "Troy": {
+    "Team 13": {
       "p": 34,
       "n": 1,
       "o": 74
     },
-    "ULM": {
+    "Team 14": {
       "p": 40,
       "n": 1.15,
       "o": 60
     }
   },
-  "SWAC": {
-    "Alabama A&M": {
+  "Conference 28": {
+    "Team 1": {
       "p": 26,
       "n": 0.5,
       "o": 62
     },
-    "Alabama State": {
+    "Team 2": {
       "p": 29,
       "n": 0.5,
       "o": 62
     },
-    "Alcorn State": {
+    "Team 3": {
       "p": 31,
       "n": 0.55,
       "o": 60
     },
-    "Arkansas-Pine Bluff": {
+    "Team 4": {
       "p": 29,
       "n": 0.5,
       "o": 62
     },
-    "Bethune-Cookman": {
+    "Team 5": {
       "p": 32,
       "n": 0.55,
       "o": 65
     },
-    "Florida A&M": {
+    "Team 6": {
       "p": 27,
       "n": 0.5,
       "o": 62
     },
-    "Grambling State": {
+    "Team 7": {
       "p": 31,
       "n": 0.55,
       "o": 62
     },
-    "Jackson State": {
+    "Team 8": {
       "p": 27,
       "n": 0.5,
       "o": 60
     },
-    "Mississippi Valley State": {
+    "Team 9": {
       "p": 26,
       "n": 0.5,
       "o": 60
     },
-    "Prairie View A&M": {
+    "Team 10": {
       "p": 30,
       "n": 0.5,
       "o": 62
     },
-    "Southern": {
+    "Team 11": {
       "p": 32,
       "n": 0.55,
       "o": 64
     },
-    "Texas Southern": {
+    "Team 12": {
       "p": 48,
       "n": 0.7,
       "o": 62
     }
   },
-  "Summit League": {
-    "Denver": {
+  "Conference 29": {
+    "Team 1": {
       "p": 33,
       "n": 0.65,
       "o": 66
     },
-    "North Dakota": {
+    "Team 2": {
       "p": 33,
       "n": 0.65,
       "o": 66
     },
-    "North Dakota State": {
+    "Team 3": {
       "p": 47,
       "n": 0.85,
       "o": 77
     },
-    "Omaha": {
+    "Team 4": {
       "p": 28,
       "n": 0.6,
       "o": 64
     },
-    "Oral Roberts": {
+    "Team 5": {
       "p": 50,
       "n": 0.85,
       "o": 63
     },
-    "Saint Thomas": {
+    "Team 6": {
       "p": 34,
       "n": 0.7,
       "o": 77
     },
-    "South Dakota": {
+    "Team 7": {
       "p": 30,
       "n": 0.65,
       "o": 63
     },
-    "South Dakota State": {
+    "Team 8": {
       "p": 51,
       "n": 1.2,
       "o": 70
     },
-    "UMKC": {
+    "Team 9": {
       "p": 33,
       "n": 0.65,
       "o": 60
     }
   },
-  "West Coast": {
-    "Gonzaga": {
+  "Conference 30": {
+    "Team 1": {
       "p": 88,
       "n": 8.5,
       "o": 98
     },
-    "Loyola-Marymount": {
+    "Team 2": {
       "p": 50,
       "n": 2.25,
       "o": 73
     },
-    "Oregon State": {
+    "Team 3": {
       "p": 66,
       "n": 3,
       "o": 73
     },
-    "Pacific": {
+    "Team 4": {
       "p": 53,
       "n": 2.4,
       "o": 78
     },
-    "Pepperdine": {
+    "Team 5": {
       "p": 50,
       "n": 2.25,
       "o": 65
     },
-    "Portland": {
+    "Team 6": {
       "p": 48,
       "n": 2.2,
       "o": 70
     },
-    "Saint Mary's College": {
+    "Team 7": {
       "p": 75,
       "n": 3.3,
       "o": 91
     },
-    "San Diego": {
+    "Team 8": {
       "p": 55,
       "n": 2.5,
       "o": 68
     },
-    "San Francisco": {
+    "Team 9": {
       "p": 62,
       "n": 2.8,
       "o": 79
     },
-    "Santa Clara": {
+    "Team 10": {
       "p": 60,
       "n": 2.7,
       "o": 86
     },
-    "Seattle University": {
+    "Team 11": {
       "p": 55,
       "n": 2.5,
       "o": 78
     },
-    "Washington State": {
+    "Team 12": {
       "p": 67,
       "n": 3,
       "o": 76
     }
   },
-  "Western Athletic": {
-    "Abilene Christian": {
+  "Conference 31": {
+    "Team 1": {
       "p": 45,
       "n": 0.8,
       "o": 66
     },
-    "California Baptist": {
+    "Team 2": {
       "p": 31,
       "n": 0.65,
       "o": 80
     },
-    "Southern Utah": {
+    "Team 3": {
       "p": 30,
       "n": 0.65,
       "o": 64
     },
-    "Tarleton State": {
+    "Team 4": {
       "p": 42,
       "n": 0.75,
       "o": 67
     },
-    "UTA": {
+    "Team 5": {
       "p": 30,
       "n": 0.65,
       "o": 71
     },
-    "Utah Tech": {
+    "Team 6": {
       "p": 35,
       "n": 0.7,
       "o": 72
     },
-    "Utah Valley": {
+    "Team 7": {
       "p": 46,
       "n": 0.8,
       "o": 80

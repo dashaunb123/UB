@@ -42,3 +42,7 @@ TODO:
 - Updated CPU transfer portal behavior so teams pull offers when they are outside a player's top five CPU offers and redirect toward less-contested players.
 - Fixed offseason retention routing so the departures screen opens the pay/portal decision list first, and only the retention screen's `FINISH RETENTION` button auto-portals undecided players.
 - Added CPU transfer portal position caps so each team can have at most two active offers per position; offering a better same-position target requires pulling the weakest existing offer first.
+- Converted shipped `teams.js` conference/team names to generic labels and added a settings JSON uploader/reset for custom name packs. Created `custom-team-names.example.json` from the previous full name list.
+- Removed the custom roster uploader and generated roster JSON files after the source roster data was found inaccurate; custom name packs remain supported.
+- Restored `teams.js` and `custom-team-names.example.json` to the original 365-team structure and original prestige/NIL/overall values after the bad roster import had overwritten overalls.
+- Added AD resource-choice effects: choosing NIL Fund stores a one-season $500K NIL boost, while choosing Scouts fully scouts 20% of the generated freshman recruiting class by revealing ratings and motivations.
