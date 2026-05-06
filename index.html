@@ -195,6 +195,75 @@
     }
     .settings-close:hover { background:#c0301c; }
 
+    /* saves overlay */
+    #saves-overlay {
+      position:fixed; inset:0; z-index:210;
+      background:rgba(8,5,2,0.82);
+      display:none; align-items:center; justify-content:center;
+      font-family:'Press Start 2P', monospace;
+    }
+    #saves-overlay.show { display:flex; }
+    .saves-shell {
+      background:#1c160c; border:3px solid #c08a18;
+      padding:22px 22px; width:min(620px, 95vw);
+      max-height:92vh; overflow-y:auto;
+      color:#ede0b8;
+      box-shadow:6px 6px 0 rgba(0,0,0,0.7);
+    }
+    .saves-info {
+      font-size:7px; color:rgba(237,224,184,0.55);
+      letter-spacing:1px; text-align:center; margin-bottom:14px;
+    }
+    .saves-list { display:flex; flex-direction:column; gap:8px; }
+    .save-row {
+      display:grid; grid-template-columns:48px 1fr auto; gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border:2px solid rgba(237,224,184,0.22);
+      background:rgba(20,16,11,0.55);
+    }
+    .save-row.active { border-color:#c08a18; background:rgba(192,138,24,0.14); }
+    .save-row.empty { opacity:0.65; }
+    .save-slot-num {
+      font-size:14px; color:#c08a18; text-align:center;
+      text-shadow:1px 1px 0 #3a2400;
+    }
+    .save-info { font-size:8px; line-height:1.55; }
+    .save-info .name { color:#ede0b8; font-size:9px; letter-spacing:1px; }
+    .save-info .meta { color:rgba(237,224,184,0.6); font-size:6.5px; letter-spacing:1px; margin-top:3px; }
+    .save-actions { display:flex; gap:5px; flex-wrap:wrap; justify-content:flex-end; }
+    .save-btn {
+      font-family:inherit; font-size:6.5px; letter-spacing:1px;
+      padding:6px 8px; cursor:pointer; min-width:50px;
+      background:rgba(20,16,11,0.6); color:#ede0b8;
+      border:2px solid rgba(237,224,184,0.35);
+    }
+    .save-btn:hover { border-color:#ede0b8; }
+    .save-btn.save  { background:rgba(31,95,168,0.35); border-color:#7cc8ff; color:#dff0ff; }
+    .save-btn.load  { background:rgba(31,77,43,0.35); border-color:#88c894; color:#e8ffe8; }
+    .save-btn.del   { background:rgba(120,30,18,0.35); border-color:#e09080; color:#ffd0c0; }
+    .save-btn:disabled { opacity:0.35; cursor:not-allowed; border-color:rgba(237,224,184,0.18); }
+    .saves-footer { display:flex; gap:10px; justify-content:center; margin-top:16px; }
+    .saves-footer .settings-close { margin:0; }
+    #auto-save-overlay {
+      position:fixed; inset:0; z-index:260;
+      display:none; align-items:center; justify-content:center;
+      pointer-events:none;
+      background:rgba(8,5,2,0.54);
+      font-family:'Press Start 2P', monospace;
+    }
+    #auto-save-overlay.show { display:flex; }
+    .auto-save-card {
+      border:3px solid #c08a18;
+      background:#1c160c;
+      color:#ede0b8;
+      box-shadow:6px 6px 0 rgba(0,0,0,0.72);
+      padding:20px 28px;
+      font-size:clamp(9px,1.05vw,13px);
+      letter-spacing:2px;
+      text-align:center;
+    }
+
     /* ── THEME OVERRIDES ── */
     /* Midnight: dark navy + ice blue accents */
     body[data-theme="midnight"] { background:#070d1a; }
@@ -438,7 +507,6 @@
     #start-btn:hover { animation:none; opacity:1; color:#c08a18; }
     #start-btn:active { transform:translate(2px,2px); }
     @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
-
     #tagline {
       font-size:clamp(5px,0.8vw,7px); color:rgba(237,224,184,0.38);
       letter-spacing:2px; margin-top:16px;
@@ -1394,6 +1462,33 @@
       overflow:hidden;
       min-height:200px;
     }
+    .ng-office-link {
+      cursor:pointer;
+      outline:none;
+    }
+    .ng-office-link:focus-visible {
+      border-color:#ede0b8;
+    }
+    .ng-office-prompt {
+      position:absolute;
+      left:50%;
+      bottom:14px;
+      transform:translateX(-50%);
+      color:#ede0b8;
+      background:rgba(8,5,2,0.76);
+      border:2px solid rgba(192,138,24,0.7);
+      padding:8px 10px;
+      font-size:clamp(5px,0.7vw,8px);
+      letter-spacing:1px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 0.12s ease;
+      white-space:nowrap;
+    }
+    .ng-office-link:hover .ng-office-prompt,
+    .ng-office-link:focus-visible .ng-office-prompt {
+      opacity:1;
+    }
     #ng-coach-canvas {
       image-rendering:pixelated;
       image-rendering:crisp-edges;
@@ -1556,6 +1651,111 @@
       border-color:#ede0b8;
       outline:none;
     }
+    .office-screen {
+      justify-content:flex-start;
+      padding:28px 46px 30px;
+      overflow-y:auto;
+      scrollbar-width:none;
+    }
+    .office-screen::-webkit-scrollbar { display:none; }
+    .office-shell {
+      width:100%;
+      max-width:1180px;
+      display:grid;
+      gap:18px;
+      min-height:0;
+    }
+    .office-header {
+      border-bottom:2px solid rgba(192,138,24,0.28);
+      padding-bottom:14px;
+    }
+    .office-title {
+      display:block;
+      font-size:clamp(14px,2.6vw,26px);
+      color:#ede0b8;
+      line-height:1.25;
+      text-shadow:3px 3px 0 #a82418, 5px 5px 0 #350a04;
+    }
+    .office-body {
+      display:grid;
+      grid-template-columns:minmax(320px, 0.9fr) minmax(0,1.1fr);
+      gap:18px;
+      min-height:0;
+    }
+    .office-scene-panel,
+    .office-history-panel {
+      border:2px solid rgba(192,138,24,0.28);
+      background:rgba(22,18,9,0.28);
+      padding:14px;
+      min-height:0;
+    }
+    #office-scene-canvas {
+      width:100%;
+      aspect-ratio:13 / 8;
+      image-rendering:pixelated;
+      image-rendering:crisp-edges;
+      display:block;
+      background:rgba(8,7,4,0.25);
+      border:2px solid rgba(237,224,184,0.12);
+    }
+    .office-stats-grid {
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:8px;
+      margin-top:12px;
+    }
+    .office-stat {
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(8,7,4,0.22);
+      padding:10px;
+      min-height:54px;
+    }
+    .office-stat span {
+      display:block;
+      color:rgba(237,224,184,0.48);
+      font-size:clamp(5px,0.62vw,7px);
+      line-height:1.5;
+      letter-spacing:1px;
+    }
+    .office-stat strong {
+      display:block;
+      margin-top:5px;
+      color:#ede0b8;
+      font-size:clamp(9px,1.15vw,14px);
+      font-weight:400;
+    }
+    .office-season-list {
+      display:grid;
+      gap:7px;
+      margin-top:12px;
+      max-height:420px;
+      overflow-y:auto;
+      padding-right:2px;
+    }
+    .office-season-row {
+      display:grid;
+      grid-template-columns:64px 78px 1fr;
+      gap:10px;
+      align-items:center;
+      border:2px solid rgba(237,224,184,0.12);
+      background:rgba(8,7,4,0.22);
+      padding:9px 10px;
+      color:rgba(237,224,184,0.66);
+      font-size:clamp(5px,0.68vw,8px);
+      line-height:1.55;
+    }
+    .office-season-row strong { color:#ede0b8; font-weight:400; }
+    .office-season-empty {
+      color:rgba(237,224,184,0.42);
+      font-size:clamp(6px,0.72vw,8px);
+      line-height:1.8;
+      padding:16px 4px;
+    }
+    @media (max-width:900px) {
+      .office-body { grid-template-columns:1fr; }
+      .office-stats-grid { grid-template-columns:repeat(2, minmax(0,1fr)); }
+      .office-season-row { grid-template-columns:54px 66px 1fr; }
+    }
     .standings-screen {
       justify-content:flex-start;
       padding:28px 46px 30px;
@@ -1611,7 +1811,7 @@
     }
     .standing-row {
       display:grid;
-      grid-template-columns:48px 1fr auto auto auto auto;
+      grid-template-columns:48px 1fr auto auto auto;
       gap:12px;
       align-items:center;
       border:2px solid rgba(237,224,184,0.12);
@@ -1801,11 +2001,6 @@
     .minute-input:focus {
       outline:none;
       border-color:#c08a18;
-    }
-    .presser-text {
-      color:rgba(237,224,184,0.58);
-      font-size:clamp(5px,0.66vw,7px);
-      line-height:1.7;
     }
     .rotation-grid {
       display:grid;
@@ -2040,6 +2235,15 @@
       color:#ede0b8;
       font-weight:400;
     }
+    .recruit-section-label {
+      color:#c08a18;
+      font-size:clamp(5px,0.68vw,7px);
+      letter-spacing:2px;
+      text-shadow:1px 1px 0 #3a2400;
+      border-top:2px solid rgba(192,138,24,0.24);
+      padding:12px 2px 4px;
+      margin-top:4px;
+    }
     .recruit-stars {
       color:#c08a18;
       letter-spacing:1px;
@@ -2142,6 +2346,64 @@
       max-height:82vh;
       overflow-y:auto;
       gap:0;
+    }
+    .portal-signing-card {
+      position:relative;
+      overflow:hidden;
+      max-width:520px;
+      text-align:center;
+      border-color:rgba(192,138,24,0.72);
+      box-shadow:0 0 0 2px rgba(192,138,24,0.12), 0 16px 42px rgba(0,0,0,0.55);
+    }
+    .portal-signing-card .recruit-headshot {
+      margin:0 auto;
+      width:112px;
+      height:140px;
+      border-color:rgba(192,138,24,0.58);
+      background:rgba(8,6,2,0.36);
+    }
+    .portal-signing-kicker {
+      color:#c08a18;
+      font-size:clamp(6px,0.78vw,9px);
+      letter-spacing:1px;
+      line-height:1.7;
+    }
+    .portal-signing-info {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:8px;
+    }
+    .portal-signing-info div {
+      border:2px solid rgba(237,224,184,0.14);
+      background:rgba(22,18,9,0.36);
+      padding:8px;
+      color:rgba(237,224,184,0.68);
+      font-size:clamp(5px,0.66vw,7px);
+      line-height:1.7;
+      letter-spacing:1px;
+    }
+    .portal-signing-info strong {
+      display:block;
+      color:#ede0b8;
+      font-weight:400;
+      margin-top:3px;
+    }
+    .portal-confetti {
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .portal-confetti span {
+      position:absolute;
+      top:-18px;
+      width:7px;
+      height:12px;
+      opacity:0.95;
+      animation:portalConfettiFall 1.35s linear infinite;
+    }
+    @keyframes portalConfettiFall {
+      to { transform:translateY(430px) rotate(540deg); opacity:0.15; }
     }
     .class-rankings-head {
       display:flex;
@@ -3516,7 +3778,42 @@
         <div class="theme-grid" id="settings-theme-grid"></div>
       </div>
 
+      <div class="settings-section">
+        <div class="settings-label">
+          <span>AUTO RECRUITING</span>
+          <button class="settings-toggle" id="settings-auto-recruit-toggle" type="button">OFF</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">
+          <span>AUTO-SAVE</span>
+          <button class="settings-toggle" id="settings-season-auto-save-toggle" type="button">OFF</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label"><span>SAVE FILES</span></div>
+        <button class="settings-close" id="settings-open-saves" type="button" style="margin:6px auto 0;background:#1f4d78;border-color:#bfe2ff;">MANAGE SAVES</button>
+      </div>
+
       <button class="settings-close" id="settings-close" type="button">CLOSE</button>
+    </div>
+  </div>
+
+  <div id="auto-save-overlay" aria-live="polite">
+    <div class="auto-save-card">AUTO-SAVING...</div>
+  </div>
+
+  <!-- SAVES OVERLAY -->
+  <div id="saves-overlay" role="dialog" aria-modal="true">
+    <div class="saves-shell">
+      <div class="settings-title">* SAVE FILES *</div>
+      <div class="saves-info" id="saves-info">10 slots · auto-save writes to the active slot</div>
+      <div class="saves-list" id="saves-list"></div>
+      <div class="saves-footer">
+        <button class="settings-close" id="saves-close" type="button">CLOSE</button>
+      </div>
     </div>
   </div>
 
@@ -3700,6 +3997,30 @@
     </div>
   </div>
 
+  <div id="coach-office-screen" class="screen-panel office-screen hidden">
+    <div class="back-row">
+      <button class="back-btn" onclick="goToDashboard()">◄ DASHBOARD</button>
+      <span class="conf-badge" id="office-team-badge"></span>
+    </div>
+    <div class="office-shell">
+      <div class="office-header">
+        <span class="dash-eyebrow">* COACH OFFICE *</span>
+        <span class="office-title" id="office-title">PROGRAM HISTORY</span>
+      </div>
+      <div class="office-body">
+        <div class="office-scene-panel">
+          <canvas id="office-scene-canvas" width="520" height="320"></canvas>
+        </div>
+        <div class="office-history-panel">
+          <div class="departures-section-label">CAREER SUMMARY</div>
+          <div class="office-stats-grid" id="office-stats-grid"></div>
+          <div class="departures-section-label" style="margin-top:14px;">SEASONS</div>
+          <div class="office-season-list" id="office-season-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- RECRUITING -->
   <div id="recruiting-screen" class="screen-panel recruiting-screen hidden">
     <div class="back-row">
@@ -3711,6 +4032,7 @@
           <div class="roster-title" id="recruiting-title"></div>
           <div class="recruiting-subtitle" id="recruiting-subtitle"></div>
           <button id="recruiting-bookmarks-btn" class="recruit-bookmarks-toggle" onclick="toggleBookmarksFilter()"></button>
+          <button id="recruiting-user-signed-btn" class="recruit-bookmarks-toggle" onclick="toggleUserSignedFilter()"></button>
           <button id="recruiting-signed-btn" class="recruit-bookmarks-toggle" onclick="toggleSignedFilter()"></button>
         </div>
         <div class="recruit-header-badges">
@@ -3803,6 +4125,7 @@
               <div class="roster-title">TRANSFER PORTAL</div>
               <div class="recruiting-subtitle" id="portal-subtitle"></div>
               <button id="portal-bookmarks-btn" class="recruit-bookmarks-toggle" onclick="togglePortalBookmarksFilter()"></button>
+              <button id="portal-user-signed-btn" class="recruit-bookmarks-toggle" onclick="togglePortalUserSignedFilter()"></button>
               <button id="portal-signed-btn" class="recruit-bookmarks-toggle" onclick="togglePortalSignedFilter()"></button>
             </div>
             <div class="recruit-header-badges">
@@ -3826,6 +4149,11 @@
     <div id="portal-detail-card" class="recruit-detail-card"></div>
   </div>
 
+  <!-- PORTAL SIGNING OVERLAY -->
+  <div id="portal-signing-overlay" class="recruit-detail-overlay hidden">
+    <div id="portal-signing-card" class="recruit-detail-card portal-signing-card"></div>
+  </div>
+
   <!-- OFFSEASON TRAINING -->
   <div id="offseason-training-screen" class="screen-panel roster-screen hidden">
     <div class="roster-shell">
@@ -3834,7 +4162,7 @@
           <div class="roster-title">OFFSEASON TRAINING</div>
           <div class="recruiting-subtitle" id="offseason-training-subtitle"></div>
         </div>
-        <button class="roster-action-btn" type="button" onclick="goToPrestigeUpdate()">NEXT SEASON</button>
+        <button class="roster-action-btn" type="button" onclick="finishOffseasonTraining()">NEXT SEASON</button>
       </div>
       <div class="roster-grid" id="offseason-training-grid"></div>
     </div>
@@ -4007,7 +4335,7 @@ const STATE_HOMETOWNS = {
 };
 
 const COACH_OPTIONS = {
-  hair:["Buzz","Short","Fade","Flat Top","Waves","Slick Back","Afro","Mohawk","Cornrows","Twists","Dreads Short","Dreads Long","Dreads Tied","Bald"],
+  hair:["Dreads Tied","Bald","Twists","Curly","Flat Top"],
   hairColor:["Black","Brown","Blonde","Red","Auburn","Gray","Salt & Pepper","Silver","Platinum"],
   facialHair:["None","Stubble","Mustache","Goatee","Chin Strap","Beard","Full Beard"],
   height:["Short","Average","Tall"],
@@ -4126,17 +4454,20 @@ let recruitingClass = null;
 let recruitingStarFilter = 'all';
 let recruitingPositionFilter = 'all';
 let recruitingBookmarksFilter = false;
+let recruitingUserSignedFilter = false;
 let recruitingSignedFilter = false;
 let recruitingHoursState = null;
-let recruitingRunId = saveGameGetItem('recruitingRunId') || '';
+let recruitingRunId = '';
 let tournamentState = null;
 let tournamentSimInProgress = false;
 let conferenceTournamentState = null;
 let conferenceTournamentSimInProgress = false;
+let offseasonState = null;
 let transferPortal = [];
 let portalStarFilter = 'all';
 let portalPositionFilter = 'all';
 let portalBookmarksFilter = false;
+let portalUserSignedFilter = false;
 let portalSignedFilter = false;
 let portalWeek = 1;
 let portalHoursState = null;
@@ -4144,12 +4475,15 @@ let portalWorkAnimId = null;
 let portalAdvanceInProgress = false;
 let portalSetupInProgress = false;
 let portalFinishInProgress = false;
+let portalSigningRevealQueue = [];
 let pendingRetentionPlayers = [];
 let retentionNILCommits = [];
 let departuresAwaitingRetention = false;
 const PORTAL_TOTAL_WEEKS = 5;
 const PORTAL_ROSTER_CAP = 13;
 const OFFSEASON_FEATURES_ENABLED = true;
+const AUTO_RECRUITING_KEY = 'autoRecruitingEnabled';
+const SEASON_AUTO_SAVE_KEY = 'seasonAutoSaveEnabled';
 const PRESTIGE_TOTAL_TARGET = 18245;
 const PRESTIGE_STORAGE_KEY = 'teamPrestigeOverrides';
 const NIL_BUDGET_LIMITS = getBaseNILBudgetLimits();
@@ -4163,7 +4497,9 @@ const GENERATED_SAVE_PREFIXES = [
   'transferPortal:',
   'portalHours:',
   'recruitingHours:',
-  'conferenceTournament:'
+  'conferenceTournament:',
+  'nationalTournament:',
+  'offseasonState:'
 ];
 const BASE_TEAM_ECONOMICS = captureBaseTeamEconomics();
 let statsMode = 'team';
@@ -4175,7 +4511,7 @@ let coachProfile = {
   lastName:'',
   homeState:'Indiana',
   hometown:'Indianapolis',
-  hair:'Short',
+  hair:'Dreads Tied',
   hairColor:'Black',
   facialHair:'None',
   height:'Average',
@@ -4204,6 +4540,67 @@ window.addEventListener('unhandledrejection', event => {
   });
 });
 
+const SAVE_SLOT_COUNT = 10;
+const SAVE_SLOT_KEY = '__ub_activeSlot__';
+const SAVE_SLOT_META_KEY = '__ub_slotMeta__';
+const SAVE_SLOT_PREFIX_FN = (n) => `s${n}:`;
+const SAVE_SLOT_LEGACY_MIGRATED_KEY = '__ub_legacyMigrated__';
+const SAVE_SLOT_GLOBAL_KEYS = new Set([SAVE_SLOT_KEY, SAVE_SLOT_META_KEY, SAVE_SLOT_LEGACY_MIGRATED_KEY]);
+
+function getActiveSaveSlot() {
+  try {
+    const raw = localStorage.getItem(SAVE_SLOT_KEY);
+    const n = parseInt(raw, 10);
+    if (n >= 1 && n <= SAVE_SLOT_COUNT) return n;
+  } catch (_) {}
+  return 1;
+}
+
+function setActiveSaveSlot(n) {
+  const slot = Math.max(1, Math.min(SAVE_SLOT_COUNT, parseInt(n, 10) || 1));
+  try { localStorage.setItem(SAVE_SLOT_KEY, String(slot)); } catch (_) {}
+  return slot;
+}
+
+function getSlotPrefix(n) { return SAVE_SLOT_PREFIX_FN(n || getActiveSaveSlot()); }
+
+// Migrate any pre-existing un-namespaced keys to slot 1 on first load.
+function migrateLegacySavesIfNeeded() {
+  try {
+    if (localStorage.getItem(SAVE_SLOT_LEGACY_MIGRATED_KEY) === '1') return;
+    const prefix = SAVE_SLOT_PREFIX_FN(1);
+    const allKeys = [];
+    for (let i = 0; i < localStorage.length; i++) allKeys.push(localStorage.key(i));
+    let migrated = 0;
+    allKeys.forEach(k => {
+      if (!k) return;
+      if (k.startsWith('s') && /^s\d+:/.test(k)) return; // already namespaced
+      if (SAVE_SLOT_GLOBAL_KEYS.has(k)) return;
+      if (k.startsWith('__ub_')) return;
+      const v = localStorage.getItem(k);
+      if (v == null) return;
+      try { localStorage.setItem(prefix + k, v); migrated++; } catch (_) {}
+      try { localStorage.removeItem(k); } catch (_) {}
+    });
+    if (migrated > 0) {
+      // Capture initial meta for slot 1 from migrated data.
+      try {
+        const conf = localStorage.getItem(prefix + 'playerConf') || '';
+        const team = localStorage.getItem(prefix + 'playerTeam') || '';
+        const meta = {
+          name:team || 'Save 1',
+          team, conf,
+          season:1,
+          savedAt:Date.now()
+        };
+        localStorage.setItem(SAVE_SLOT_META_KEY, JSON.stringify({ 1:meta }));
+      } catch (_) {}
+    }
+    localStorage.setItem(SAVE_SLOT_LEGACY_MIGRATED_KEY, '1');
+  } catch (_) {}
+}
+migrateLegacySavesIfNeeded();
+
 function getSaveStorage() {
   try {
     const key = '__ub_storage_test__';
@@ -4215,14 +4612,22 @@ function getSaveStorage() {
   }
 }
 
+function _slotKey(key) {
+  if (!key) return key;
+  if (SAVE_SLOT_GLOBAL_KEYS.has(key)) return key;
+  if (/^s\d+:/.test(key)) return key; // already namespaced
+  return getSlotPrefix() + key;
+}
+
 function saveGameGetItem(key) {
   const storage = getSaveStorage();
+  const k = _slotKey(key);
   let value = null;
-  try { value = storage.getItem(key); } catch (err) { value = null; }
+  try { value = storage.getItem(k); } catch (err) { value = null; }
   if (value == null && storage !== sessionStorage) {
     try {
-      value = sessionStorage.getItem(key);
-      if (value != null) storage.setItem(key, value);
+      value = sessionStorage.getItem(k);
+      if (value != null) storage.setItem(k, value);
     } catch (err) {}
   }
   return value;
@@ -4230,14 +4635,15 @@ function saveGameGetItem(key) {
 
 function saveGameSetItem(key, value) {
   const storage = getSaveStorage();
-  try { storage.removeItem(key); } catch (err) {}
+  const k = _slotKey(key);
+  try { storage.removeItem(k); } catch (err) {}
   try {
-    storage.setItem(key, value);
+    storage.setItem(k, value);
   } catch (err) {
     if (!isStorageQuotaError(err)) throw err;
-    reclaimSaveStorageSpace(storage, key);
-    try { storage.removeItem(key); } catch (removeErr) {}
-    storage.setItem(key, value);
+    reclaimSaveStorageSpace(storage, k);
+    try { storage.removeItem(k); } catch (removeErr) {}
+    storage.setItem(k, value);
   }
 }
 
@@ -4252,65 +4658,75 @@ function isStorageQuotaError(err) {
 
 function reclaimSaveStorageSpace(storage, targetKey) {
   const currentSeason = seasonNumber || 1;
+  const slotPrefix = getSlotPrefix();
+  const ns = (k) => slotPrefix + k;
   const keepKeys = new Set([
     targetKey,
-    'allRosters',
-    'rosterGenerationVersion',
-    `schedule:${currentSeason}:${selectedConf || ''}:${selectedTeam || ''}`,
-    `leagueSchedule:${currentSeason}`,
-    `standings:${currentSeason}`,
-    `playerStats:${currentSeason}`,
-    `recruitingClass:${currentSeason}`,
-    `recruitingClassVersion:${currentSeason}`,
-    `transferPortal:${currentSeason}`,
-    `portalHours:${currentSeason}:${selectedTeam || ''}`,
-    `recruitingHours:${recruitingRunId || 'default'}:${currentSeason}:${selectedTeam || ''}`,
-    getSavedGameplanKey(),
-    'coachProfile',
-    'resourceDecision',
-    'pressPersonality',
-    'pressAnswers',
-    'recruitingRunId',
-    PRESTIGE_STORAGE_KEY,
-    'playerConf',
-    'playerTeam'
+    ns('allRosters'),
+    ns('rosterGenerationVersion'),
+    ns(`schedule:${currentSeason}:${selectedConf || ''}:${selectedTeam || ''}`),
+    ns(`leagueSchedule:${currentSeason}`),
+    ns(`standings:${currentSeason}`),
+    ns(`playerStats:${currentSeason}`),
+    ns(`recruitingClass:${currentSeason}`),
+    ns(`recruitingClassVersion:${currentSeason}`),
+    ns(`transferPortal:${currentSeason}`),
+    ns(`portalHours:${currentSeason}:${selectedTeam || ''}`),
+    ns(`recruitingHours:${recruitingRunId || 'default'}:${currentSeason}:${selectedTeam || ''}`),
+    ns(`conferenceTournament:${currentSeason}`),
+    ns(`nationalTournament:${currentSeason}`),
+    ns(`offseasonState:${currentSeason}`),
+    ns(getSavedGameplanKey()),
+    ns('coachProfile'),
+    ns('coachHistory'),
+    ns('resourceDecision'),
+    ns('pressPersonality'),
+    ns('pressAnswers'),
+    ns('recruitingRunId'),
+    ns('careerState'),
+    ns(PRESTIGE_STORAGE_KEY),
+    ns('playerConf'),
+    ns('playerTeam')
   ]);
 
   const keys = [];
   for (let i = 0; i < storage.length; i++) keys.push(storage.key(i));
   keys.forEach(key => {
     if (!key || key === targetKey || keepKeys.has(key)) return;
-    if (GENERATED_SAVE_PREFIXES.some(prefix => key.startsWith(prefix))) {
+    // Only consider keys in the active slot's namespace.
+    if (!key.startsWith(slotPrefix)) return;
+    const inner = key.slice(slotPrefix.length);
+    if (GENERATED_SAVE_PREFIXES.some(prefix => inner.startsWith(prefix))) {
       try { storage.removeItem(key); } catch (err) {}
     }
   });
 
-  if (targetKey !== 'recruitingClass:' + currentSeason) {
-    try { storage.removeItem(`recruitingClass:${currentSeason}`); } catch (err) {}
+  if (targetKey !== ns('recruitingClass:' + currentSeason)) {
+    try { storage.removeItem(ns(`recruitingClass:${currentSeason}`)); } catch (err) {}
   }
-  if (targetKey !== `transferPortal:${currentSeason}`) {
-    try { storage.removeItem(`transferPortal:${currentSeason}`); } catch (err) {}
+  if (targetKey !== ns(`transferPortal:${currentSeason}`)) {
+    try { storage.removeItem(ns(`transferPortal:${currentSeason}`)); } catch (err) {}
   }
-  if (targetKey !== `playerStats:${currentSeason}`) {
-    try { storage.removeItem(`playerStats:${currentSeason}`); } catch (err) {}
+  if (targetKey !== ns(`playerStats:${currentSeason}`)) {
+    try { storage.removeItem(ns(`playerStats:${currentSeason}`)); } catch (err) {}
   }
-  if (targetKey !== `leagueSchedule:${currentSeason}`) {
-    try { storage.removeItem(`leagueSchedule:${currentSeason}`); } catch (err) {}
+  if (targetKey !== ns(`leagueSchedule:${currentSeason}`)) {
+    try { storage.removeItem(ns(`leagueSchedule:${currentSeason}`)); } catch (err) {}
   }
-  if (targetKey !== `conferenceTournament:${currentSeason}`) {
-    try { storage.removeItem(`conferenceTournament:${currentSeason}`); } catch (err) {}
+  if (targetKey !== ns(`conferenceTournament:${currentSeason}`)) {
+    try { storage.removeItem(ns(`conferenceTournament:${currentSeason}`)); } catch (err) {}
   }
 
-  if (targetKey !== 'allRosters' && allRosters) {
+  if (targetKey !== ns('allRosters') && allRosters) {
     try {
-      storage.removeItem('allRosters');
-      storage.setItem('allRosters', JSON.stringify(compactAllRosters(allRosters)));
+      storage.removeItem(ns('allRosters'));
+      storage.setItem(ns('allRosters'), JSON.stringify(compactAllRosters(allRosters)));
     } catch (err) {
-      try { storage.removeItem('allRosters'); } catch (removeErr) {}
+      try { storage.removeItem(ns('allRosters')); } catch (removeErr) {}
     }
   }
 
-  const currentRecruitingKey = `recruitingClass:${currentSeason}`;
+  const currentRecruitingKey = ns(`recruitingClass:${currentSeason}`);
   if (targetKey !== currentRecruitingKey && recruitingClass) {
     try {
       storage.removeItem(currentRecruitingKey);
@@ -4320,7 +4736,7 @@ function reclaimSaveStorageSpace(storage, targetKey) {
     }
   }
 
-  const currentLeagueKey = `leagueSchedule:${currentSeason}`;
+  const currentLeagueKey = ns(`leagueSchedule:${currentSeason}`);
   if (targetKey !== currentLeagueKey && leagueSchedule) {
     try {
       storage.removeItem(currentLeagueKey);
@@ -4332,8 +4748,9 @@ function reclaimSaveStorageSpace(storage, targetKey) {
 }
 
 function saveGameRemoveItem(key) {
-  try { getSaveStorage().removeItem(key); } catch (err) {}
-  try { sessionStorage.removeItem(key); } catch (err) {}
+  const k = _slotKey(key);
+  try { getSaveStorage().removeItem(k); } catch (err) {}
+  try { sessionStorage.removeItem(k); } catch (err) {}
 }
 
 function saveGameJSON(key, value) {
@@ -4349,6 +4766,51 @@ function loadGameJSON(key, fallback = null) {
   }
 }
 
+recruitingRunId = saveGameGetItem('recruitingRunId') || '';
+
+function getCareerStateKey() {
+  return 'careerState';
+}
+
+function saveCareerState(screenOverride) {
+  const state = {
+    season:Number(typeof seasonNumber !== 'undefined' ? seasonNumber : 1) || 1,
+    selectedConf:selectedConf || saveGameGetItem('playerConf') || '',
+    selectedTeam:selectedTeam || saveGameGetItem('playerTeam') || '',
+    currentScreen:screenOverride || currentScreen || 'home',
+    currentGameIndex:Number(typeof currentGameIndex !== 'undefined' ? currentGameIndex : 0) || 0,
+    portalWeek:Number(typeof portalWeek !== 'undefined' ? portalWeek : 1) || 1,
+    savedAt:Date.now()
+  };
+  saveGameJSON(getCareerStateKey(), state);
+  return state;
+}
+
+function loadCareerState() {
+  const state = loadGameJSON(getCareerStateKey());
+  return state && typeof state === 'object' ? state : null;
+}
+
+function saveCurrentGameSnapshot(screenOverride) {
+  try {
+    if (selectedConf) saveGameSetItem('playerConf', selectedConf);
+    if (selectedTeam) saveGameSetItem('playerTeam', selectedTeam);
+    if (typeof saveAllRosters === 'function' && allRosters) saveAllRosters();
+    if (typeof saveCachedSchedule === 'function' && cachedSchedule) saveCachedSchedule();
+    if (typeof saveLeagueSchedule === 'function' && leagueSchedule) saveLeagueSchedule();
+    if (typeof saveConferenceTournamentState === 'function' && conferenceTournamentState) saveConferenceTournamentState();
+    if (typeof saveTournamentState === 'function' && tournamentState) saveTournamentState();
+    if (typeof savePortalState === 'function' && (Array.isArray(transferPortal) && transferPortal.length || portalWeek > 1 || retentionNILCommits.length)) savePortalState();
+    if (typeof saveOffseasonState === 'function' && offseasonState) saveOffseasonState();
+    if (typeof saveRecruitingClass === 'function' && recruitingClass) saveRecruitingClass();
+    if (standingsState) saveGameJSON(getStandingsStateKey(), standingsState);
+    if (playerStatsState) saveGameJSON(getPlayerStatsKey(), playerStatsState);
+    saveCareerState(screenOverride);
+  } catch (err) {
+    console.warn('save snapshot failed:', err);
+  }
+}
+
 function removeGeneratedSaveDataFromStorage(storage) {
   if (!storage) return;
   const keys = [];
@@ -4357,23 +4819,29 @@ function removeGeneratedSaveDataFromStorage(storage) {
   } catch (err) {
     return;
   }
+  const slotPrefix = getSlotPrefix();
+  const namedRoots = new Set([
+    'allRosters',
+    'rosterGenerationVersion',
+    'lastBoxScore',
+    'coachProfile',
+    'coachHistory',
+    'resourceDecision',
+    'pressPersonality',
+    'pressAnswers',
+    'recruitingRunId',
+    'careerState',
+    'playerConf',
+    'playerTeam'
+  ]);
   keys.forEach(key => {
     if (!key) return;
+    if (!key.startsWith(slotPrefix)) return; // only clear active slot
+    const inner = key.slice(slotPrefix.length);
     if (
-      GENERATED_SAVE_PREFIXES.some(prefix => key.startsWith(prefix)) ||
-      [
-        'allRosters',
-        'rosterGenerationVersion',
-        'lastBoxScore',
-        'coachProfile',
-        'resourceDecision',
-        'pressPersonality',
-        'pressAnswers',
-        'recruitingRunId',
-        'playerConf',
-        'playerTeam'
-      ].includes(key) ||
-      key.startsWith('gameplan:')
+      GENERATED_SAVE_PREFIXES.some(prefix => inner.startsWith(prefix)) ||
+      namedRoots.has(inner) ||
+      inner.startsWith('gameplan:')
     ) {
       try { storage.removeItem(key); } catch (err) {}
     }
@@ -4404,6 +4872,7 @@ function clearGeneratedSaveDataForNewGame() {
   tournamentSimInProgress = false;
   conferenceTournamentState = null;
   conferenceTournamentSimInProgress = false;
+  offseasonState = null;
   transferPortal = [];
   portalWeek = 1;
   portalHoursState = null;
@@ -4640,7 +5109,8 @@ function compactRecruit(recruit) {
     flags,
     compactUserOffer(recruit.offer),
     (recruit.cpuOffers || []).map(compactTeamOffer),
-    compactCommit(recruit.committedTo)
+    compactCommit(recruit.committedTo),
+    Math.max(0, Math.round(Number(recruit.committedAmount) || 0))
   ];
 }
 
@@ -4677,6 +5147,7 @@ function expandRecruit(value) {
   if (offer) recruit.offer = offer;
   const committedTo = expandCommit(value[18]);
   if (committedTo) recruit.committedTo = committedTo;
+  if (value[19] != null) recruit.committedAmount = Math.max(0, Math.round(Number(value[19]) || 0));
   return recruit;
 }
 
@@ -4787,6 +5258,13 @@ const Sfx = (() => {
     success:  () => { tone({ type:'triangle', freq:600, dur:0.08, gain:0.22 });
                       setTimeout(()=>tone({ type:'triangle', freq:800, dur:0.08, gain:0.22 }), 70);
                       setTimeout(()=>tone({ type:'triangle', freq:1100, dur:0.12, gain:0.22 }), 140); },
+    celebrate:() => {
+      tone({ type:'triangle', freq:523, dur:0.09, gain:0.22 });
+      setTimeout(()=>tone({ type:'triangle', freq:659, dur:0.09, gain:0.22 }), 70);
+      setTimeout(()=>tone({ type:'triangle', freq:784, dur:0.11, gain:0.24 }), 140);
+      setTimeout(()=>tone({ type:'triangle', freq:1046, dur:0.16, gain:0.22 }), 230);
+      setTimeout(()=>noise({ freq:2600, q:5, dur:0.22, gain:0.12, decay:10 }), 80);
+    },
     simStart: () => {
       // ascending whistle-style
       tone({ type:'triangle', freq:520, freqEnd:980, dur:0.18, gain:0.22 });
@@ -4894,6 +5372,152 @@ const Theme = (() => {
     }
   }
   return { get: () => current, apply, list: THEMES };
+})();
+
+// ── SAVE FILE MANAGER ─────────────────────────────────────────
+const Saves = (() => {
+  function readMetaMap() {
+    try {
+      const raw = localStorage.getItem(SAVE_SLOT_META_KEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return obj && typeof obj === 'object' ? obj : {};
+    } catch (_) { return {}; }
+  }
+  function writeMetaMap(map) {
+    try { localStorage.setItem(SAVE_SLOT_META_KEY, JSON.stringify(map || {})); } catch (_) {}
+  }
+
+  function activeSlot() { return getActiveSaveSlot(); }
+
+  function slotKeys(slot) {
+    const prefix = SAVE_SLOT_PREFIX_FN(slot);
+    const out = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(prefix)) out.push(k);
+    }
+    return out;
+  }
+
+  function slotHasData(slot) {
+    const prefix = SAVE_SLOT_PREFIX_FN(slot);
+    if (localStorage.getItem(prefix + 'playerTeam')) return true;
+    try {
+      const career = JSON.parse(localStorage.getItem(prefix + getCareerStateKey()) || 'null');
+      return !!(career && career.selectedTeam);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function getMeta(slot) {
+    const m = readMetaMap();
+    return m[slot] || null;
+  }
+
+  function captureCurrentMeta(slotName, slot = activeSlot()) {
+    const prefix = SAVE_SLOT_PREFIX_FN(slot);
+    let team = '', conf = '', season = 1, record = '0-0';
+    try { team = localStorage.getItem(prefix + 'playerTeam') || (typeof selectedTeam === 'string' ? selectedTeam : '') || ''; } catch (_) {}
+    try { conf = localStorage.getItem(prefix + 'playerConf') || (typeof selectedConf === 'string' ? selectedConf : '') || ''; } catch (_) {}
+    try {
+      const career = JSON.parse(localStorage.getItem(prefix + getCareerStateKey()) || 'null');
+      if (career && typeof career === 'object') {
+        team = team || career.selectedTeam || '';
+        conf = conf || career.selectedConf || '';
+        season = Number(career.season) || season;
+      }
+    } catch (_) {}
+    if (typeof seasonNumber === 'number') season = seasonNumber || 1;
+    try {
+      if (typeof getTeamStandingEntry === 'function' && team) {
+        const e = getTeamStandingEntry(team);
+        if (e) record = `${Number(e.wins) || 0}-${Number(e.losses) || 0}`;
+      }
+    } catch (_) {}
+    return {
+      name:(slotName || team || `Save ${slot}`).slice(0, 28),
+      team, conf, season, record,
+      savedAt:Date.now()
+    };
+  }
+
+  function saveCurrentToActive(name) {
+    if (typeof saveCurrentGameSnapshot === 'function') saveCurrentGameSnapshot();
+    // Auto-save already writes to active slot; just refresh metadata.
+    const slot = activeSlot();
+    const meta = captureCurrentMeta(name);
+    const all = readMetaMap();
+    all[slot] = meta;
+    writeMetaMap(all);
+    return meta;
+  }
+
+  function copySlot(fromSlot, toSlot) {
+    if (fromSlot === toSlot) return;
+    deleteSlot(toSlot);
+    const fromPrefix = SAVE_SLOT_PREFIX_FN(fromSlot);
+    const toPrefix = SAVE_SLOT_PREFIX_FN(toSlot);
+    const keys = slotKeys(fromSlot);
+    keys.forEach(k => {
+      const inner = k.slice(fromPrefix.length);
+      const val = localStorage.getItem(k);
+      if (val != null) {
+        try { localStorage.setItem(toPrefix + inner, val); } catch (_) {}
+      }
+    });
+  }
+
+  function saveCurrentToSlot(targetSlot, name) {
+    const previousActive = activeSlot();
+    saveCurrentToActive();
+    if (targetSlot !== previousActive) copySlot(previousActive, targetSlot);
+    setActiveSaveSlot(targetSlot);
+    const meta = captureCurrentMeta(name, targetSlot);
+    const all = readMetaMap();
+    all[targetSlot] = meta;
+    writeMetaMap(all);
+    return meta;
+  }
+
+  function deleteSlot(slot) {
+    const keys = slotKeys(slot);
+    keys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
+    const all = readMetaMap();
+    delete all[slot];
+    writeMetaMap(all);
+  }
+
+  function loadSlot(slot) {
+    if (!slotHasData(slot)) return false;
+    setActiveSaveSlot(slot);
+    return loadActiveSaveFromStorage();
+  }
+
+  function list() {
+    const out = [];
+    for (let i = 1; i <= SAVE_SLOT_COUNT; i++) {
+      out.push({
+        slot:i,
+        active:i === activeSlot(),
+        hasData:slotHasData(i),
+        meta:getMeta(i)
+      });
+    }
+    return out;
+  }
+
+  return {
+    SLOT_COUNT:SAVE_SLOT_COUNT,
+    activeSlot,
+    list,
+    getMeta,
+    saveCurrentToActive,
+    saveCurrentToSlot,
+    deleteSlot,
+    loadSlot,
+    slotHasData
+  };
 })();
 
 function getThemeCssValue(name, fallback) {
@@ -5015,17 +5639,37 @@ function showPanel(name) {
   if (name !== 'dashboard' && typeof stopDashboardCoachAnimation === 'function') {
     stopDashboardCoachAnimation();
   }
+  if (selectedTeam && typeof saveCareerState === 'function') {
+    try { saveCareerState(name); } catch (_) {}
+  }
 }
 
 function goHome() {
   flash(() => showPanel('home'));
 }
 
+function prepareNewGameSaveSlot() {
+  if (typeof Saves === 'undefined') return true;
+  const active = Saves.activeSlot();
+  if (!Saves.slotHasData(active)) return true;
+  for (let slot = 1; slot <= Saves.SLOT_COUNT; slot++) {
+    if (!Saves.slotHasData(slot)) {
+      setActiveSaveSlot(slot);
+      return true;
+    }
+  }
+  window.alert('All save slots are full. Delete a save file before starting a new career.');
+  return false;
+}
+
 function goToConf() {
   if (typeof playGameSoundtrack === 'function') playGameSoundtrack();
   const homeBtn = document.getElementById('start-btn');
   if (homeBtn) homeBtn.disabled = false;
-  if (currentScreen === 'home') clearGeneratedSaveDataForNewGame();
+  if (currentScreen === 'home') {
+    if (!prepareNewGameSaveSlot()) return;
+    clearGeneratedSaveDataForNewGame();
+  }
   flash(() => {
     confCursor = 0;
     showPanel('conf');
@@ -5061,10 +5705,13 @@ function goToDashboard() {
   currentGameIndex = getNextUnplayedGameIndex();
   ensureDefaultGameplanSaved();
   ensureRecruitingClass();
+  try { if (typeof Saves !== 'undefined') Saves.saveCurrentToActive(); } catch (_) {}
   flash(() => {
     showPanel('dashboard');
     renderNextGame();
   });
+  maybeRunSeasonStartAutoSave();
+  maybeRunRegularSeasonCompleteAutoSave();
 }
 
 function renderDashboardRecord() {
@@ -5072,6 +5719,191 @@ function renderDashboardRecord() {
   if (!recordEl || !selectedTeam) return;
   const entry = getTeamStandingEntry(selectedTeam);
   recordEl.textContent = entry ? `${entry.wins}-${entry.losses}` : '0-0';
+}
+
+function getCoachHistoryKey() {
+  return 'coachHistory';
+}
+
+function loadCoachHistory() {
+  const saved = loadGameJSON(getCoachHistoryKey(), []);
+  return Array.isArray(saved) ? saved.filter(item => item && Number(item.season)) : [];
+}
+
+function saveCoachHistory(history) {
+  saveGameJSON(getCoachHistoryKey(), history || []);
+}
+
+function buildCompletedSeasonHistoryEntry() {
+  if (!selectedTeam || !selectedConf) return null;
+  ensureStandingsState();
+  const standings = getTeamStandingEntry(selectedTeam);
+  const key = getTeamKey(selectedConf, selectedTeam);
+  const national = getNationalTournamentSummary()[key] || { made:false, wins:0, result:'Missed' };
+  const conference = getConferenceTournamentSummary()[key] || { champion:false, result:'No tournament' };
+  const wins = Number(standings && standings.wins) || 0;
+  const losses = Number(standings && standings.losses) || 0;
+  const nationalWins = Number(national.wins) || 0;
+  return {
+    season:Number(seasonNumber) || 1,
+    team:selectedTeam,
+    conf:selectedConf,
+    wins,
+    losses,
+    conferenceChampion:!!conference.champion,
+    conferenceResult:conference.result || (conference.champion ? 'Champion' : 'Played'),
+    tournamentMade:!!national.made,
+    tournamentSeed:Number(national.seed) || null,
+    tournamentWins:nationalWins,
+    tournamentResult:national.result || 'Missed',
+    r32:nationalWins >= 1,
+    r16:nationalWins >= 2,
+    r8:nationalWins >= 3,
+    r4:nationalWins >= 4,
+    championshipGame:nationalWins >= 5,
+    champion:nationalWins >= 6 || national.result === 'Champion'
+  };
+}
+
+function recordCompletedCoachSeason() {
+  const entry = buildCompletedSeasonHistoryEntry();
+  if (!entry) return null;
+  const history = loadCoachHistory().filter(item => Number(item.season) !== Number(entry.season));
+  history.push(entry);
+  history.sort((a, b) => Number(a.season) - Number(b.season));
+  saveCoachHistory(history);
+  return entry;
+}
+
+function getCoachHistoryTotals(history = loadCoachHistory()) {
+  return history.reduce((totals, season) => {
+    totals.seasons++;
+    totals.wins += Number(season.wins) || 0;
+    totals.losses += Number(season.losses) || 0;
+    if (season.conferenceChampion) totals.conferenceChampionships++;
+    if (season.tournamentMade) totals.tournamentAppearances++;
+    if (season.r32) totals.r32++;
+    if (season.r16) totals.r16++;
+    if (season.r8) totals.r8++;
+    if (season.r4) totals.r4++;
+    if (season.championshipGame) totals.championshipGames++;
+    if (season.champion) totals.championships++;
+    return totals;
+  }, {
+    seasons:0,
+    wins:0,
+    losses:0,
+    conferenceChampionships:0,
+    tournamentAppearances:0,
+    r32:0,
+    r16:0,
+    r8:0,
+    r4:0,
+    championshipGames:0,
+    championships:0
+  });
+}
+
+function handleCoachOfficeKey(event) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    enterCoachOffice();
+  }
+}
+
+function enterCoachOffice() {
+  const stage = document.querySelector('.ng-office-link');
+  if (stage) {
+    stage.style.transition = 'transform 0.42s ease, opacity 0.42s ease';
+    stage.style.transform = 'scale(1.05)';
+    stage.style.opacity = '0.35';
+  }
+  if (typeof Sfx !== 'undefined') Sfx.nav();
+  setTimeout(() => {
+    if (stage) {
+      stage.style.transition = '';
+      stage.style.transform = '';
+      stage.style.opacity = '';
+    }
+    goToCoachOffice();
+  }, 430);
+}
+
+function goToCoachOffice() {
+  stopDashboardCoachAnimation();
+  renderCoachOffice();
+  flash(() => showPanel('coach-office'));
+}
+
+function renderCoachOffice() {
+  const badge = document.getElementById('office-team-badge');
+  if (badge) badge.textContent = `${selectedTeam || ''} / ${selectedConf || ''}`;
+  const title = document.getElementById('office-title');
+  if (title) title.textContent = coachProfile.lastName ? `COACH ${coachProfile.lastName.toUpperCase()} OFFICE` : 'PROGRAM HISTORY';
+  drawCoachOfficeScene();
+  renderCoachHistory();
+}
+
+function drawCoachOfficeScene() {
+  const canvas = document.getElementById('office-scene-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawSceneBackground(ctx);
+  ctx.save();
+  ctx.translate(DESK_SIT_X - 90, FLOOR_Y - 220);
+  _drawCoachPixels(ctx, coachProfile, {
+    pose:'desk',
+    mouth:'neutral',
+    blink:false,
+    sway:0,
+    headTilt:0,
+    walking:false,
+    walkPhase:0,
+    hideShadow:true
+  });
+  ctx.restore();
+  drawDesk(ctx);
+}
+
+function renderCoachHistory() {
+  const history = loadCoachHistory();
+  const totals = getCoachHistoryTotals(history);
+  const statsGrid = document.getElementById('office-stats-grid');
+  const seasonList = document.getElementById('office-season-list');
+  const stat = (label, value) => `<div class="office-stat"><span>${label}</span><strong>${value}</strong></div>`;
+  if (statsGrid) {
+    statsGrid.innerHTML = [
+      stat('OVERALL RECORD', `${totals.wins}-${totals.losses}`),
+      stat('CONF TITLES', totals.conferenceChampionships),
+      stat('TOURNAMENTS', totals.tournamentAppearances),
+      stat('R32', totals.r32),
+      stat('R16', totals.r16),
+      stat('R8', totals.r8),
+      stat('R4', totals.r4),
+      stat('TITLE GAMES', totals.championshipGames),
+      stat('CHAMPIONSHIPS', totals.championships)
+    ].join('');
+  }
+  if (!seasonList) return;
+  if (!history.length) {
+    seasonList.innerHTML = '<div class="office-season-empty">NO COMPLETED SEASONS YET.</div>';
+    return;
+  }
+  seasonList.innerHTML = history.slice().reverse().map(season => {
+    const tourney = season.tournamentMade
+      ? `${season.tournamentResult}${season.tournamentSeed ? ` · #${season.tournamentSeed}` : ''}`
+      : 'Missed tournament';
+    const conf = season.conferenceChampion ? 'Conference champion' : (season.conferenceResult || 'Conference tournament');
+    return `
+      <div class="office-season-row">
+        <strong>S${Number(season.season) || ''}</strong>
+        <div>${Number(season.wins) || 0}-${Number(season.losses) || 0}</div>
+        <div>${escapeAttr(conf)}<br>${escapeAttr(tourney)}</div>
+      </div>
+    `;
+  }).join('');
 }
 
 function getTeamConf(teamName) {
@@ -5111,8 +5943,9 @@ function renderNextGame() {
       `<div class="ng-date-row">${game.date} &nbsp;·&nbsp; ${haLabel}</div>` +
       `<div class="ng-opp-conf">${oppConf || '&nbsp;'}</div>` +
       `<div class="ng-opponent">${game.opponent}</div>` +
-      `<div class="ng-coach-stage">` +
+      `<div class="ng-coach-stage ng-office-link" role="button" tabindex="0" onclick="enterCoachOffice()" onkeydown="handleCoachOfficeKey(event)">` +
         `<canvas id="ng-coach-canvas" width="520" height="320"></canvas>` +
+        `<div class="ng-office-prompt">ENTER OFFICE</div>` +
       `</div>` +
       `<div class="ng-actions">` +
         `<button class="ng-play-btn" type="button" onclick="playGame()">▶ PLAY GAME</button>` +
@@ -5151,6 +5984,8 @@ function startConferenceTournaments() {
   ensureLeagueSchedule();
   ensureStandingsState();
   conferenceTournamentState = loadConferenceTournamentState() || buildConferenceTournamentState();
+  saveConferenceTournamentState();
+  saveCareerState('conference-tournament');
   renderConferenceTournamentPage();
   flash(() => showPanel('conference-tournament'));
 }
@@ -5302,8 +6137,8 @@ function renderConferenceTournamentPage() {
     subtitle.textContent = phase === 'user-bracket'
       ? `${selectedTeam} conference tournament results. Simulate one round or the full bracket.`
       : (phase === 'winners'
-        ? 'Automatic bids are locked. Conference champions are protected in the national tournament field.'
-        : 'The remaining conference tournaments reveal their championship results one at a time.');
+        ? ''
+        : '');
   }
   if (userRoundBtn) userRoundBtn.style.display = canSimUserRound ? 'inline-block' : 'none';
   if (userTournamentBtn) userTournamentBtn.style.display = canSimUserRound ? 'inline-block' : 'none';
@@ -5320,7 +6155,7 @@ function renderConferenceTournamentPage() {
       ? renderUserConferenceTournamentStatus(state)
       : (phase === 'winners'
       ? `<div class="conf-tourney-status-label">COMPLETE</div><div class="conf-tourney-status-name">${total} CONFERENCE CHAMPIONS CROWNED</div><div class="conf-tourney-progress">Review the winners, then start the national tournament.</div>`
-      : `<div class="conf-tourney-status-label">${phase === 'other-ready' ? 'READY' : 'SIMULATING'}</div><div class="conf-tourney-status-name">${escapeAttr(current ? current.conf : 'OTHER CONFERENCES')}</div><div class="conf-tourney-progress">${getOtherConferenceTournamentProgressText(state)}</div>`);
+      : `<div class="conf-tourney-status-label">${phase === 'other-ready' ? 'READY' : 'SIMULATING'}</div><div class="conf-tourney-status-name">${escapeAttr(current ? current.conf : 'CONFERENCE TOURNAMENTS')}</div><div class="conf-tourney-progress">${getOtherConferenceTournamentProgressText(state)}</div>`);
   }
   if (!grid) return;
   if (phase === 'user-bracket') {
@@ -5341,7 +6176,7 @@ function renderConferenceTournamentPage() {
     return `
       <div class="conf-tourney-card${statusClass}">
         <div class="conf-tourney-card-title">${escapeAttr(tourney.conf)}</div>
-        <div class="conf-tourney-card-line">${isUserTournament ? 'USER CONFERENCE' : 'OTHER CONFERENCE'} · TEAMS ${tourney.teamCount}</div>
+        <div class="conf-tourney-card-line">${isUserTournament ? 'USER CONFERENCE · ' : ''}TEAMS ${tourney.teamCount}</div>
         <div class="conf-tourney-card-line conf-tourney-champ">${seed} ${escapeAttr(champion)}</div>
         <div class="conf-tourney-result-list">${finalHtml}</div>
       </div>
@@ -5430,6 +6265,7 @@ function renderUserConferenceTournamentTeam(game, slot) {
 
 function advanceConferenceTournamentReview() {
   if (!conferenceTournamentState || getConferenceTournamentReviewPhase(conferenceTournamentState) !== 'winners') return;
+  saveCurrentGameSnapshot('tournament');
   startTournament();
 }
 
@@ -5445,6 +6281,7 @@ function simulateUserConferenceTournamentRound() {
   });
   if (tournament.complete) conferenceTournamentState.reviewPhase = 'user-bracket';
   saveConferenceTournamentState();
+  saveCareerState('conference-tournament');
   renderConferenceTournamentPage();
 }
 
@@ -5455,6 +6292,7 @@ function simulateUserConferenceTournament() {
   simulateSingleConferenceTournament(tournament);
   conferenceTournamentState.reviewPhase = 'user-bracket';
   saveConferenceTournamentState();
+  saveCareerState('conference-tournament');
   renderConferenceTournamentPage();
 }
 
@@ -5478,6 +6316,8 @@ function simulateOtherConferenceTournaments() {
   if (!userTournament || !userTournament.complete) return;
   conferenceTournamentState.reviewPhase = 'other-simulating';
   conferenceTournamentSimInProgress = true;
+  saveConferenceTournamentState();
+  saveCareerState('conference-tournament');
   simulateNextOtherConferenceTournament();
 }
 
@@ -5491,6 +6331,7 @@ function simulateNextOtherConferenceTournament() {
     state.reviewPhase = 'winners';
     conferenceTournamentSimInProgress = false;
     saveConferenceTournamentState();
+    saveCareerState('conference-tournament');
     renderConferenceTournamentPage();
     return;
   }
@@ -5502,6 +6343,7 @@ function simulateNextOtherConferenceTournament() {
     simulateSingleConferenceTournament(tournament);
     state.otherSimIndex = (Number(state.otherSimIndex) || 0) + 1;
     saveConferenceTournamentState();
+    saveCareerState('conference-tournament');
     renderConferenceTournamentPage();
     setTimeout(simulateNextOtherConferenceTournament, 520);
   }, 520);
@@ -5628,9 +6470,311 @@ function startTournament() {
     startConferenceTournaments();
     return;
   }
-  if (!tournamentState) tournamentState = buildTournamentState();
+  if (!tournamentState) tournamentState = loadTournamentState() || buildTournamentState();
+  saveTournamentState();
+  saveCareerState('tournament');
   renderTournamentBracket();
   flash(() => showPanel('tournament'));
+}
+
+function getTournamentStateKey() {
+  return `nationalTournament:${seasonNumber || 1}`;
+}
+
+function saveTournamentState() {
+  if (!tournamentState) return;
+  try {
+    saveGameJSON(getTournamentStateKey(), compactTournamentStateForStorage(tournamentState));
+  } catch (err) {
+    console.warn('national tournament save skipped:', err);
+  }
+}
+
+function loadTournamentState() {
+  const saved = loadGameJSON(getTournamentStateKey());
+  const expanded = expandTournamentStateFromStorage(saved);
+  if (expanded && Array.isArray(expanded.regions) && Array.isArray(expanded.finalFour) && expanded.championship) return normalizeTournamentState(expanded);
+  return null;
+}
+
+function compactTournamentTeamForStorage(team) {
+  if (!team) return null;
+  return [
+    team.conf || '',
+    team.team || '',
+    Number(team.seed) || 0,
+    Number(team.overallRank) || 0,
+    team.autoBid ? 1 : 0
+  ];
+}
+
+function expandTournamentTeamFromStorage(value) {
+  if (!value) return null;
+  if (Array.isArray(value)) {
+    return {
+      conf:value[0] || '',
+      team:value[1] || '',
+      seed:Number(value[2]) || null,
+      overallRank:Number(value[3]) || null,
+      autoBid:!!value[4]
+    };
+  }
+  if (typeof value === 'object') {
+    return {
+      conf:value.conf || '',
+      team:value.team || '',
+      seed:Number(value.seed) || null,
+      overallRank:Number(value.overallRank) || null,
+      autoBid:!!value.autoBid
+    };
+  }
+  return null;
+}
+
+function compactTournamentGameForStorage(game) {
+  if (!game) return [null, null, null, -1, 0];
+  const teams = game.teams || [];
+  const winnerIndex = game.winner
+    ? teams.findIndex(team => team && team.conf === game.winner.conf && team.team === game.winner.team)
+    : -1;
+  const out = [
+    compactTournamentTeamForStorage(teams[0]),
+    compactTournamentTeamForStorage(teams[1]),
+    Array.isArray(game.scores) ? [Number(game.scores[0]) || 0, Number(game.scores[1]) || 0] : null,
+    winnerIndex,
+    game.complete ? 1 : 0
+  ];
+  if (winnerIndex < 0 && game.winner) out.push(compactTournamentTeamForStorage(game.winner));
+  return out;
+}
+
+function expandTournamentGameFromStorage(value) {
+  if (Array.isArray(value)) {
+    const teams = [expandTournamentTeamFromStorage(value[0]), expandTournamentTeamFromStorage(value[1])];
+    const winnerIndex = Number(value[3]);
+    const fallbackWinner = expandTournamentTeamFromStorage(value[5]);
+    const winner = winnerIndex >= 0 ? teams[winnerIndex] : fallbackWinner;
+    return {
+      teams,
+      scores:Array.isArray(value[2]) ? [Number(value[2][0]) || 0, Number(value[2][1]) || 0] : null,
+      winner:winner || null,
+      complete:!!value[4] || !!winner
+    };
+  }
+  if (value && typeof value === 'object') {
+    return {
+      teams:(value.teams || []).map(expandTournamentTeamFromStorage),
+      scores:Array.isArray(value.scores) ? [Number(value.scores[0]) || 0, Number(value.scores[1]) || 0] : null,
+      winner:expandTournamentTeamFromStorage(value.winner),
+      complete:!!value.complete
+    };
+  }
+  return makeTournamentGame(null, null);
+}
+
+function compactTournamentStateForStorage(state) {
+  const normalized = normalizeTournamentState(state);
+  const compact = {
+    v:2,
+    roundIndex:Number(normalized.roundIndex) || 0,
+    regions:(normalized.regions || []).map(region => ({
+      name:region.name || '',
+      champion:compactTournamentTeamForStorage(region.champion),
+      rounds:(region.rounds || []).map(round => (round || []).map(compactTournamentGameForStorage))
+    })),
+    finalFour:(normalized.finalFour || []).map(compactTournamentGameForStorage),
+    championship:compactTournamentGameForStorage(normalized.championship),
+    champion:compactTournamentTeamForStorage(normalized.champion)
+  };
+  if (normalized.prestigeRebalanced) compact.prestigeRebalanced = true;
+  if (normalized.prestigeRebalanceReport) compact.prestigeRebalanceReport = compactPrestigeRebalanceReport(normalized.prestigeRebalanceReport);
+  return compact;
+}
+
+function expandTournamentStateFromStorage(saved) {
+  if (!saved || typeof saved !== 'object') return null;
+  if (saved.v === 2) {
+    return {
+      roundIndex:Number(saved.roundIndex) || 0,
+      regions:(saved.regions || []).map(region => ({
+        name:region.name || '',
+        champion:expandTournamentTeamFromStorage(region.champion),
+        rounds:(region.rounds || []).map(round => (round || []).map(expandTournamentGameFromStorage))
+      })),
+      finalFour:(saved.finalFour || []).map(expandTournamentGameFromStorage),
+      championship:expandTournamentGameFromStorage(saved.championship),
+      champion:expandTournamentTeamFromStorage(saved.champion),
+      prestigeRebalanced:!!saved.prestigeRebalanced,
+      prestigeRebalanceReport:saved.prestigeRebalanceReport || null
+    };
+  }
+  return saved;
+}
+
+function compactPrestigeRebalanceReport(report) {
+  if (!report || typeof report !== 'object') return report;
+  return {
+    beforeSum:report.beforeSum,
+    afterSum:report.afterSum,
+    unresolvedCorrection:report.unresolvedCorrection,
+    records:(report.records || []).map(record => ({
+      conf:record.conf,
+      team:record.team,
+      oldPrestige:record.oldPrestige,
+      newPrestige:record.newPrestige,
+      delta:record.delta,
+      wins:record.wins,
+      losses:record.losses,
+      nationalResult:record.nationalResult,
+      oldNIL:record.oldNIL,
+      newNIL:record.newNIL,
+      nilDelta:record.nilDelta,
+      score:record.score
+    }))
+  };
+}
+
+function logNationalTournamentDebug(event, data = {}) {
+  const payload = {
+    scope:'national-tournament',
+    event,
+    data:{
+      season:seasonNumber || 1,
+      roundIndex:tournamentState ? tournamentState.roundIndex : null,
+      champion:tournamentState && tournamentState.champion ? serializeTournamentDebugTeam(tournamentState.champion) : null,
+      ...data
+    }
+  };
+  console.log(`[NATIONAL TOURNAMENT] ${event}`, payload.data);
+  try {
+    if (window.location && /^https?:$/.test(window.location.protocol) && window.UB_SERVER_DEBUG === true) {
+      fetch('/debug-log', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify(payload),
+        keepalive:true
+      }).catch(() => {});
+    }
+  } catch (_) {}
+}
+
+function serializeTournamentDebugTeam(team) {
+  if (!team) return null;
+  return {
+    conf:team.conf || '',
+    team:team.team || '',
+    seed:team.seed || null,
+    rank:team.overallRank || null
+  };
+}
+
+function getTournamentDebugRoundName(roundIndex) {
+  return ['R64','R32','SWEET 16','ELITE 8','FINAL FOUR','CHAMPIONSHIP'][roundIndex] || `ROUND ${roundIndex}`;
+}
+
+function getTournamentDebugGame(item) {
+  if (!item || !item.game) return null;
+  const region = item.regionIndex != null && tournamentState && tournamentState.regions[item.regionIndex]
+    ? tournamentState.regions[item.regionIndex].name
+    : '';
+  return {
+    region,
+    roundIndex:item.roundIndex,
+    round:getTournamentDebugRoundName(item.roundIndex),
+    gameIndex:item.gameIndex,
+    teams:(item.game.teams || []).map(serializeTournamentDebugTeam),
+    scores:item.game.scores || null,
+    complete:!!item.game.complete,
+    winner:serializeTournamentDebugTeam(item.game.winner)
+  };
+}
+
+function getTournamentDebugSummary() {
+  const summary = {
+    champion:tournamentState && tournamentState.champion ? serializeTournamentDebugTeam(tournamentState.champion) : null,
+    playableByRound:{},
+    incompleteWithTeams:0,
+    completeWithoutWinner:0,
+    scoredWithoutWinner:0,
+    missingTeamSlots:0
+  };
+  if (!tournamentState) return summary;
+  for (let roundIndex = 0; roundIndex < 6; roundIndex++) {
+    summary.playableByRound[getTournamentDebugRoundName(roundIndex)] = getPlayableTournamentGames(roundIndex).length;
+  }
+  const inspectGame = game => {
+    if (!game) return;
+    const teams = game.teams || [];
+    if (!teams[0] || !teams[1]) summary.missingTeamSlots++;
+    if (!game.complete && teams[0] && teams[1]) summary.incompleteWithTeams++;
+    if (game.complete && !game.winner) summary.completeWithoutWinner++;
+    if (Array.isArray(game.scores) && !game.winner) summary.scoredWithoutWinner++;
+  };
+  (tournamentState.regions || []).forEach(region => {
+    (region.rounds || []).forEach(round => (round || []).forEach(inspectGame));
+  });
+  (tournamentState.finalFour || []).forEach(inspectGame);
+  inspectGame(tournamentState.championship);
+  return summary;
+}
+
+function normalizeTournamentState(state) {
+  if (!state) return state;
+  if (!Array.isArray(state.regions)) state.regions = [];
+  if (!Array.isArray(state.finalFour)) state.finalFour = [makeTournamentGame(null, null), makeTournamentGame(null, null)];
+  while (state.finalFour.length < 2) state.finalFour.push(makeTournamentGame(null, null));
+  if (!state.championship) state.championship = makeTournamentGame(null, null);
+
+  const sameTeam = (a, b) => !!(a && b && a.team === b.team && a.conf === b.conf);
+  const putTeam = (game, slot, team) => {
+    if (!game || !team) return;
+    if (!game.teams) game.teams = [null, null];
+    if (!game.teams[slot] || sameTeam(game.teams[slot], team)) game.teams[slot] = team;
+  };
+  const hydrateCompletedGame = (game) => {
+    if (!game) return null;
+    if (!Array.isArray(game.teams)) game.teams = [null, null];
+    if (game.winner) {
+      game.complete = true;
+      return game.winner;
+    }
+    if (Array.isArray(game.scores) && game.scores.length >= 2 && game.teams[0] && game.teams[1]) {
+      const a = Number(game.scores[0]) || 0;
+      const b = Number(game.scores[1]) || 0;
+      game.winner = a > b ? game.teams[0] : game.teams[1];
+      game.complete = true;
+      return game.winner;
+    }
+    return null;
+  };
+
+  state.regions.forEach((region, regionIndex) => {
+    if (!region || !Array.isArray(region.rounds)) return;
+    region.rounds.forEach((round, roundIndex) => {
+      (round || []).forEach((game, gameIndex) => {
+        const winner = hydrateCompletedGame(game);
+        if (!winner) return;
+        if (roundIndex >= 3) {
+          region.champion = winner;
+          const finalFourIndex = regionIndex === 0 || regionIndex === 2 ? 0 : 1;
+          const finalFourSlot = regionIndex === 0 || regionIndex === 1 ? 0 : 1;
+          putTeam(state.finalFour[finalFourIndex], finalFourSlot, winner);
+        } else {
+          const nextGame = region.rounds[roundIndex + 1] && region.rounds[roundIndex + 1][Math.floor(gameIndex / 2)];
+          putTeam(nextGame, gameIndex % 2, winner);
+        }
+      });
+    });
+  });
+
+  state.finalFour.forEach((game, gameIndex) => {
+    const winner = hydrateCompletedGame(game);
+    if (winner) putTeam(state.championship, gameIndex, winner);
+  });
+
+  const champion = hydrateCompletedGame(state.championship);
+  if (champion) state.champion = champion;
+  return state;
 }
 
 function getTournamentSeed(rank) {
@@ -5715,8 +6859,10 @@ function renderTournamentBracket() {
   const board = document.getElementById('bracket-board');
   if (!board) return;
   if (!tournamentState) tournamentState = buildTournamentState();
+  tournamentState = normalizeTournamentState(tournamentState);
   const continueBtn = document.getElementById('tournament-continue-btn');
   if (continueBtn) continueBtn.style.display = tournamentState.champion ? 'inline-block' : 'none';
+  if (tournamentState.champion) maybeRunNationalTournamentCompleteAutoSave();
   board.innerHTML = `
     <div class="bracket-side left">
       ${[0, 2].map(i => `
@@ -5799,27 +6945,63 @@ function renderBracketTeam(team, game, slot) {
 
 function simulateTournamentRound() {
   if (tournamentSimInProgress) return;
-  if (!tournamentState) tournamentState = buildTournamentState();
+  if (!tournamentState) tournamentState = loadTournamentState() || buildTournamentState();
+  tournamentState = normalizeTournamentState(tournamentState);
   const roundIndex = getCurrentTournamentRoundIndex();
-  if (roundIndex < 0) return;
+  logNationalTournamentDebug('simulate round pressed', {
+    round:getTournamentDebugRoundName(roundIndex),
+    summary:getTournamentDebugSummary()
+  });
+  if (roundIndex < 0) {
+    logNationalTournamentDebug('simulate round found no playable games', {
+      summary:getTournamentDebugSummary()
+    });
+    saveTournamentState();
+    saveCareerState('tournament');
+    renderTournamentBracket();
+    return;
+  }
   const games = getPlayableTournamentGames(roundIndex);
-  if (!games.length) return;
+  if (!games.length) {
+    logNationalTournamentDebug('round index had zero playable games', {
+      round:getTournamentDebugRoundName(roundIndex),
+      summary:getTournamentDebugSummary()
+    });
+    return;
+  }
+  logNationalTournamentDebug('simulate round queued games', {
+    round:getTournamentDebugRoundName(roundIndex),
+    count:games.length,
+    games:games.map(getTournamentDebugGame)
+  });
   tournamentSimInProgress = true;
   simulateTournamentGameQueue(games, () => {
     tournamentState.roundIndex = getCurrentTournamentRoundIndex();
     tournamentSimInProgress = false;
+    saveTournamentState();
+    saveCareerState('tournament');
+    logNationalTournamentDebug('simulate round complete', {
+      nextRound:getTournamentDebugRoundName(tournamentState.roundIndex),
+      summary:getTournamentDebugSummary()
+    });
     renderTournamentBracket();
   });
 }
 
 function simulateTournament() {
   if (tournamentSimInProgress) return;
-  if (!tournamentState) tournamentState = buildTournamentState();
+  if (!tournamentState) tournamentState = loadTournamentState() || buildTournamentState();
+  tournamentState = normalizeTournamentState(tournamentState);
+  logNationalTournamentDebug('simulate tournament pressed', {
+    summary:getTournamentDebugSummary()
+  });
   tournamentSimInProgress = true;
+  saveCareerState('tournament');
   simulateRemainingTournamentRounds();
 }
 
 function getCurrentTournamentRoundIndex() {
+  tournamentState = normalizeTournamentState(tournamentState);
   for (let roundIndex = 0; roundIndex < 6; roundIndex++) {
     if (getPlayableTournamentGames(roundIndex).length) return roundIndex;
   }
@@ -5851,13 +7033,28 @@ function getPlayableTournamentGames(roundIndex) {
 }
 
 function simulateTournamentGameQueue(games, done) {
+  logNationalTournamentDebug('game queue start', {
+    count:games.length,
+    games:games.map(getTournamentDebugGame)
+  });
   const next = () => {
     const item = games.shift();
     if (!item) {
+      saveTournamentState();
+      saveCareerState('tournament');
+      logNationalTournamentDebug('game queue empty', {
+        summary:getTournamentDebugSummary()
+      });
       done();
       return;
     }
+    logNationalTournamentDebug('game queue next', {
+      remaining:games.length,
+      game:getTournamentDebugGame(item)
+    });
     simulateTournamentGameItem(item);
+    saveTournamentState();
+    saveCareerState('tournament');
     if (typeof Sfx !== 'undefined') Sfx.simTick();
     renderTournamentBracket();
     setTimeout(next, 180);
@@ -5867,12 +7064,32 @@ function simulateTournamentGameQueue(games, done) {
 
 function simulateRemainingTournamentRounds() {
   const roundIndex = getCurrentTournamentRoundIndex();
+  logNationalTournamentDebug('simulate remaining step', {
+    round:getTournamentDebugRoundName(roundIndex),
+    summary:getTournamentDebugSummary()
+  });
   if (roundIndex < 0) {
     tournamentSimInProgress = false;
+    saveTournamentState();
+    saveCareerState('tournament');
+    logNationalTournamentDebug('simulate remaining complete or stuck', {
+      summary:getTournamentDebugSummary()
+    });
     renderTournamentBracket();
     return;
   }
   const games = getPlayableTournamentGames(roundIndex);
+  if (!games.length) {
+    tournamentSimInProgress = false;
+    logNationalTournamentDebug('simulate remaining zero games for round', {
+      round:getTournamentDebugRoundName(roundIndex),
+      summary:getTournamentDebugSummary()
+    });
+    saveTournamentState();
+    saveCareerState('tournament');
+    renderTournamentBracket();
+    return;
+  }
   simulateTournamentGameQueue(games, () => {
     tournamentState.roundIndex = getCurrentTournamentRoundIndex();
     setTimeout(simulateRemainingTournamentRounds, 220);
@@ -5881,11 +7098,19 @@ function simulateRemainingTournamentRounds() {
 
 function simulateTournamentGameItem(item) {
   const game = item.game;
+  logNationalTournamentDebug('game start', {
+    game:getTournamentDebugGame(item)
+  });
   const result = simulateNeutralTournamentGame(game.teams[0], game.teams[1], item);
   game.scores = result.scores;
   game.winner = result.winner;
   game.complete = true;
   advanceTournamentWinner(item, result.winner);
+  logNationalTournamentDebug('game complete', {
+    game:getTournamentDebugGame(item),
+    scores:result.scores,
+    winner:serializeTournamentDebugTeam(result.winner)
+  });
 }
 
 function simulateNeutralTournamentGame(teamA, teamB, item) {
@@ -5898,20 +7123,42 @@ function simulateNeutralTournamentGame(teamA, teamB, item) {
       simulatePossession(state);
       guard++;
     }
+    if (!state.complete) {
+      logNationalTournamentDebug('game hit possession guard', {
+        game:getTournamentDebugGame(item),
+        guard,
+        scores:{ ...state.scores },
+        clock:state.clock,
+        quarter:state.quarter
+      });
+    }
     const scores = [state.scores.home, state.scores.away];
     const winner = scores[0] > scores[1] ? teamA : teamB;
-    return { scores, winner };
+    return { scores, winner, guard, stateComplete:state.complete };
   });
 }
 
 function advanceTournamentWinner(item, winner) {
   const { regionIndex, roundIndex, gameIndex } = item;
+  logNationalTournamentDebug('advance winner', {
+    source:getTournamentDebugGame(item),
+    winner:serializeTournamentDebugTeam(winner)
+  });
   if (roundIndex === 4) {
     tournamentState.championship.teams[gameIndex] = winner;
+    logNationalTournamentDebug('advanced to championship', {
+      slot:gameIndex,
+      championship:getTournamentDebugGame({ roundIndex:5, gameIndex:0, game:tournamentState.championship })
+    });
     return;
   }
   if (roundIndex === 5) {
     tournamentState.champion = winner;
+    saveTournamentState();
+    saveCareerState('tournament');
+    logNationalTournamentDebug('champion crowned', {
+      champion:serializeTournamentDebugTeam(winner)
+    });
     return;
   }
   const region = tournamentState.regions[regionIndex];
@@ -5920,10 +7167,21 @@ function advanceTournamentWinner(item, winner) {
     const finalFourIndex = regionIndex === 0 || regionIndex === 2 ? 0 : 1;
     const finalFourSlot = regionIndex === 0 || regionIndex === 1 ? 0 : 1;
     tournamentState.finalFour[finalFourIndex].teams[finalFourSlot] = winner;
+    logNationalTournamentDebug('advanced to final four', {
+      finalFourIndex,
+      finalFourSlot,
+      finalFourGame:getTournamentDebugGame({ roundIndex:4, gameIndex:finalFourIndex, game:tournamentState.finalFour[finalFourIndex] })
+    });
     return;
   }
   const nextGame = region.rounds[roundIndex + 1][Math.floor(gameIndex / 2)];
   nextGame.teams[gameIndex % 2] = winner;
+  logNationalTournamentDebug('advanced to next regional round', {
+    region:region.name,
+    nextRound:getTournamentDebugRoundName(roundIndex + 1),
+    slot:gameIndex % 2,
+    nextGame:getTournamentDebugGame({ regionIndex, roundIndex:roundIndex + 1, gameIndex:Math.floor(gameIndex / 2), game:nextGame })
+  });
 }
 
 function getLeaguePrestigeSum() {
@@ -6186,6 +7444,7 @@ function rebalancePrestigeAfterTournament() {
     unresolvedCorrection
   };
   logPrestigeRebalance(records, beforeSum, afterSum, unresolvedCorrection);
+  saveTournamentState();
   return tournamentState.prestigeRebalanceReport;
 }
 
@@ -6234,6 +7493,7 @@ function goToPrestigeUpdate() {
     return;
   }
   renderPrestigeUpdate(report);
+  saveCurrentGameSnapshot('prestige-update');
   flash(() => showPanel('prestige-update'));
 }
 
@@ -6274,8 +7534,40 @@ function renderPrestigeUpdate(report) {
 }
 
 function finishPrestigeUpdate() {
+  recordCompletedCoachSeason();
+  saveCurrentGameSnapshot('dashboard');
   resetForNextSeason();
   goToDashboard();
+}
+
+function getOffseasonStateKey() {
+  return `offseasonState:${seasonNumber || 1}`;
+}
+
+function saveOffseasonState(stage) {
+  if (!offseasonState) offseasonState = {};
+  offseasonState = {
+    ...offseasonState,
+    season:seasonNumber || 1,
+    stage:stage || offseasonState.stage || currentScreen || 'departures',
+    pendingRetentionPlayers,
+    retentionNILCommits,
+    departuresAwaitingRetention,
+    portalWeek,
+    savedAt:Date.now()
+  };
+  saveGameJSON(getOffseasonStateKey(), offseasonState);
+}
+
+function loadOffseasonState() {
+  const saved = loadGameJSON(getOffseasonStateKey());
+  if (!saved || saved.season !== (seasonNumber || 1)) return null;
+  offseasonState = saved;
+  pendingRetentionPlayers = Array.isArray(saved.pendingRetentionPlayers) ? saved.pendingRetentionPlayers : [];
+  retentionNILCommits = Array.isArray(saved.retentionNILCommits) ? saved.retentionNILCommits : [];
+  departuresAwaitingRetention = !!saved.departuresAwaitingRetention;
+  portalWeek = Number(saved.portalWeek) || portalWeek || 1;
+  return offseasonState;
 }
 
 function processSeasonDepartures() {
@@ -6362,6 +7654,16 @@ function processSeasonDepartures() {
   portalWeek = 1;
   portalHoursState = null;
   savePortalState();
+  offseasonState = {
+    season:seasonNumber || 1,
+    stage:'departures',
+    departing:userDeparting,
+    pendingRetentionPlayers,
+    retentionNILCommits,
+    departuresAwaitingRetention,
+    portalWeek
+  };
+  saveOffseasonState('departures');
   return userDeparting;
 }
 
@@ -6426,20 +7728,15 @@ function areOffseasonFeaturesEnabled() {
   return OFFSEASON_FEATURES_ENABLED;
 }
 
-function goToDepartures() {
-  if (!areOffseasonFeaturesEnabled()) {
-    resetForNextSeason();
-    goToDashboard();
-    return;
-  }
-  const departing = processSeasonDepartures();
+function renderDeparturesScreen(departing) {
   const subtitle = document.getElementById('departures-subtitle');
   const list = document.getElementById('departures-list');
   if (subtitle) subtitle.textContent = `${selectedTeam} — END OF SEASON ROSTER CHANGES`;
 
-  const draft = departing.filter(p => p.reason === 'DRAFT');
-  const grads = departing.filter(p => p.reason === 'GRADUATED');
-  const transfers = departing.filter(p => p.reason === 'TRANSFER');
+  const players = Array.isArray(departing) ? departing : [];
+  const draft = players.filter(p => p.reason === 'DRAFT');
+  const grads = players.filter(p => p.reason === 'GRADUATED');
+  const transfers = players.filter(p => p.reason === 'TRANSFER');
 
   let html = '';
   const makeRows = (players) => players.map(p => `
@@ -6460,20 +7757,45 @@ function goToDepartures() {
   if (transfers.length) {
     html += `<div class="departures-section-label" style="margin-top:14px;">TRANSFERRING</div>${makeRows(transfers)}`;
   }
-  if (!departing.length) {
+  if (!players.length) {
     html = `<div style="color:rgba(237,224,184,0.4);font-size:clamp(6px,0.72vw,8px);">NO DEPARTURES THIS SEASON.</div>`;
   }
 
   if (list) list.innerHTML = html;
   const btn = document.getElementById('departures-continue-btn');
   if (btn) btn.textContent = departuresAwaitingRetention ? '► PLAYER RETENTION' : '► TRANSFER PORTAL';
+}
+
+function goToDepartures() {
+  if (!areOffseasonFeaturesEnabled()) {
+    resetForNextSeason();
+    goToDashboard();
+    return;
+  }
+  const saved = loadOffseasonState();
+  const departing = saved && Array.isArray(saved.departing) ? saved.departing : processSeasonDepartures();
+  if (!offseasonState) offseasonState = {};
+  offseasonState.departing = departing;
+  saveOffseasonState('departures');
+  renderDeparturesScreen(departing);
+  saveCurrentGameSnapshot('departures');
   flash(() => showPanel('departures'));
 }
 
 function continueFromDepartures() {
-  if (departuresAwaitingRetention) {
-    renderRetentionOffers();
-    return;
+  const stage = offseasonState && offseasonState.stage ? offseasonState.stage : 'departures';
+  if (departuresAwaitingRetention || pendingRetentionPlayers.length) {
+    if (stage !== 'retention') {
+      renderRetentionOffers();
+      saveCurrentGameSnapshot('departures');
+      return;
+    }
+    if (pendingRetentionPlayers.length) {
+      autoPortalRemainingRetentionPlayers();
+      openFinalizedTransferPortal();
+      return;
+    }
+    departuresAwaitingRetention = false;
   }
   openFinalizedTransferPortal();
 }
@@ -6486,6 +7808,8 @@ function renderRetentionOffers() {
   if (btn) {
     btn.textContent = pendingRetentionPlayers.length ? '► FINISH RETENTION' : '► TRANSFER PORTAL';
   }
+  saveOffseasonState('retention');
+  saveCareerState('departures');
   if (!list) return;
   const remainingNIL = getAvailableNILDollars();
   list.innerHTML = `
@@ -6526,6 +7850,7 @@ function payRetentionOffer(playerName) {
   retentionNILCommits.push({ name:item.player.name, amount:item.amount });
   removeRetentionCandidate(playerName);
   savePortalState();
+  saveOffseasonState('retention');
   renderRetentionOffers();
 }
 
@@ -6540,7 +7865,23 @@ function declineRetentionOffer(playerName) {
   removeRetentionCandidate(playerName);
   saveAllRosters();
   savePortalState();
+  saveOffseasonState('retention');
   renderRetentionOffers();
+}
+
+function autoPortalRemainingRetentionPlayers() {
+  if (!pendingRetentionPlayers.length) return;
+  const entry = ((allRosters || {})[selectedConf] || {})[selectedTeam];
+  const portalNames = new Set(pendingRetentionPlayers.map(item => item.player.name));
+  const roster = getRosterFromEntry(entry).filter(player => !portalNames.has(player.name));
+  if (Array.isArray(entry)) allRosters[selectedConf][selectedTeam] = roster;
+  else if (entry) entry.roster = roster;
+  pendingRetentionPlayers.forEach(item => addPlayerToTransferPortal(item.player, 'RETENTION'));
+  pendingRetentionPlayers = [];
+  departuresAwaitingRetention = false;
+  saveAllRosters();
+  savePortalState();
+  saveOffseasonState('portal');
 }
 
 async function openFinalizedTransferPortal() {
@@ -6550,10 +7891,14 @@ async function openFinalizedTransferPortal() {
     await runPortalProgress(async () => {
       pendingRetentionPlayers = [];
       departuresAwaitingRetention = false;
+      ensureRosterLoaded();
+      applyRecruitingCommits();
+      saveAllRosters();
       await generateCPUPortalOffersWithProgress();
       updatePortalWorkProgress('OPENING TRANSFER PORTAL', 0, 1);
       await yieldToPortalAnimation();
       savePortalState();
+      saveOffseasonState('portal');
       saveAllRosters();
       updatePortalWorkProgress('OPENING TRANSFER PORTAL', 1, 1);
       await yieldToPortalAnimation();
@@ -6566,11 +7911,17 @@ async function openFinalizedTransferPortal() {
 
 function goToTransferPortal() {
   if (!transferPortal.length) loadPortalState();
+  loadOffseasonState();
+  ensureRosterLoaded();
+  applyRecruitingCommits();
+  saveAllRosters();
   portalStarFilter = 'all';
   portalPositionFilter = 'all';
   portalBookmarksFilter = false;
+  portalUserSignedFilter = false;
   portalSignedFilter = false;
   renderTransferPortal();
+  saveCurrentGameSnapshot('portal');
   flash(() => showPanel('portal'));
 }
 
@@ -6584,15 +7935,65 @@ function getFilteredPortal() {
   });
 }
 
+function isPortalPlayerSignedByUser(player) {
+  if (!player) return false;
+  if (player.signed) return true;
+  const userCommitted = !!(player.committedTo && player.committedTo.conf === selectedConf && player.committedTo.team === selectedTeam);
+  if (userCommitted) revealSignedPortalPlayer(player);
+  return userCommitted;
+}
+
+function revealSignedPortalPlayer(player) {
+  if (!player) return;
+  player.overallRevealed = true;
+  player.potentialRevealed = true;
+}
+
+function renderSignedPortalSection(players) {
+  const signed = (players || [])
+    .filter(isPortalPlayerSignedByUser)
+    .sort((a, b) => (Number(b.overall) || 0) - (Number(a.overall) || 0) || a.name.localeCompare(b.name));
+  if (!signed.length) return '';
+  return `
+    <div class="recruit-section-label">SIGNED BY YOUR TEAM (${signed.length})</div>
+    ${signed.map(p => `
+      <div class="recruit-row" onclick="openPortalDetail('${p.portalId}')">
+        <div>SIGNED</div>
+        <div><strong>${escapeAttr(p.name)}</strong><br><span class="recruit-home">${escapeAttr(p.fromTeam || 'Transfer Portal')}</span></div>
+        <div>${p.position}</div>
+        <div>${p.overall}</div>
+        <div>${p.potential}</div>
+        <div class="recruit-stars">${getStarText(p.stars)}</div>
+        <div></div>
+      </div>
+    `).join('')}
+  `;
+}
+
 function togglePortalBookmarksFilter() {
   portalBookmarksFilter = !portalBookmarksFilter;
-  if (portalBookmarksFilter) portalSignedFilter = false;
+  if (portalBookmarksFilter) {
+    portalUserSignedFilter = false;
+    portalSignedFilter = false;
+  }
+  renderTransferPortal();
+}
+
+function togglePortalUserSignedFilter() {
+  portalUserSignedFilter = !portalUserSignedFilter;
+  if (portalUserSignedFilter) {
+    portalBookmarksFilter = false;
+    portalSignedFilter = false;
+  }
   renderTransferPortal();
 }
 
 function togglePortalSignedFilter() {
   portalSignedFilter = !portalSignedFilter;
-  if (portalSignedFilter) portalBookmarksFilter = false;
+  if (portalSignedFilter) {
+    portalBookmarksFilter = false;
+    portalUserSignedFilter = false;
+  }
   renderTransferPortal();
 }
 
@@ -6620,7 +8021,7 @@ function renderPortalRoster() {
   const panel = document.getElementById('portal-roster-panel');
   if (!panel) return;
   const baseRoster = getTeamRoster(selectedConf, selectedTeam) || [];
-  const incoming = transferPortal.filter(p => p.signed);
+  const incoming = transferPortal.filter(isPortalPlayerSignedByUser);
   const positions = ['PG','SG','SF','PF','C'];
   const groups = {};
   positions.forEach(pos => { groups[pos] = { current: [], incoming: [] }; });
@@ -6679,11 +8080,17 @@ function renderTransferPortal() {
   if (nextSeasonBtn) nextSeasonBtn.style.display = portalDone ? 'inline-block' : 'none';
 
   const bmCount = transferPortal.filter(p => p.bookmarked && !p.signed && !p.committedTo).length;
+  const userSignedCount = transferPortal.filter(isPortalPlayerSignedByUser).length;
   const signedCount = transferPortal.filter(p => p.signed).length;
   const bmBtn = document.getElementById('portal-bookmarks-btn');
   if (bmBtn) {
     bmBtn.classList.toggle('active', portalBookmarksFilter);
     bmBtn.innerHTML = `<svg width="9" height="12" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg>${portalBookmarksFilter ? 'ALL TRANSFERS' : `BOOKMARKS${bmCount ? ` (${bmCount})` : ''}`}`;
+  }
+  const userSignedBtn = document.getElementById('portal-user-signed-btn');
+  if (userSignedBtn) {
+    userSignedBtn.classList.toggle('active', portalUserSignedFilter);
+    userSignedBtn.textContent = portalUserSignedFilter ? 'ALL TRANSFERS' : `SIGNED${userSignedCount ? ` (${userSignedCount})` : ''}`;
   }
   const signedBtn = document.getElementById('portal-signed-btn');
   if (signedBtn) {
@@ -6693,6 +8100,13 @@ function renderTransferPortal() {
 
   const filters = document.getElementById('portal-filters');
   const grid = document.getElementById('portal-grid');
+
+  if (portalUserSignedFilter) {
+    filters.innerHTML = '';
+    filters.style.display = 'none';
+    grid.innerHTML = renderSignedPortalSection(transferPortal) || '<div class="recruit-row"><span class="recruit-empty">NO TRANSFERS SIGNED BY YOUR TEAM YET</span></div>';
+    return;
+  }
 
   if (portalSignedFilter) {
     filters.innerHTML = '';
@@ -6895,6 +8309,7 @@ async function finishPortalGoDashboard() {
   if (portalFinishInProgress) return;
   portalFinishInProgress = true;
   const btn = document.getElementById('portal-next-season-btn');
+  let completed = false;
   if (btn) {
     btn.disabled = true;
     btn.textContent = 'FINAL CHECKS...';
@@ -6902,20 +8317,18 @@ async function finishPortalGoDashboard() {
   try {
     await finalizePortal();
     portalWeek = Math.max(portalWeek, PORTAL_TOTAL_WEEKS + 1);
-    savePortalState();
-    applyPortalCommits();
     applyRecruitingCommits();
+    applyPortalCommits();
     ensurePostPortalRosterMinimums();
-    clearOffseasonRecruitingStorage();
-    const trainingResults = runOffseasonTraining();
-    saveAllRosters();
-    renderOffseasonTraining(trainingResults);
-    flash(() => showPanel('offseason-training'));
+    goToOffseasonTraining(runOffseasonTraining());
+    completed = true;
+  } catch (err) {
+    console.error('offseason training transition failed:', err);
   } finally {
     portalFinishInProgress = false;
-    if (btn) {
+    if (btn && !completed) {
       btn.disabled = false;
-      btn.textContent = '► OFFSEASON TRAINING';
+      btn.textContent = 'TRY AGAIN';
     }
   }
 }
@@ -6937,25 +8350,166 @@ function getPortalStateKey() {
 
 function savePortalState() {
   normalizeTransferPortalStars();
-  saveGameJSON(getPortalStateKey(), {
-    portal: transferPortal,
-    week: portalWeek,
-    retentionNILCommits
-  });
+  try {
+    saveGameJSON(getPortalStateKey(), compactPortalStateForStorage({
+      portal: transferPortal,
+      week: portalWeek,
+      retentionNILCommits
+    }));
+  } catch (err) {
+    console.warn('portal state save skipped:', err);
+  }
 }
 
 function loadPortalState() {
   try {
-    const saved = loadGameJSON(getPortalStateKey());
+    const saved = expandPortalStateFromStorage(loadGameJSON(getPortalStateKey()));
     if (saved && Array.isArray(saved.portal)) {
       transferPortal = saved.portal;
       normalizeTransferPortalStars();
       portalWeek = saved.week || 1;
+      if (saved.hours) portalHoursState = saved.hours;
       retentionNILCommits = Array.isArray(saved.retentionNILCommits) ? saved.retentionNILCommits : [];
       return true;
     }
   } catch (e) {}
   return false;
+}
+
+function compactPortalOfferForStorage(offer) {
+  if (!offer) return null;
+  return [
+    offer.conf || '',
+    offer.team || '',
+    Math.max(0, Math.round(Number(offer.amount) || 0)),
+    Math.min(1, Number(offer.interest != null ? offer.interest : offer.valueScore) || 0),
+    offer.offerWeek || '',
+    Math.max(0, Math.round(Number(offer.fairValue) || 0))
+  ];
+}
+
+function expandPortalOfferFromStorage(value, isPlayerOffer = false) {
+  if (!value) return null;
+  if (Array.isArray(value)) {
+    if (isPlayerOffer) {
+      return {
+        amount:Math.max(0, Math.round(Number(value[2]) || 0)),
+        fairValue:Math.max(0, Math.round(Number(value[5]) || 0)),
+        valueScore:Math.min(1, Number(value[3]) || 0),
+        offerWeek:value[4] || ''
+      };
+    }
+    return {
+      conf:value[0] || '',
+      team:value[1] || '',
+      amount:Math.max(0, Math.round(Number(value[2]) || 0)),
+      interest:Math.min(1, Number(value[3]) || 0)
+    };
+  }
+  if (typeof value === 'object') return { ...value };
+  return null;
+}
+
+function compactPortalPlayerForStorage(player) {
+  if (!player) return null;
+  return [
+    player.portalId || '',
+    player.name || '',
+    player.position || '',
+    player.grade || 'Sophomore',
+    Math.round(Number(player.overall) || 0),
+    Math.round(Number(player.potential) || Number(player.overall) || 0),
+    compactAttributes(player.attributes || makeAttributes(player.overall || 50)),
+    player.homeState || '',
+    player.hometown || '',
+    PLAYER_TENDENCY_KEYS.map(key => Math.round(Number((player.tendencies || {})[key]) || 0)),
+    player.fromTeam || '',
+    player.fromConf || '',
+    Number(player.stars) || 1,
+    player.overallRevealed ? 1 : 0,
+    player.potentialRevealed ? 1 : 0,
+    player.signed ? 1 : 0,
+    player.bookmarked ? 1 : 0,
+    compactPortalOfferForStorage(player.offer),
+    (player.cpuOffers || []).map(compactPortalOfferForStorage),
+    player.committedTo ? [player.committedTo.conf || '', player.committedTo.team || ''] : null,
+    Math.max(0, Math.round(Number(player.committedAmount) || 0)),
+    player.retentionReason || '',
+    player.motivations || [],
+    player.topMotivations || [],
+    player.guessedMotivations || {},
+    player.recruitedByOriginalSchool ? 1 : 0,
+    player.originalConf || '',
+    player.originalTeam || ''
+  ];
+}
+
+function expandPortalPlayerFromStorage(value) {
+  if (!value) return null;
+  if (!Array.isArray(value)) {
+    if (!Array.isArray(value.cpuOffers)) value.cpuOffers = [];
+    return value;
+  }
+  const tendencies = {};
+  PLAYER_TENDENCY_KEYS.forEach((key, i) => {
+    tendencies[key] = Math.round(Number((value[9] || [])[i]) || 0);
+  });
+  const player = {
+    portalId:value[0] || '',
+    name:value[1] || '',
+    position:value[2] || '',
+    grade:value[3] || 'Sophomore',
+    overall:Math.round(Number(value[4]) || 0),
+    potential:Math.round(Number(value[5]) || Number(value[4]) || 0),
+    attributes:expandAttributes(value[6], Number(value[4]) || 50),
+    homeState:value[7] || '',
+    hometown:value[8] || '',
+    tendencies,
+    fromTeam:value[10] || '',
+    fromConf:value[11] || '',
+    stars:Number(value[12]) || 1,
+    overallRevealed:!!value[13],
+    potentialRevealed:!!value[14],
+    signed:!!value[15],
+    bookmarked:!!value[16],
+    offer:expandPortalOfferFromStorage(value[17], true),
+    cpuOffers:(value[18] || []).map(offer => expandPortalOfferFromStorage(offer)).filter(Boolean),
+    committedTo:value[19] ? { conf:value[19][0] || '', team:value[19][1] || '' } : null,
+    committedAmount:Math.max(0, Math.round(Number(value[20]) || 0)),
+    retentionReason:value[21] || '',
+    motivations:Array.isArray(value[22]) ? value[22] : [],
+    topMotivations:Array.isArray(value[23]) ? value[23] : [],
+    guessedMotivations:value[24] && typeof value[24] === 'object' ? value[24] : {},
+    recruitedByOriginalSchool:!!value[25],
+    originalConf:value[26] || '',
+    originalTeam:value[27] || ''
+  };
+  if (!player.offer) delete player.offer;
+  if (!player.committedTo) delete player.committedTo;
+  return player;
+}
+
+function compactPortalStateForStorage(state) {
+  return {
+    v:2,
+    week:Number(state.week) || 1,
+    portal:(state.portal || []).map(compactPortalPlayerForStorage).filter(Boolean),
+    hours:portalHoursState || null,
+    retentionNILCommits:state.retentionNILCommits || []
+  };
+}
+
+function expandPortalStateFromStorage(saved) {
+  if (!saved || typeof saved !== 'object') return saved;
+  if (saved.v === 2) {
+    return {
+      week:Number(saved.week) || 1,
+      portal:(saved.portal || []).map(expandPortalPlayerFromStorage).filter(Boolean),
+      hours:saved.hours || null,
+      retentionNILCommits:Array.isArray(saved.retentionNILCommits) ? saved.retentionNILCommits : []
+    };
+  }
+  return saved;
 }
 
 function getPortalHoursKey() {
@@ -6996,7 +8550,10 @@ function spendPortalHours(n) {
 }
 
 function getCommittedPortalNIL() {
-  return transferPortal.reduce((sum, p) => sum + Math.max(0, Math.round(Number((p.offer || {}).amount) || 0)), 0);
+  return transferPortal.reduce((sum, p) => {
+    if (p.committedTo && !isUserTeam(p.committedTo.conf, p.committedTo.team)) return sum;
+    return sum + Math.max(Math.round(Number((p.offer || {}).amount) || 0), getPortalAutoNILAmount(p));
+  }, 0);
 }
 
 function getPortalFairValue(player) {
@@ -7010,10 +8567,42 @@ function getPortalTeamBudget(conf, team) {
 
 function getPortalOfferAmountForTeam(player, conf, team) {
   if (conf === selectedConf && team === selectedTeam) {
-    return Math.max(0, Math.round(Number((player.offer || {}).amount) || 0));
+    return Math.max(
+      0,
+      Math.round(Number((player.offer || {}).amount) || 0),
+      Math.round(Number((getUserPortalAutoOffer(player) || {}).amount) || 0),
+      player && player.committedTo && player.committedTo.conf === conf && player.committedTo.team === team
+        ? Math.round(Number(player.committedAmount) || 0)
+        : 0
+    );
   }
   const offer = (player.cpuOffers || []).find(o => o.conf === conf && o.team === team);
   return Math.max(0, Math.round(Number(offer ? offer.amount : player.committedAmount) || 0));
+}
+
+function getUserPortalAutoOffer(player) {
+  return (player && player.cpuOffers || []).find(o => isUserTeam(o.conf, o.team)) || null;
+}
+
+function getPortalAutoNILAmount(player) {
+  if (!player) return 0;
+  const autoOffer = getUserPortalAutoOffer(player);
+  if (player.committedTo && isUserTeam(player.committedTo.conf, player.committedTo.team)) {
+    return Math.max(0, Math.round(Number(player.committedAmount) || Number((autoOffer || {}).amount) || 0));
+  }
+  if (!player.signed && !player.committedTo && autoOffer) {
+    return Math.max(0, Math.round(Number(autoOffer.amount) || 0));
+  }
+  return 0;
+}
+
+function getPortalSigningAmount(player) {
+  return Math.max(
+    0,
+    Math.round(Number((player && player.offer || {}).amount) || 0),
+    Math.round(Number((getUserPortalAutoOffer(player) || {}).amount) || 0),
+    Math.round(Number(player && player.committedAmount) || 0)
+  );
 }
 
 function getAcceptedPortalSpend(conf, team, ignorePortalId = null) {
@@ -7029,7 +8618,7 @@ function getAcceptedPortalSpend(conf, team, ignorePortalId = null) {
 function getPortalTeamRemainingBudget(conf, team, ignorePortalId = null) {
   if (conf === selectedConf && team === selectedTeam) {
     const extra = ignorePortalId
-      ? transferPortal.reduce((sum, p) => p.portalId === ignorePortalId ? sum + Math.max(0, Math.round(Number((p.offer || {}).amount) || 0)) : sum, 0)
+      ? transferPortal.reduce((sum, p) => p.portalId === ignorePortalId ? sum + Math.max(Math.round(Number((p.offer || {}).amount) || 0), getPortalAutoNILAmount(p)) : sum, 0)
       : 0;
     return getAvailableNILDollars(extra);
   }
@@ -7098,7 +8687,20 @@ function pruneUnfulfillablePortalOffers() {
   });
 }
 
-function scorePortalTargetForCPU(player, team, conf, prestige, rng) {
+function getPortalActiveCPUOfferCount(player) {
+  if (!player || player.signed || player.committedTo) return 0;
+  return (player.cpuOffers || []).filter(o => isPortalOfferFulfillable(player, o.conf, o.team, o.amount)).length;
+}
+
+function isPortalTeamTopFiveOffer(player, conf, team) {
+  return getPortalTopCPUOffers(player).some(o => o.conf === conf && o.team === team);
+}
+
+function hasPortalCPUOfferForTeam(player, cpuTeam) {
+  return !!player && (player.cpuOffers || []).some(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+}
+
+function getPortalBaseTargetScoreForCPU(player, team, conf, prestige) {
   const counts = getPortalCPUPositionCounts(team, conf);
   const need = (counts[player.position] || 0) < 2;
   const currentBest = getPortalCPUBestAtPosition(team, conf, player.position);
@@ -7106,7 +8708,80 @@ function scorePortalTargetForCPU(player, team, conf, prestige, rng) {
   if (!need && !isImprovement) return -1;
   const needBonus = need ? 1000000 : 0;
   const upgradeBonus = isImprovement ? (player.overall - currentBest) * 1500 : 0;
-  return needBonus + upgradeBonus + (Number(player.stars) || 1) * 80000 + (Number(player.overall) || 0) * 200 + rng() * 30000 + prestige * 120;
+  const offerCount = getPortalActiveCPUOfferCount(player);
+  const lowOfferBonus = Math.max(0, 5 - offerCount) * 220000;
+  return needBonus + upgradeBonus + lowOfferBonus + (Number(player.stars) || 1) * 80000 + (Number(player.overall) || 0) * 200 + prestige * 120;
+}
+
+function scorePortalTargetForCPU(player, team, conf, prestige, rng) {
+  const base = getPortalBaseTargetScoreForCPU(player, team, conf, prestige);
+  return base < 0 ? -1 : base + rng() * 30000;
+}
+
+function getPortalTeamPositionOfferEntries(cpuTeam, position) {
+  const entries = [];
+  transferPortal.forEach(player => {
+    if (!player || player.signed || player.committedTo || player.position !== position) return;
+    const offers = player.cpuOffers || [];
+    const idx = offers.findIndex(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+    if (idx === -1) return;
+    const offer = offers[idx];
+    if (!isPortalOfferFulfillable(player, offer.conf, offer.team, offer.amount)) return;
+    const baseScore = getPortalBaseTargetScoreForCPU(player, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige);
+    entries.push({
+      player,
+      offer,
+      index:idx,
+      keepScore:baseScore + Math.min(1, Number(offer.interest) || 0) * 90000 + Math.max(0, Number(offer.amount) || 0) / 100
+    });
+  });
+  return entries;
+}
+
+function removePortalCPUOfferEntry(entry) {
+  if (!entry || !entry.player || !Array.isArray(entry.player.cpuOffers)) return 0;
+  const offer = entry.player.cpuOffers[entry.index];
+  if (offer) entry.player.cpuOffers.splice(entry.index, 1);
+  return Math.max(0, Math.round(Number((offer || entry.offer || {}).amount) || 0));
+}
+
+function prunePortalPositionOffersForTeam(cpuTeam, pulledOfferIds = null) {
+  RECRUIT_POSITIONS.forEach(position => {
+    const entries = getPortalTeamPositionOfferEntries(cpuTeam, position)
+      .sort((a, b) => b.keepScore - a.keepScore);
+    entries.slice(2).forEach(entry => {
+      removePortalCPUOfferEntry(entry);
+      if (pulledOfferIds) pulledOfferIds.add(entry.player.portalId);
+    });
+  });
+}
+
+function getPortalPositionOfferSlot(cpuTeam, player, candidateScore) {
+  const entries = getPortalTeamPositionOfferEntries(cpuTeam, player.position)
+    .sort((a, b) => a.keepScore - b.keepScore);
+  if (entries.length < 2) return { allowed:true, replace:null, releasedAmount:0 };
+  const weakest = entries[0];
+  if (candidateScore <= weakest.keepScore) return { allowed:false, replace:null, releasedAmount:0 };
+  return {
+    allowed:true,
+    replace:weakest,
+    releasedAmount:Math.max(0, Math.round(Number((weakest.offer || {}).amount) || 0))
+  };
+}
+
+function addPortalCPUOfferWithPositionLimit(player, cpuTeam, amount, interest, candidateScore) {
+  if (hasPortalCPUOfferForTeam(player, cpuTeam)) return false;
+  const slot = getPortalPositionOfferSlot(cpuTeam, player, candidateScore);
+  if (!slot.allowed) return false;
+  if (slot.replace) removePortalCPUOfferEntry(slot.replace);
+  if (!player.cpuOffers) player.cpuOffers = [];
+  player.cpuOffers.push({
+    conf:cpuTeam.conf,
+    team:cpuTeam.team,
+    amount,
+    interest
+  });
+  return true;
 }
 
 function generateCPUPortalOffers() {
@@ -7140,27 +8815,30 @@ async function generateCPUPortalOffersWithProgress() {
 
 function generateInitialCPUPortalOffersForTeam(cpuTeam, rng) {
   if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) >= PORTAL_ROSTER_CAP) return;
-  let remaining = cpuTeam.budget;
+  prunePortalPositionOffersForTeam(cpuTeam);
+  const isUserAutoTeam = isUserTeam(cpuTeam.conf, cpuTeam.team);
+  let remaining = isUserAutoTeam ? getAvailableNILDollars() : cpuTeam.budget;
+  const pulledOfferIds = new Set();
   const scored = transferPortal
+    .filter(p => !pulledOfferIds.has(p.portalId) && !hasPortalCPUOfferForTeam(p, cpuTeam) && (!isUserAutoTeam || !p.offer))
     .map(p => ({ player: p, score: scorePortalTargetForCPU(p, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige, rng) }))
     .filter(x => x.score >= 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 6);
-  scored.forEach(({ player }) => {
-    if (remaining <= 0 && getPortalFairValue(player) > 0) return;
+    .slice(0, 12);
+  scored.forEach(({ player, score }) => {
     const fairValue = getPortalFairValue(player);
     const mult = 0.82 + rng() * 0.46;
     const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
-    const amount = Math.min(desired, remaining);
+    const slot = getPortalPositionOfferSlot(cpuTeam, player, score);
+    if (!slot.allowed) return;
+    const amount = Math.min(desired, remaining + slot.releasedAmount);
     if (fairValue > 0 && amount <= 0) return;
+    if (slot.replace) {
+      remaining += removePortalCPUOfferEntry(slot.replace);
+      pulledOfferIds.add(slot.replace.player.portalId);
+    }
     remaining -= amount;
-    if (!player.cpuOffers) player.cpuOffers = [];
-    player.cpuOffers.push({
-      conf: cpuTeam.conf,
-      team: cpuTeam.team,
-      amount,
-      interest: getCPUOfferInterest(cpuTeam, player, amount)
-    });
+    addPortalCPUOfferWithPositionLimit(player, cpuTeam, amount, getCPUOfferInterest(cpuTeam, player, amount), score);
   });
 }
 
@@ -7168,7 +8846,7 @@ function getPortalCPUTeams() {
   const teams = [];
   Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
     teamNames.forEach(team => {
-      if (conf === selectedConf && team === selectedTeam) return;
+      if (conf === selectedConf && team === selectedTeam && !isAutoRecruitingEnabled()) return;
       const data = ((TEAM_DATA[conf] || {})[team] || {});
       teams.push({ conf, team, prestige: Number(data.p) || 0, budget: Math.max(0, Math.round((Number(data.n) || 0) * 1000000)) });
     });
@@ -7194,17 +8872,20 @@ function prunePortalOffersFromFullTeams() {
 
 function sortPortalCPUOffers() {
   transferPortal.forEach(p => {
-    p.cpuOffers = (p.cpuOffers || [])
-      .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team))
-      .slice(0, 6);
+    const sorted = (p.cpuOffers || [])
+      .sort((a, b) => b.interest - a.interest || b.amount - a.amount || a.team.localeCompare(b.team));
+    const userOffers = sorted.filter(o => isUserTeam(o.conf, o.team));
+    const otherOffers = sorted.filter(o => !isUserTeam(o.conf, o.team));
+    p.cpuOffers = userOffers.concat(otherOffers.slice(0, Math.max(0, 6 - userOffers.length)));
   });
 }
 
 function simulateCPUPortalTeam(cpuTeam, rng) {
   let hoursLeft = 100;
   if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) >= PORTAL_ROSTER_CAP) return;
+  const isUserAutoTeam = isUserTeam(cpuTeam.conf, cpuTeam.team);
 
-  const myOffers = [];
+  const pulledOfferIds = new Set();
   transferPortal.forEach(p => {
     const idx = (p.cpuOffers || []).findIndex(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
     if (idx === -1) return;
@@ -7212,6 +8893,18 @@ function simulateCPUPortalTeam(cpuTeam, rng) {
       p.cpuOffers.splice(idx, 1);
       return;
     }
+    if (!isPortalTeamTopFiveOffer(p, cpuTeam.conf, cpuTeam.team)) {
+      p.cpuOffers.splice(idx, 1);
+      pulledOfferIds.add(p.portalId);
+      return;
+    }
+  });
+  prunePortalPositionOffersForTeam(cpuTeam, pulledOfferIds);
+
+  const myOffers = [];
+  transferPortal.forEach(p => {
+    const idx = (p.cpuOffers || []).findIndex(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
+    if (idx === -1 || p.committedTo || p.signed) return;
     myOffers.push({ player: p, offer: p.cpuOffers[idx] });
   });
 
@@ -7224,35 +8917,41 @@ function simulateCPUPortalTeam(cpuTeam, rng) {
     if (offer.interest >= 1.0 && !player.committedTo && !player.signed) {
       if (getPortalCPUTeamFinalCount(cpuTeam.team, cpuTeam.conf) < PORTAL_ROSTER_CAP) {
         player.committedTo = { team: cpuTeam.team, conf: cpuTeam.conf };
+        player.committedAmount = Math.max(0, Math.round(Number(offer.amount) || 0));
       }
     }
   }
 
   // Send new offers based on positional need / improvement
   if (hoursLeft >= 5) {
-    const committedAmt = transferPortal.reduce((sum, p) => {
+    const committedAmt = isUserAutoTeam ? getCommittedNILDollars() : transferPortal.reduce((sum, p) => {
       const o = (p.cpuOffers || []).find(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
       return sum + (o ? (Number(o.amount) || 0) : 0);
     }, 0);
-    let remaining = Math.max(0, cpuTeam.budget - committedAmt);
+    let remaining = isUserAutoTeam ? getAvailableNILDollars() : Math.max(0, cpuTeam.budget - committedAmt);
     const targeted = new Set(myOffers.map(x => x.player.portalId));
     const candidates = transferPortal
-      .filter(p => !targeted.has(p.portalId) && !p.committedTo && !p.signed)
+      .filter(p => !targeted.has(p.portalId) && !pulledOfferIds.has(p.portalId) && !hasPortalCPUOfferForTeam(p, cpuTeam) && !p.committedTo && !p.signed && (!isUserAutoTeam || !p.offer))
       .map(p => ({ player: p, score: scorePortalTargetForCPU(p, cpuTeam.team, cpuTeam.conf, cpuTeam.prestige, rng) }))
       .filter(x => x.score >= 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 4);
+      .slice(0, 8);
 
-    for (const { player } of candidates) {
+    for (const { player, score } of candidates) {
       if (hoursLeft < 5) break;
       const fairValue = getPortalFairValue(player);
       const mult = 0.82 + rng() * 0.46;
       const desired = fairValue <= 0 ? 0 : Math.max(1000, Math.round(fairValue * mult / 1000) * 1000);
-      const amount = fairValue > 0 ? Math.min(desired, remaining) : 0;
+      const slot = getPortalPositionOfferSlot(cpuTeam, player, score);
+      if (!slot.allowed) continue;
+      const amount = fairValue > 0 ? Math.min(desired, remaining + slot.releasedAmount) : 0;
       if (fairValue > 0 && amount <= 0) continue;
+      if (slot.replace) {
+        remaining += removePortalCPUOfferEntry(slot.replace);
+        pulledOfferIds.add(slot.replace.player.portalId);
+      }
       remaining -= amount;
-      if (!player.cpuOffers) player.cpuOffers = [];
-      player.cpuOffers.push({ conf: cpuTeam.conf, team: cpuTeam.team, amount, interest: getCPUOfferInterest(cpuTeam, player, amount) });
+      addPortalCPUOfferWithPositionLimit(player, cpuTeam, amount, getCPUOfferInterest(cpuTeam, player, amount), score);
       hoursLeft -= 5;
     }
   }
@@ -7270,6 +8969,7 @@ async function advancePortalWeek() {
   if (portalAdvanceInProgress) return;
   if (!transferPortal.length) return;
   portalAdvanceInProgress = true;
+  const signedBefore = new Set(transferPortal.filter(isPortalPlayerSignedByUser).map(getPortalSigningKey));
   try {
     await runPortalProgress(async () => {
       pruneUnfulfillablePortalOffers();
@@ -7296,9 +8996,80 @@ async function advancePortalWeek() {
       savePortalState();
       renderTransferPortal();
     });
+    const newSignings = getNewPortalSigningsSince(signedBefore);
+    if (newSignings.length) queuePortalSigningReveal(newSignings);
   } finally {
     portalAdvanceInProgress = false;
   }
+}
+
+function getPortalSigningKey(player) {
+  return player ? String(player.portalId || player.id || player.name || '') : '';
+}
+
+function getNewPortalSigningsSince(signedBefore) {
+  const before = signedBefore || new Set();
+  return transferPortal
+    .filter(player => player && isPortalPlayerSignedByUser(player) && !before.has(getPortalSigningKey(player)))
+    .sort((a, b) => (Number(b.stars) || 0) - (Number(a.stars) || 0) || (Number(b.overall) || 0) - (Number(a.overall) || 0));
+}
+
+function queuePortalSigningReveal(players) {
+  portalSigningRevealQueue = portalSigningRevealQueue.concat(players || []);
+  showPortalSigningReveal();
+}
+
+function showPortalSigningReveal() {
+  const overlay = document.getElementById('portal-signing-overlay');
+  const card = document.getElementById('portal-signing-card');
+  if (!overlay || !card) return;
+  const player = portalSigningRevealQueue[0];
+  if (!player) {
+    overlay.classList.add('hidden');
+    card.innerHTML = '';
+    return;
+  }
+  const headshotSrc = generateRecruitHeadshot(player.portalId || player.name || 'portal-signing');
+  const confettiColors = ['#c08a18','#ede0b8','#7cc8ff','#88c894','#e09080'];
+  const confetti = Array.from({ length:34 }, (_, i) => {
+    const color = confettiColors[i % confettiColors.length];
+    const left = (i * 29) % 100;
+    const delay = ((i * 73) % 100) / 100;
+    const duration = 1.05 + ((i * 17) % 55) / 100;
+    return `<span style="left:${left}%;background:${color};animation-delay:${delay}s;animation-duration:${duration}s;"></span>`;
+  }).join('');
+  card.innerHTML = `
+    <div class="portal-confetti">${confetti}</div>
+    <div class="portal-signing-kicker">SIGNED TO ${escapeAttr(selectedTeam || 'YOUR PROGRAM')}</div>
+    <img class="recruit-headshot" src="${headshotSrc}" alt="">
+    <div>
+      <div class="recruit-detail-name">${escapeAttr(player.name)}</div>
+      <div class="recruit-detail-sub">${escapeAttr(player.position || '')} · ${escapeAttr(player.grade || 'Transfer')} · ${escapeAttr(player.hometown || '')}${player.homeState ? `, ${escapeAttr(player.homeState)}` : ''}</div>
+      <div class="recruit-detail-stars">${getStarText(player.stars || overallToStars(player.overall))}</div>
+    </div>
+    <div class="portal-signing-info">
+      <div>OVERALL<strong>${Math.round(Number(player.overall) || 0)}</strong></div>
+      <div>POTENTIAL<strong>${Math.round(Number(player.potential) || Number(player.overall) || 0)}</strong></div>
+      <div>FROM<strong>${escapeAttr(player.fromTeam || 'Transfer Portal')}</strong></div>
+      <div>NIL<strong>${formatDollars(getPortalSigningAmount(player))}</strong></div>
+    </div>
+    <button class="recruit-detail-close-btn" type="button" onclick="continuePortalSigningReveal()">${portalSigningRevealQueue.length > 1 ? 'NEXT SIGNING' : 'CONTINUE'}</button>
+  `;
+  overlay.classList.remove('hidden');
+  if (typeof Sfx !== 'undefined' && Sfx.celebrate) Sfx.celebrate();
+}
+
+function continuePortalSigningReveal() {
+  portalSigningRevealQueue.shift();
+  if (portalSigningRevealQueue.length) {
+    showPortalSigningReveal();
+    return;
+  }
+  const overlay = document.getElementById('portal-signing-overlay');
+  const card = document.getElementById('portal-signing-card');
+  if (overlay) overlay.classList.add('hidden');
+  if (card) card.innerHTML = '';
+  renderTransferPortal();
 }
 
 async function resolveCPUPortalTeamOffersWithProgress() {
@@ -7392,6 +9163,7 @@ function commitPortalPlayer(player, offer) {
   if (offer.isPlayer) {
     player.signed = true;
     player.bookmarked = true;
+    revealSignedPortalPlayer(player);
     if (!player.offer) player.offer = { amount:offer.amount || 0, fairValue:getPortalFairValue(player), valueScore:1, offerWeek:getPortalWeekKey() };
   } else {
     player.committedTo = { team:offer.team, conf:offer.conf };
@@ -7546,6 +9318,7 @@ function applyPortalCommits() {
     const entry = ((allRosters || {})[targetConf] || {})[targetTeam];
     if (!entry) { stillUnsigned.push(p); return; }
     const roster = getRosterFromEntry(entry);
+    if (roster.some(player => player.name === p.name)) return;
     if (roster.length >= PORTAL_ROSTER_CAP) { stillUnsigned.push(p); return; }
     roster.push({
       name: p.name,
@@ -7578,6 +9351,7 @@ function applyRecruitingCommits() {
     const entry = ((allRosters || {})[targetConf] || {})[targetTeam];
     if (!entry) return;
     const roster = getRosterFromEntry(entry);
+    if (roster.some(player => player.name === r.name)) return;
     if (roster.length >= PORTAL_ROSTER_CAP) return;
     roster.push({
       name:r.name,
@@ -7712,9 +9486,15 @@ function renderOffseasonTraining(results) {
   `;
 }
 
+function goToOffseasonTraining(results) {
+  saveAllRosters();
+  renderOffseasonTraining(results);
+  saveCurrentGameSnapshot('offseason-training');
+  flash(() => showPanel('offseason-training'));
+}
+
 function finishOffseasonTraining() {
-  resetForNextSeason();
-  goToDashboard();
+  goToPrestigeUpdate();
 }
 
 function resetForNextSeason() {
@@ -7728,7 +9508,9 @@ function resetForNextSeason() {
     getRecruitingHoursKey(),
     getPortalStateKey(),
     getPortalHoursKey(),
-    getConferenceTournamentKey()
+    getConferenceTournamentKey(),
+    getTournamentStateKey(),
+    getOffseasonStateKey()
   ];
 
   clearRecruitedFreshmanFlags();
@@ -7741,6 +9523,7 @@ function resetForNextSeason() {
   tournamentState = null;
   conferenceTournamentState = null;
   conferenceTournamentSimInProgress = false;
+  offseasonState = null;
   cachedSchedule = null;
   leagueSchedule = null;
   currentGameIndex = 0;
@@ -7754,10 +9537,12 @@ function resetForNextSeason() {
   portalStarFilter = 'all';
   portalPositionFilter = 'all';
   portalBookmarksFilter = false;
+  portalUserSignedFilter = false;
   portalSignedFilter = false;
   recruitingStarFilter = 'all';
   recruitingPositionFilter = 'all';
   recruitingBookmarksFilter = false;
+  recruitingUserSignedFilter = false;
   recruitingSignedFilter = false;
 
   saveAllRosters();
@@ -7832,6 +9617,7 @@ function getPortalKnownTopMotivationCount(player) {
 function sendPortalOffer(portalId) {
   const player = transferPortal.find(p => p.portalId === portalId);
   if (!player || player.signed) return;
+  const wasSigned = !!player.signed;
   const weekKey = getPortalWeekKey();
   if (player.offer && player.offer.offerWeek === weekKey) return;
   const currentOffer = player.offer ? Math.max(0, Math.round(Number(player.offer.amount) || 0)) : 0;
@@ -7846,10 +9632,15 @@ function sendPortalOffer(portalId) {
   const valueScore = getOfferValueScore(player, amount);
   player.bookmarked = true;
   player.offer = { amount, fairValue, valueScore, offerWeek: weekKey };
-  if (valueScore >= 1) player.signed = true;
+  if (valueScore >= 1) {
+    player.signed = true;
+    revealSignedPortalPlayer(player);
+  }
   savePortalState();
+  saveCurrentGameSnapshot('portal');
   renderTransferPortal();
   renderPortalDetailCard(player);
+  if (!wasSigned && player.signed) queuePortalSigningReveal([player]);
 }
 
 function pullPortalOffer(portalId) {
@@ -7867,14 +9658,20 @@ function portalHardSell(portalId) { applyPortalSell(portalId, 75, 7, 10, 2); }
 function applyPortalSell(portalId, hoursCost, minBoost, maxBoost, requiredKnownTops) {
   const player = transferPortal.find(p => p.portalId === portalId);
   if (!player || !player.offer || player.signed) return;
+  const wasSigned = !!player.signed;
   if (getPortalKnownTopMotivationCount(player) < requiredKnownTops) return;
   if (!spendPortalHours(hoursCost)) return;
   const boost = randInt(minBoost, maxBoost);
   player.offer.valueScore = (Number(player.offer.valueScore) || 0) + (boost / 100);
-  if (player.offer.valueScore >= 1) player.signed = true;
+  if (player.offer.valueScore >= 1) {
+    player.signed = true;
+    revealSignedPortalPlayer(player);
+  }
   savePortalState();
+  saveCurrentGameSnapshot('portal');
   renderPortalDetailCard(player);
   renderTransferPortal();
+  if (!wasSigned && player.signed) queuePortalSigningReveal([player]);
 }
 
 function updatePortalOfferPreview(value) {
@@ -8341,7 +10138,7 @@ function generateCPURecruitOffers(recruits) {
   const teams = [];
   Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
     teamNames.forEach(team => {
-      if (conf === selectedConf && team === selectedTeam) return;
+      if (!isAutoRecruitingEnabled() && conf === selectedConf && team === selectedTeam) return;
       const data = ((TEAM_DATA[conf] || {})[team] || {});
       const budget = Math.max(0, Math.round((Number(data.n) || 0) * 1000000));
       budgets[`${conf}::${team}`] = budget;
@@ -8426,9 +10223,110 @@ function getRecruitFairValue(recruit) {
   return ({ 5:2000000, 4:500000, 3:100000, 2:50000, 1:0 })[Number(recruit.stars) || 1] || 0;
 }
 
+function isAutoRecruitingEnabled() {
+  return saveGameGetItem(AUTO_RECRUITING_KEY) === '1';
+}
+
+function setAutoRecruitingEnabled(enabled) {
+  saveGameSetItem(AUTO_RECRUITING_KEY, enabled ? '1' : '0');
+}
+
+function isSeasonAutoSaveEnabled() {
+  try { return localStorage.getItem(SEASON_AUTO_SAVE_KEY) === '1'; }
+  catch (_) { return false; }
+}
+
+function setSeasonAutoSaveEnabled(enabled) {
+  try { localStorage.setItem(SEASON_AUTO_SAVE_KEY, enabled ? '1' : '0'); }
+  catch (_) {}
+}
+
+function getLastSeasonAutoSavedKey() {
+  return 'lastSeasonAutoSaved';
+}
+
+function getAutoSaveCheckpointKey(name) {
+  return `autoSaveCheckpoint:${name}`;
+}
+
+function showAutoSaveOverlay() {
+  const overlay = document.getElementById('auto-save-overlay');
+  if (!overlay) return;
+  overlay.classList.add('show');
+  window.clearTimeout(showAutoSaveOverlay.hideTimer);
+  showAutoSaveOverlay.hideTimer = window.setTimeout(() => {
+    overlay.classList.remove('show');
+  }, 2000);
+}
+
+function maybeRunSeasonStartAutoSave() {
+  if (!isSeasonAutoSaveEnabled()) return false;
+  if (!selectedTeam || typeof Saves === 'undefined') return false;
+  if (currentScreen !== 'dashboard') return false;
+  if ((Number(currentGameIndex) || 0) !== 0) return false;
+  const season = Number(seasonNumber) || 1;
+  if (Number(saveGameGetItem(getLastSeasonAutoSavedKey())) === season) return false;
+  runAutoSaveToActiveSlot(`${selectedTeam} S${season}`);
+  saveGameSetItem(getLastSeasonAutoSavedKey(), String(season));
+  return true;
+}
+
+function maybeRunAutoSaveCheckpoint(name, fallbackName) {
+  if (!isSeasonAutoSaveEnabled()) return false;
+  if (!selectedTeam || typeof Saves === 'undefined') return false;
+  const season = Number(seasonNumber) || 1;
+  const key = getAutoSaveCheckpointKey(name);
+  if (Number(saveGameGetItem(key)) === season) return false;
+  if (!runAutoSaveToActiveSlot(fallbackName || `${selectedTeam} S${season}`)) return false;
+  saveGameSetItem(key, String(season));
+  return true;
+}
+
+function maybeRunRegularSeasonCompleteAutoSave() {
+  const totalGames = cachedSchedule && cachedSchedule.length ? cachedSchedule.length : 0;
+  if (!totalGames) return false;
+  if ((Number(currentGameIndex) || 0) < totalGames) return false;
+  return maybeRunAutoSaveCheckpoint('regularSeasonComplete', `${selectedTeam} regular season complete`);
+}
+
+function maybeRunNationalTournamentCompleteAutoSave() {
+  if (!tournamentState || !tournamentState.champion) return false;
+  return maybeRunAutoSaveCheckpoint('nationalTournamentComplete', `${selectedTeam} post tournament`);
+}
+
+function runAutoSaveToActiveSlot(fallbackName) {
+  const slot = Saves.activeSlot();
+  if (!slot || slot < 1 || slot > Saves.SLOT_COUNT) return false;
+  const existingMeta = Saves.getMeta(slot);
+  const saveName = existingMeta && existingMeta.name ? existingMeta.name : fallbackName;
+  Saves.saveCurrentToSlot(slot, saveName);
+  showAutoSaveOverlay();
+  return true;
+}
+
 function getTeamNILBudgetDollars() {
   const teamNILVal = ((TEAM_DATA[selectedConf] || {})[selectedTeam] || {}).n;
   return Math.max(0, Math.round((Number(teamNILVal) || 0) * 1000000));
+}
+
+function isUserTeam(conf, team) {
+  return conf === selectedConf && team === selectedTeam;
+}
+
+function getUserAutoRecruitOffer(recruit) {
+  return (recruit && recruit.cpuOffers || []).find(o => isUserTeam(o.conf, o.team)) || null;
+}
+
+function getRecruitAutoNILAmount(recruit) {
+  if (!recruit) return 0;
+  const autoOffer = getUserAutoRecruitOffer(recruit);
+  if (recruit.committedTo && isUserTeam(recruit.committedTo.conf, recruit.committedTo.team)) {
+    return Math.max(0, Math.round(Number(recruit.committedAmount) || Number((autoOffer || {}).amount) || 0));
+  }
+  if (!recruit.signed && !recruit.committedTo && autoOffer) {
+    return Math.max(0, Math.round(Number(autoOffer.amount) || 0));
+  }
+  return 0;
 }
 
 function getCommittedNILDollars() {
@@ -8436,14 +10334,17 @@ function getCommittedNILDollars() {
     return sum + Math.max(0, Math.round(Number(item.amount) || 0));
   }, 0);
   const recruitSum = ensureRecruitingClass().reduce((sum, recruit) => {
-    if (!recruit.offer) return sum;
-    if (recruit.committedTo) return sum;
-    return sum + Math.max(0, Math.round(Number(recruit.offer.amount) || 0));
+    const manualAmount = recruit.offer && !recruit.committedTo
+      ? Math.max(0, Math.round(Number(recruit.offer.amount) || 0))
+      : 0;
+    return sum + Math.max(manualAmount, getRecruitAutoNILAmount(recruit));
   }, 0);
   const portalSum = (transferPortal || []).reduce((sum, p) => {
-    if (!p.offer) return sum;
-    if (p.committedTo) return sum;
-    return sum + Math.max(0, Math.round(Number(p.offer.amount) || 0));
+    if (p.committedTo && !isUserTeam(p.committedTo.conf, p.committedTo.team)) return sum;
+    const manualAmount = p.offer && !p.committedTo
+      ? Math.max(0, Math.round(Number(p.offer.amount) || 0))
+      : 0;
+    return sum + Math.max(manualAmount, getPortalAutoNILAmount(p));
   }, 0);
   return retentionSum + recruitSum + portalSum;
 }
@@ -8482,7 +10383,10 @@ function getKnownTopMotivationCount(recruit) {
 function addRecruitOfferInterest(recruit, percent) {
   if (!recruit.offer || recruit.signed) return;
   recruit.offer.valueScore = (Number(recruit.offer.valueScore) || 0) + (percent / 100);
-  if (recruit.offer.valueScore >= 1) recruit.signed = true;
+  if (recruit.offer.valueScore >= 1) {
+    recruit.signed = true;
+    revealSignedRecruit(recruit);
+  }
 }
 
 function getFilteredRecruits(recruits) {
@@ -8494,6 +10398,44 @@ function getFilteredRecruits(recruits) {
     const matchesPosition = recruitingPositionFilter === 'all' || recruit.position === recruitingPositionFilter;
     return matchesStars && matchesPosition;
   });
+}
+
+function isRecruitSignedByUser(recruit) {
+  if (!recruit) return false;
+  if (recruit.signed) {
+    revealSignedRecruit(recruit);
+    return true;
+  }
+  const userCommitted = !!(recruit.committedTo && recruit.committedTo.conf === selectedConf && recruit.committedTo.team === selectedTeam);
+  if (userCommitted) revealSignedRecruit(recruit);
+  return userCommitted;
+}
+
+function revealSignedRecruit(recruit) {
+  if (!recruit) return;
+  recruit.overallRevealed = true;
+  recruit.potentialRevealed = true;
+}
+
+function renderSignedRecruitingSection(recruits) {
+  const signed = (recruits || [])
+    .filter(isRecruitSignedByUser)
+    .sort((a, b) => (Number(a.rank) || 9999) - (Number(b.rank) || 9999) || a.name.localeCompare(b.name));
+  if (!signed.length) return '';
+  return `
+    <div class="recruit-section-label">SIGNED BY YOUR TEAM (${signed.length})</div>
+    ${signed.map(r => `
+      <div class="recruit-row" onclick="openRecruitDetail('${r.id}')">
+        <div>SIGNED</div>
+        <div><strong>${escapeAttr(r.name)}</strong><br><span class="recruit-home">${escapeAttr(r.hometown)}, ${escapeAttr(r.homeState)}</span></div>
+        <div>${r.position}</div>
+        <div>${r.overall}</div>
+        <div>${r.potential}</div>
+        <div class="recruit-stars">${getStarText(r.stars)}</div>
+        <div></div>
+      </div>
+    `).join('')}
+  `;
 }
 
 function updateRecruitingStarFilter(value) {
@@ -8513,10 +10455,16 @@ function renderRecruiting() {
   document.getElementById('recruiting-title').textContent = `RECRUITING`;
   document.getElementById('recruiting-hours-badge').textContent = `${hours} / 100 HRS`;
   const bmCount = (ensureRecruitingClass() || []).filter(r => r.bookmarked).length;
+  const userSignedCount = (ensureRecruitingClass() || []).filter(isRecruitSignedByUser).length;
   const signedCount = (ensureRecruitingClass() || []).filter(r => r.signed).length;
   const bmBtn = document.getElementById('recruiting-bookmarks-btn');
   bmBtn.classList.toggle('active', recruitingBookmarksFilter);
   bmBtn.innerHTML = `<svg width="9" height="12" viewBox="0 0 11 15" xmlns="http://www.w3.org/2000/svg"><path class="bm-path" d="M1 1 H10 V14 L5.5 10.5 L1 14 Z"/></svg>${recruitingBookmarksFilter ? 'ALL RECRUITS' : `BOOKMARKS${bmCount ? ` (${bmCount})` : ''}`}`;
+  const userSignedBtn = document.getElementById('recruiting-user-signed-btn');
+  if (userSignedBtn) {
+    userSignedBtn.classList.toggle('active', recruitingUserSignedFilter);
+    userSignedBtn.textContent = recruitingUserSignedFilter ? 'ALL RECRUITS' : `SIGNED${userSignedCount ? ` (${userSignedCount})` : ''}`;
+  }
   const signedBtn = document.getElementById('recruiting-signed-btn');
   signedBtn.classList.toggle('active', recruitingSignedFilter);
   signedBtn.textContent = recruitingSignedFilter ? 'ALL RECRUITS' : `CLASS RANKINGS${signedCount ? ` (${signedCount})` : ''}`;
@@ -8524,6 +10472,13 @@ function renderRecruiting() {
 
   const filters = document.getElementById('recruiting-filters');
   const grid = document.getElementById('recruiting-grid');
+
+  if (recruitingUserSignedFilter) {
+    filters.innerHTML = '';
+    filters.style.display = 'none';
+    grid.innerHTML = renderSignedRecruitingSection(recruits) || '<div class="recruit-row"><span class="recruit-empty">NO RECRUITS SIGNED BY YOUR TEAM YET</span></div>';
+    return;
+  }
 
   if (recruitingSignedFilter) {
     filters.innerHTML = '';
@@ -8659,7 +10614,10 @@ function getRecruitingHoursRemaining() {
 }
 
 function getCPUTeamSignedCount(recruits, team, conf) {
-  return recruits.filter(r => r.committedTo && r.committedTo.team === team && r.committedTo.conf === conf).length;
+  return recruits.filter(r => {
+    if (r.committedTo && r.committedTo.team === team && r.committedTo.conf === conf) return true;
+    return r.signed && team === selectedTeam && conf === selectedConf;
+  }).length;
 }
 
 function simulateCPURecruitingWeek(weekKey) {
@@ -8697,7 +10655,7 @@ function simulateCPURecruitingWeek(weekKey) {
   const teams = [];
   Object.entries(CONFERENCES).forEach(([conf, teamNames]) => {
     teamNames.forEach(team => {
-      if (conf === selectedConf && team === selectedTeam) return;
+      if (!isAutoRecruitingEnabled() && conf === selectedConf && team === selectedTeam) return;
       const data = ((TEAM_DATA[conf] || {})[team] || {});
       teams.push({ conf, team, prestige: Number(data.p) || 0, budget: Math.max(0, Math.round((Number(data.n) || 0) * 1000000)) });
     });
@@ -8731,6 +10689,7 @@ function simulateCPURecruitingWeek(weekKey) {
       if (offer.interest >= 1.0 && !recruit.committedTo && !recruit.signed) {
         if (getCPUTeamSignedCount(recruits, cpuTeam.team, cpuTeam.conf) < 6) {
           recruit.committedTo = { team: cpuTeam.team, conf: cpuTeam.conf };
+          recruit.committedAmount = Math.max(0, Math.round(Number(offer.amount) || 0));
         }
       }
     }
@@ -8739,9 +10698,14 @@ function simulateCPURecruitingWeek(weekKey) {
     const activeCount = myOffers.filter(x => !x.recruit.committedTo && !x.recruit.signed).length;
     const wantMore = activeCount < minActiveOffers || (hoursLeft >= 5 && activeCount < Math.min(slotsLeft + 2, 6));
     if (hoursLeft >= 5 && wantMore) {
-      const committedAmt = recruits.reduce((sum, r) => {
+      const isUserAutoTeam = isUserTeam(cpuTeam.conf, cpuTeam.team);
+      const committedAmt = isUserAutoTeam ? getCommittedNILDollars() : recruits.reduce((sum, r) => {
         const o = (r.cpuOffers || []).find(o => o.team === cpuTeam.team && o.conf === cpuTeam.conf);
-        return sum + (o ? (Number(o.amount) || 0) : 0);
+        const offerAmount = o ? (Number(o.amount) || 0) : 0;
+        const commitAmount = r.committedTo && r.committedTo.team === cpuTeam.team && r.committedTo.conf === cpuTeam.conf
+          ? (Number(r.committedAmount) || offerAmount)
+          : 0;
+        return sum + Math.max(offerAmount, commitAmount);
       }, 0);
       let remaining = Math.max(0, cpuTeam.budget - committedAmt);
       const targeted = new Set(myOffers.map(x => x.recruit.id));
@@ -8790,13 +10754,16 @@ function resolveRecruitingSignings(recruits, weekKey, autoSign) {
     if (r.committedTo) {
       const key = `${r.committedTo.conf}::${r.committedTo.team}`;
       signedCounts[key] = (signedCounts[key] || 0) + 1;
+    } else if (r.signed) {
+      const key = `${selectedConf}::${selectedTeam}`;
+      signedCounts[key] = (signedCounts[key] || 0) + 1;
     }
   });
   recruits.forEach(recruit => {
     if (recruit.signed || recruit.committedTo) return;
     const allOffers = [];
-    if (recruit.offer) allOffers.push({ isPlayer:true, interest:Math.min(1, Number(recruit.offer.valueScore) || 0) });
-    (recruit.cpuOffers || []).forEach(o => allOffers.push({ isPlayer:false, team:o.team, conf:o.conf, interest:Math.min(1, Number(o.interest) || 0) }));
+    if (recruit.offer) allOffers.push({ isPlayer:true, amount:recruit.offer.amount, interest:Math.min(1, Number(recruit.offer.valueScore) || 0) });
+    (recruit.cpuOffers || []).forEach(o => allOffers.push({ isPlayer:false, team:o.team, conf:o.conf, amount:o.amount, interest:Math.min(1, Number(o.interest) || 0) }));
     if (!allOffers.length) return;
     const best = allOffers.sort((a, b) => b.interest - a.interest)[0];
     if (best.interest <= 0) return;
@@ -8804,11 +10771,14 @@ function resolveRecruitingSignings(recruits, weekKey, autoSign) {
     if (best.isPlayer) {
       recruit.signed = true;
       recruit.bookmarked = true;
+      revealSignedRecruit(recruit);
       return;
     }
     const key = `${best.conf}::${best.team}`;
     if ((signedCounts[key] || 0) < 6) {
       recruit.committedTo = { team:best.team, conf:best.conf };
+      recruit.committedAmount = Math.max(0, Math.round(Number(best.amount) || 0));
+      if (isRecruitSignedByUser(recruit)) revealSignedRecruit(recruit);
       if (recruit.offer) delete recruit.offer;
       signedCounts[key] = (signedCounts[key] || 0) + 1;
     }
@@ -9171,13 +11141,28 @@ function renderClassRankings() {
 
 function toggleBookmarksFilter() {
   recruitingBookmarksFilter = !recruitingBookmarksFilter;
-  if (recruitingBookmarksFilter) recruitingSignedFilter = false;
+  if (recruitingBookmarksFilter) {
+    recruitingUserSignedFilter = false;
+    recruitingSignedFilter = false;
+  }
+  renderRecruiting();
+}
+
+function toggleUserSignedFilter() {
+  recruitingUserSignedFilter = !recruitingUserSignedFilter;
+  if (recruitingUserSignedFilter) {
+    recruitingBookmarksFilter = false;
+    recruitingSignedFilter = false;
+  }
   renderRecruiting();
 }
 
 function toggleSignedFilter() {
   recruitingSignedFilter = !recruitingSignedFilter;
-  if (recruitingSignedFilter) recruitingBookmarksFilter = false;
+  if (recruitingSignedFilter) {
+    recruitingBookmarksFilter = false;
+    recruitingUserSignedFilter = false;
+  }
   renderRecruiting();
 }
 
@@ -9221,7 +11206,10 @@ function sendRecruitOffer(recruitId) {
     valueScore,
     offerWeek: weekKey
   };
-  if (valueScore >= 1) recruit.signed = true;
+  if (valueScore >= 1) {
+    recruit.signed = true;
+    revealSignedRecruit(recruit);
+  }
   saveRecruitingClass();
   renderRecruiting();
   renderRecruitDetailCard(recruit);
@@ -9921,10 +11909,6 @@ function getOverallWinPct(entry) {
   return total ? wins / total : 0;
 }
 
-function formatPowerIndex(value) {
-  return Math.round(Number(value) || 0).toLocaleString();
-}
-
 function getRankedTeams(limit, mode = 'national', conf = selectedConf) {
   ensureStandingsState();
   if (!leagueSchedule && typeof ensureLeagueSchedule === 'function') ensureLeagueSchedule();
@@ -9982,7 +11966,6 @@ function renderStandings() {
       <div class="standing-rank">#${i + 1}</div>
       <div class="standing-team">${escapeAttr(entry.team)}</div>
       <div class="standing-conf">${escapeAttr(entry.conf)}</div>
-      <div class="standing-record">PI ${formatPowerIndex(entry.power)}</div>
       <div class="standing-record">CONF ${(Number(entry.confWins) || 0)}-${(Number(entry.confLosses) || 0)}</div>
       <div class="standing-record">ALL ${entry.wins}-${entry.losses}</div>
     </div>
@@ -10178,26 +12161,21 @@ function renderGameplan() {
 
 function renderGameplanStyles() {
   const panel = document.getElementById('gameplan-style-panel');
-  const offense = getPressAnswerByKey('offense');
-  const defense = getPressAnswerByKey('defense');
-  const tempo = getPressAnswerByKey('tempo');
   panel.innerHTML = `
     <div class="gameplan-panel-title">STYLE</div>
-    ${renderStyleSelect('offensiveStyle', 'OFFENSIVE STYLE', getStyleOptions('offense'), gameplan.offensiveStyle, offense)}
-    ${renderStyleSelect('defensiveStyle', 'DEFENSIVE STYLE', getStyleOptions('defense'), gameplan.defensiveStyle, defense)}
-    ${renderStyleSelect('tempo', 'TEMPO', getStyleOptions('tempo'), gameplan.tempo, tempo)}
+    ${renderStyleSelect('offensiveStyle', 'OFFENSIVE STYLE', getStyleOptions('offense'), gameplan.offensiveStyle)}
+    ${renderStyleSelect('defensiveStyle', 'DEFENSIVE STYLE', getStyleOptions('defense'), gameplan.defensiveStyle)}
+    ${renderStyleSelect('tempo', 'TEMPO', getStyleOptions('tempo'), gameplan.tempo)}
   `;
 }
 
-function renderStyleSelect(field, label, options, value, presserAnswer) {
-  const response = presserAnswer ? presserAnswer.response : 'No presser answer saved for this category yet.';
+function renderStyleSelect(field, label, options, value) {
   return `
     <div class="gameplan-field">
       <label for="gp-${field}">${label}</label>
       <select class="gameplan-select" id="gp-${field}" onchange="updateGameplanStyle('${field}', this.value)">
         ${options.map(opt => `<option value="${escapeAttr(opt)}"${opt === value ? ' selected' : ''}>${opt}</option>`).join('')}
       </select>
-      <div class="presser-text">${escapeAttr(response)}</div>
     </div>
   `;
 }
@@ -10578,6 +12556,7 @@ function renderCoachCustomize() {
 }
 
 function renderCoachControls() {
+  normalizeCoachProfile();
   const controls = document.getElementById('coach-controls');
   const labels = {
     hair:'HAIR',
@@ -10608,7 +12587,15 @@ function renderCoachControls() {
   });
 }
 
+function normalizeCoachProfile(profile = coachProfile) {
+  Object.entries(COACH_OPTIONS).forEach(([key, values]) => {
+    if (!values.includes(profile[key])) profile[key] = values[0];
+  });
+  return profile;
+}
+
 function finishCoachBuilder() {
+  normalizeCoachProfile();
   saveGameJSON('coachProfile', coachProfile);
   goToCutscene();
 }
@@ -11085,6 +13072,25 @@ function drawCoachHair(ctx, profile, hair, headX, headY, hairTopY) {
     ctx.fillRect(crownL - 2, crownT + 10, crownW + 4, 2);
     ctx.fillRect(crownL - 2, crownT - 12, 2, 24);
     ctx.fillRect(crownL + crownW, crownT - 12, 2, 24);
+  } else if (profile.hair === 'Curly') {
+    ctx.fillRect(crownL - 6, crownT - 8, crownW + 12, 22);
+    ctx.fillRect(skullL - 4, headY - 2, 10, 20);
+    ctx.fillRect(skullR - 6, headY - 2, 10, 20);
+    ctx.fillStyle = hairDk;
+    for (let r = -8; r < 20; r += 5) {
+      for (let c = -6; c < crownW + 12; c += 7) {
+        const offset = r % 10 === 0 ? 0 : 3;
+        ctx.fillRect(crownL + c + offset, crownT + r, 3, 3);
+      }
+    }
+    for (let r = 0; r < 18; r += 5) {
+      ctx.fillRect(skullL - 3 + ((r % 10 === 0) ? 0 : 2), headY + r, 3, 3);
+      ctx.fillRect(skullR + 2 + ((r % 10 === 0) ? 0 : 2), headY + r, 3, 3);
+    }
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(crownL + 2, crownT - 5, 5, 2);
+    ctx.fillRect(crownL + 22, crownT - 8, 6, 2);
+    ctx.fillRect(crownR - 12, crownT - 4, 5, 2);
   } else if (profile.hair === 'Waves') {
     ctx.fillRect(crownL, crownT, crownW, 14);
     ctx.fillRect(skullL, headY, 5, 8);
@@ -11260,6 +13266,7 @@ function drawCoachHair(ctx, profile, hair, headX, headY, hairTopY) {
 }
 
 function _drawCoachPixels(ctx, profile, opts) {
+  normalizeCoachProfile(profile);
   const skin = COACH_PALETTE.skinColor[profile.skinColor];
   const hair = COACH_PALETTE.hairColor[profile.hairColor];
   const eyes = COACH_PALETTE.eyeColor[profile.eyeColor];
@@ -11800,6 +13807,20 @@ function drawPortalWorkCoach(t) {
   }
   ctx.fillStyle = hair;
   if (coachProfile.hair === 'Flat Top') ctx.fillRect(132, 6, 56, 14);
+  if (coachProfile.hair === 'Curly') {
+    ctx.fillRect(120, 6, 80, 24);
+    ctx.fillStyle = hairDk;
+    for (let r = 0; r < 24; r += 5) {
+      for (let c = 0; c < 80; c += 7) {
+        ctx.fillRect(120 + c + ((r % 10 === 0) ? 0 : 3), 6 + r, 3, 3);
+      }
+    }
+    ctx.fillStyle = hairLt;
+    ctx.fillRect(132, 9, 6, 2);
+    ctx.fillRect(158, 6, 7, 2);
+    ctx.fillRect(180, 11, 6, 2);
+    ctx.fillStyle = hair;
+  }
   if (coachProfile.hair === 'Waves') {
     ctx.fillRect(134, 8, 10, 7);
     ctx.fillRect(154, 6, 10, 7);
@@ -12967,6 +14988,8 @@ Music.apply();
   const musicSlider = document.getElementById('settings-music-vol');
   const musicVal    = document.getElementById('settings-music-val');
   const themeGrid   = document.getElementById('settings-theme-grid');
+  const autoRecruitToggle = document.getElementById('settings-auto-recruit-toggle');
+  const seasonAutoSaveToggle = document.getElementById('settings-season-auto-save-toggle');
 
   function syncSfx() {
     const m = Sfx.isMuted();
@@ -13002,6 +15025,18 @@ Music.apply();
       });
     });
   }
+  function syncAutoRecruiting() {
+    if (!autoRecruitToggle) return;
+    const enabled = isAutoRecruitingEnabled();
+    autoRecruitToggle.textContent = enabled ? 'ON' : 'OFF';
+    autoRecruitToggle.classList.toggle('off', !enabled);
+  }
+  function syncSeasonAutoSave() {
+    if (!seasonAutoSaveToggle) return;
+    const enabled = isSeasonAutoSaveEnabled();
+    seasonAutoSaveToggle.textContent = enabled ? 'ON' : 'OFF';
+    seasonAutoSaveToggle.classList.toggle('off', !enabled);
+  }
 
   sfxToggle.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -13024,9 +15059,26 @@ Music.apply();
     Music.setVolume(musicSlider.value / 100);
     musicVal.textContent = musicSlider.value;
   });
+  if (autoRecruitToggle) {
+    autoRecruitToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setAutoRecruitingEnabled(!isAutoRecruitingEnabled());
+      syncAutoRecruiting();
+      if (typeof Sfx !== 'undefined') Sfx.select();
+      if (typeof renderRecruiting === 'function' && currentScreen === 'recruiting') renderRecruiting();
+    });
+  }
+  if (seasonAutoSaveToggle) {
+    seasonAutoSaveToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setSeasonAutoSaveEnabled(!isSeasonAutoSaveEnabled());
+      syncSeasonAutoSave();
+      if (typeof Sfx !== 'undefined') Sfx.select();
+    });
+  }
 
   function open() {
-    syncSfx(); syncMusic(); buildThemes();
+    syncSfx(); syncMusic(); syncAutoRecruiting(); syncSeasonAutoSave(); buildThemes();
     overlay.classList.add('show');
   }
   function close() { overlay.classList.remove('show'); }
@@ -13035,6 +15087,203 @@ Music.apply();
   closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('show')) close(); });
+
+  const openSavesBtn = document.getElementById('settings-open-saves');
+  if (openSavesBtn) {
+    openSavesBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      close();
+      openSavesOverlay();
+    });
+  }
+})();
+
+function restoreSavedCareerScreen(career) {
+  const screen = career && career.currentScreen ? career.currentScreen : 'dashboard';
+  cachedSchedule = loadCachedSchedule() || cachedSchedule;
+  leagueSchedule = loadLeagueSchedule() || leagueSchedule;
+  currentGameIndex = getNextUnplayedGameIndex();
+  conferenceTournamentState = loadConferenceTournamentState() || conferenceTournamentState;
+  tournamentState = loadTournamentState() || tournamentState;
+  loadPortalState();
+  loadOffseasonState();
+
+  if (screen === 'conference-tournament' && conferenceTournamentState) {
+    renderConferenceTournamentPage();
+    flash(() => showPanel('conference-tournament'));
+    return true;
+  }
+  if (screen === 'tournament' && tournamentState) {
+    renderTournamentBracket();
+    flash(() => showPanel('tournament'));
+    return true;
+  }
+  if (screen === 'prestige-update' && tournamentState) {
+    const report = tournamentState.prestigeRebalanceReport || rebalancePrestigeAfterTournament();
+    if (report) {
+      renderPrestigeUpdate(report);
+      flash(() => showPanel('prestige-update'));
+      return true;
+    }
+  }
+  if (screen === 'departures' && offseasonState) {
+    flash(() => {
+      showPanel('departures');
+      if (offseasonState.stage === 'retention') renderRetentionOffers();
+      else renderDeparturesScreen(offseasonState.departing || []);
+    });
+    return true;
+  }
+  if (screen === 'portal') {
+    goToTransferPortal();
+    return true;
+  }
+  if (screen === 'offseason-training') {
+    renderOffseasonTraining([]);
+    flash(() => showPanel('offseason-training'));
+    return true;
+  }
+  if (screen === 'coach-office') {
+    goToCoachOffice();
+    return true;
+  }
+
+  goToDashboard();
+  return true;
+}
+
+function loadActiveSaveFromStorage() {
+  try {
+    const career = loadCareerState();
+    if (career && Number(career.season) > 0) seasonNumber = Number(career.season) || 1;
+    const conf = (career && career.selectedConf) || saveGameGetItem('playerConf');
+    const team = (career && career.selectedTeam) || saveGameGetItem('playerTeam');
+    if (!conf || !team) return false;
+    selectedConf = conf;
+    selectedTeam = team;
+    const savedCoach = loadGameJSON('coachProfile');
+    if (savedCoach && typeof savedCoach === 'object') {
+      coachProfile = Object.assign({}, coachProfile, savedCoach);
+      normalizeCoachProfile();
+    }
+    if (typeof ensureRosterLoaded === 'function') ensureRosterLoaded();
+    if (typeof closeSavesOverlay === 'function') closeSavesOverlay();
+    if (career && typeof restoreSavedCareerScreen === 'function') {
+      restoreSavedCareerScreen(career);
+      return true;
+    }
+    if (typeof goToDashboard === 'function') return restoreSavedCareerScreen({ currentScreen:'dashboard' });
+  } catch (err) {
+    console.warn('save load failed:', err);
+  }
+  return false;
+}
+
+/* Saves overlay */
+function openSavesOverlay() {
+  const ov = document.getElementById('saves-overlay');
+  if (!ov) return;
+  renderSavesList();
+  ov.classList.add('show');
+}
+function closeSavesOverlay() {
+  const ov = document.getElementById('saves-overlay');
+  if (ov) ov.classList.remove('show');
+}
+function formatSaveTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  const yr = String(d.getFullYear()).slice(-2);
+  const hr = String(d.getHours()).padStart(2,'0');
+  const mn = String(d.getMinutes()).padStart(2,'0');
+  return `${m}/${day}/${yr} ${hr}:${mn}`;
+}
+function renderSavesList() {
+  const list = document.getElementById('saves-list');
+  if (!list) return;
+  const items = Saves.list();
+  list.innerHTML = items.map(({slot, active, hasData, meta}) => {
+    const empty = !hasData;
+    const classes = ['save-row'];
+    if (active) classes.push('active');
+    if (empty) classes.push('empty');
+    const name = meta && meta.name ? meta.name : (empty ? 'EMPTY' : `Save ${slot}`);
+    const teamLine = empty ? '— no save data —'
+      : `${(meta && meta.team) || '?'}${meta && meta.conf ? ' · ' + meta.conf : ''}`;
+    const detailLine = empty ? '' : `Season ${meta ? meta.season : '?'} · ${meta ? (meta.record || '') : ''} · ${meta ? formatSaveTime(meta.savedAt) : ''}`;
+    return `
+      <div class="${classes.join(' ')}" data-slot="${slot}">
+        <div class="save-slot-num">${slot}</div>
+        <div class="save-info">
+          <div class="name">${escapeAttr(name)}${active ? ' · ACTIVE' : ''}</div>
+          <div class="meta">${escapeAttr(teamLine)}</div>
+          ${detailLine ? `<div class="meta">${escapeAttr(detailLine)}</div>` : ''}
+        </div>
+        <div class="save-actions">
+          <button class="save-btn save"  type="button" data-action="save"   data-slot="${slot}">SAVE</button>
+          <button class="save-btn load"  type="button" data-action="load"   data-slot="${slot}" ${empty ? 'disabled' : ''}>LOAD</button>
+          <button class="save-btn del"   type="button" data-action="delete" data-slot="${slot}" ${empty ? 'disabled' : ''}>DELETE</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  list.querySelectorAll('.save-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const slot = parseInt(btn.dataset.slot, 10);
+      const action = btn.dataset.action;
+      handleSaveSlotAction(slot, action);
+    });
+  });
+  const info = document.getElementById('saves-info');
+  if (info) info.textContent = `Active slot: ${Saves.activeSlot()} · use SAVE or LOAD on a slot · ${SAVE_SLOT_COUNT} slots total`;
+}
+function handleSaveSlotAction(slot, action) {
+  if (action === 'save') {
+    if (!selectedTeam) {
+      window.alert('Start or load a career before saving.');
+      return;
+    }
+    let defaultName = '';
+    const meta = Saves.getMeta(slot);
+    if (meta && meta.name) defaultName = meta.name;
+    else if (typeof selectedTeam === 'string') defaultName = selectedTeam || '';
+    const enteredName = window.prompt('Save name?', defaultName);
+    if (enteredName === null) return;
+    const name = (enteredName || defaultName || `Save ${slot}`).slice(0, 28);
+    if (Saves.slotHasData(slot) && slot !== Saves.activeSlot()) {
+      if (!window.confirm(`Overwrite save in slot ${slot}?`)) return;
+    }
+    Saves.saveCurrentToSlot(slot, name);
+    if (typeof Sfx !== 'undefined') Sfx.success && Sfx.success();
+    renderSavesList();
+  } else if (action === 'load') {
+    if (!window.confirm(`Load slot ${slot}? Unsaved progress in the active slot will remain in slot ${Saves.activeSlot()}.`)) return;
+    Saves.loadSlot(slot);
+  } else if (action === 'delete') {
+    if (!window.confirm(`Delete slot ${slot}? This cannot be undone.`)) return;
+    const wasActive = (slot === Saves.activeSlot());
+    Saves.deleteSlot(slot);
+    if (typeof Sfx !== 'undefined') Sfx.error && Sfx.error();
+    if (wasActive) {
+      // After deleting the active slot, reload to bootstrap fresh state.
+      location.reload();
+      return;
+    }
+    renderSavesList();
+  }
+}
+(function setupSavesOverlay(){
+  const ov = document.getElementById('saves-overlay');
+  if (!ov) return;
+  const closeBtn = document.getElementById('saves-close');
+  if (closeBtn) closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeSavesOverlay(); });
+  ov.addEventListener('click', (e) => { if (e.target === ov) closeSavesOverlay(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && ov.classList.contains('show')) closeSavesOverlay();
+  });
 })();
 
 /* Pixel crowd */

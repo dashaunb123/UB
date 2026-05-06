@@ -11,6 +11,9 @@
 
 const SIM_TRACE_ENABLED = false;
 let superSimBatchInProgress = false;
+const ENERGY_MAX = 100;
+const ENERGY_QUARTER_SECONDS = 7.5 * 60;
+const ENERGY_HALF_SECONDS = 15 * 60;
 
 function simTrace(label, data = {}) {
   if (!SIM_TRACE_ENABLED || typeof console === 'undefined') return;
@@ -287,6 +290,7 @@ function createGameState(scheduleGame) {
     speedIndex:0,
     complete:false,
     homeCourtMultiplier,
+    energyElapsedSeconds:0,
     possessionSide:scheduleGame.home ? 'home' : 'away'
   };
   state.teams[userSide] = buildSimTeam(selectedTeam, userRoster, gameplan, true, selectedTeam === awayTeam ? awayPenalty : 0);
@@ -319,6 +323,7 @@ function createLeagueGameState(leagueGame, rng = Math.random) {
     complete:false,
     backgroundSim:true,
     homeCourtMultiplier:getConferenceHomeCourtMultiplier(leagueGame, homeTeam, rng),
+    energyElapsedSeconds:0,
     possessionSide:'home'
   };
   state.teams.home = buildSimTeam(homeTeam, homeRoster, buildOpponentGameplan(homeTeam, homeConf, homeRoster), false, 0);
@@ -345,6 +350,7 @@ function createTournamentGameState(teamA, teamB, rng = Math.random) {
     complete:false,
     tournamentSim:true,
     homeCourtMultiplier:1,
+    energyElapsedSeconds:0,
     possessionSide:rng() > 0.5 ? 'home' : 'away'
   };
   state.teams.home = buildSimTeam(teamA.team, rosterA, buildOpponentGameplan(teamA.team, teamA.conf, rosterA), false, 0);
@@ -360,6 +366,7 @@ function buildSimTeam(teamName, roster, plan, isUser, gameOverallPenalty = 0) {
   const players = (activePlayers.length ? activePlayers : fallbackPlayers).map((p, i) => ({
     ...applyTemporaryOverallPenalty(p, gameOverallPenalty),
     simMinutes:Number((rotation.find(r => r.playerName === p.name) || {}).minutes) || (i < 5 ? 24 : 8),
+    energy:ENERGY_MAX,
     box:{ pts:0, fgm:0, fga:0, threePm:0, threePa:0, ast:0, reb:0 }
   }));
   return {
@@ -473,14 +480,108 @@ function simulatePossession(state) {
   const defenseSide = state.possessionSide === 'home' ? 'away' : 'home';
   const defense = state.teams[defenseSide];
   const seconds = getPossessionSeconds(offense.plan.tempo);
+  const actualSeconds = Math.max(0, Math.min(seconds, state.clock));
+  setPossessionLineups(offense, defense);
   state.clock = Math.max(0, state.clock - seconds);
   const homeOnOffense = state.possessionSide === 'home';
   const result = resolvePossession(offense, defense, homeOnOffense, state.homeCourtMultiplier);
   state.scores[state.possessionSide] += result.points;
   if (!result.made) assignRebound(defense, result);
+  updateGameEnergy(state, actualSeconds);
+  drainInitiatorEnergy(result);
   addGameFeed(state, formatPossessionFeed(state, offense.name, result));
   if (state.clock <= 0) advanceGamePeriod(state);
   state.possessionSide = defenseSide;
+}
+
+function setPossessionLineups(offense, defense) {
+  if (offense) offense.currentLineup = chooseLineup(offense);
+  if (defense) defense.currentLineup = chooseLineup(defense);
+}
+
+function chooseLineup(team) {
+  const players = team && Array.isArray(team.players) ? team.players : [];
+  if (players.length <= 5) return players.slice();
+  const lineup = [];
+  ['PG','SG','SF','PF','C'].forEach(pos => {
+    const pool = players.filter(p => p.position === pos && !lineup.includes(p));
+    const pick = weightedChoice(pool, p => getLineupWeight(p));
+    if (pick) lineup.push(pick);
+  });
+  while (lineup.length < 5 && lineup.length < players.length) {
+    const pick = weightedChoice(players.filter(p => !lineup.includes(p)), p => getLineupWeight(p));
+    if (!pick) break;
+    lineup.push(pick);
+  }
+  return lineup;
+}
+
+function getLineupWeight(player) {
+  const minutes = Math.max(1, Number(player && player.simMinutes) || 1);
+  const energy = Math.max(10, clampEnergy(player && player.energy));
+  return minutes * (0.5 + energy / 100);
+}
+
+function getCourtPlayers(team) {
+  if (!team) return [];
+  return Array.isArray(team.currentLineup) && team.currentLineup.length ? team.currentLineup : (team.players || []);
+}
+
+function updateGameEnergy(state, seconds) {
+  if (!state || seconds <= 0) return;
+  const before = Number(state.energyElapsedSeconds) || 0;
+  const after = before + seconds;
+  Object.values(state.teams || {}).forEach(team => updateTeamEnergyForPossession(team, seconds / 60));
+  applyEnergyBreakBonuses(state, before, after);
+  state.energyElapsedSeconds = after;
+}
+
+function updateTeamEnergyForPossession(team, minutes) {
+  if (!team || !Array.isArray(team.players)) return;
+  const onCourt = new Set(getCourtPlayers(team));
+  team.players.forEach(player => {
+    const delta = onCourt.has(player) ? -minutes : minutes;
+    player.energy = clampEnergy(clampEnergy(player.energy) + delta);
+  });
+}
+
+function applyEnergyBreakBonuses(state, before, after) {
+  const startQuarter = Math.floor(before / ENERGY_QUARTER_SECONDS);
+  const endQuarter = Math.floor(after / ENERGY_QUARTER_SECONDS);
+  for (let q = startQuarter + 1; q <= endQuarter; q++) {
+    let bonus = 5;
+    if ((q * ENERGY_QUARTER_SECONDS) % ENERGY_HALF_SECONDS === 0) bonus += 10;
+    addEnergyToAllPlayers(state, bonus);
+  }
+}
+
+function addEnergyToAllPlayers(state, amount) {
+  Object.values((state && state.teams) || {}).forEach(team => {
+    (team.players || []).forEach(player => {
+      player.energy = clampEnergy(clampEnergy(player.energy) + amount);
+    });
+  });
+}
+
+function clampEnergy(value) {
+  return Math.max(0, Math.min(ENERGY_MAX, Number.isFinite(Number(value)) ? Number(value) : ENERGY_MAX));
+}
+
+function getEnergyMultiplier(player) {
+  return clampEnergy(player && player.energy) / ENERGY_MAX;
+}
+
+function getEffectiveAttribute(player, key, fallback = 70) {
+  const attrs = player && player.attributes ? player.attributes : {};
+  const value = Number(attrs[key]);
+  const base = Number.isFinite(value) ? value : fallback;
+  return base * getEnergyMultiplier(player);
+}
+
+function drainInitiatorEnergy(result) {
+  const player = result && result.initiator;
+  if (!player) return;
+  player.energy = clampEnergy(clampEnergy(player.energy) - 1);
 }
 
 function getPossessionSeconds(tempo) {
@@ -494,15 +595,17 @@ function resolvePossession(offense, defense, homeOnOffense, homeCourtMultiplier 
   const ovmBoost = homeOnOffense ? homeBoost : 1;
   const dvmBoost = homeOnOffense ? 1 : homeBoost;
   const initiator = chooseInitiator(offense);
-  if (!initiator) return { player:{ name:'Team' }, action:'turnover', made:false, points:0, shotValue:2, passer:null, passQuality:null };
+  if (!initiator) return { player:{ name:'Team' }, action:'turnover', made:false, points:0, shotValue:2, passer:null, passQuality:null, initiator:null };
   const defender = chooseDefender(defense, initiator.position);
   const action = chooseAction(initiator, offense.plan.offensiveStyle, true);
   if (action === 'pass') return resolvePassAction(offense, defense, initiator, defender, ovmBoost, dvmBoost);
-  return resolveScoringAction(initiator, defender, action, offense.plan.offensiveStyle, ovmBoost, initiator, dvmBoost);
+  const result = resolveScoringAction(initiator, defender, action, offense.plan.offensiveStyle, ovmBoost, initiator, dvmBoost);
+  result.initiator = initiator;
+  return result;
 }
 
 function chooseInitiator(team) {
-  const players = team.players.length ? team.players : [];
+  const players = getCourtPlayers(team);
   if (!players.length) return null;
   const star = players.reduce((best, p) => (p.overall || 0) > (best.overall || 0) ? p : best, players[0]);
   if (team.plan.offensiveStyle === 'Play through our star' && Math.random() < 0.35) return star;
@@ -517,9 +620,10 @@ function chooseInitiator(team) {
 }
 
 function chooseDefender(team, pos) {
-  if (!team.players.length) return null;
-  const match = team.players.filter(p => p.position === pos);
-  return weightedChoice(match.length ? match : team.players, p => Math.max(1, Number(p.simMinutes) || 1));
+  const players = getCourtPlayers(team);
+  if (!players.length) return null;
+  const match = players.filter(p => p.position === pos);
+  return weightedChoice(match.length ? match : players, p => Math.max(1, Number(p.simMinutes) || 1));
 }
 
 function chooseAction(player, style, allowPass) {
@@ -546,41 +650,48 @@ function chooseAction(player, style, allowPass) {
 }
 
 function resolvePassAction(offense, defense, passer, passerDefender, ovmBoost, dvmBoost) {
-  const teammates = offense.players.filter(p => p.name !== passer.name);
-  const receiver = weightedChoice(teammates.length ? teammates : offense.players, p => Math.max(1, Number(p.simMinutes) || 1));
+  const offensePlayers = getCourtPlayers(offense);
+  const teammates = offensePlayers.filter(p => p.name !== passer.name);
+  const receiver = weightedChoice(teammates.length ? teammates : offensePlayers, p => Math.max(1, Number(p.simMinutes) || 1));
   if (!receiver) return resolveScoringAction(passer, passerDefender, 'shoot', offense.plan.offensiveStyle, 0.75 * ovmBoost, passer, dvmBoost);
   const defender = chooseDefender(defense, receiver.position);
   const ovm = randInt(0, 300) * ovmBoost;
   const dvm = randInt(0, 300) * dvmBoost;
-  const passSkill = average([passer.attributes.iq, passer.attributes.passing]);
-  const defSkill = (passerDefender && passerDefender.attributes.defense) || 70;
+  const passSkill = average([
+    getEffectiveAttribute(passer, 'iq'),
+    getEffectiveAttribute(passer, 'passing')
+  ]);
+  const defSkill = passerDefender ? getEffectiveAttribute(passerDefender, 'defense') : 70;
   const qualityBoost = (ovm * passSkill) > (dvm * defSkill) ? 1.25 : 0.75;
   const action = chooseAction(receiver, offense.plan.offensiveStyle, false);
   const result = resolveScoringAction(receiver, defender, action, offense.plan.offensiveStyle, qualityBoost, passer, dvmBoost);
   result.passQuality = qualityBoost > 1 ? 'good' : 'bad';
   result.passer = passer;
+  result.initiator = passer;
   return result;
 }
 
 function resolveScoringAction(player, defender, action, style, ovmMod, passer, dvmBoost = 1) {
-  const attrs = player.attributes || {};
-  const def = (defender && defender.attributes && defender.attributes.defense) || 70;
+  const def = defender ? getEffectiveAttribute(defender, 'defense') : 70;
   const ovm = randInt(0, 300) * ovmMod;
   const dvm = randInt(0, 300) * dvmBoost;
   let points = 2;
-  let skill = attrs.finishing || 70;
+  let skill = getEffectiveAttribute(player, 'finishing');
   let label = 'drive';
   if (action === 'shoot') {
     const isThree = Math.random() < (style === 'Shoot threes' ? 0.60 : 0.40);
     points = isThree ? 3 : 2;
-    skill = isThree ? (attrs.threePoint || 70) : (attrs.midRange || 70);
+    skill = isThree ? getEffectiveAttribute(player, 'threePoint') : getEffectiveAttribute(player, 'midRange');
     label = isThree ? 'three' : 'jumper';
     if (isThree) skill *= 0.9;
   } else if (action === 'postUp') {
-    skill = average([attrs.finishing || 70, attrs.iq || 70]);
+    skill = average([
+      getEffectiveAttribute(player, 'finishing'),
+      getEffectiveAttribute(player, 'iq')
+    ]);
     label = 'post up';
   } else {
-    skill = attrs.finishing || 70;
+    skill = getEffectiveAttribute(player, 'finishing');
     label = 'drive';
   }
   const made = (ovm * skill) > (dvm * def);
@@ -607,11 +718,12 @@ function assignRebound(defense, result) {
 }
 
 function chooseRebounder(team) {
-  if (!team || !team.players || !team.players.length) return null;
+  const players = getCourtPlayers(team);
+  if (!players.length) return null;
   const weights = { PG:0.55, SG:0.7, SF:1, PF:1.35, C:1.55 };
-  return weightedChoice(team.players, p => {
+  return weightedChoice(players, p => {
     const posWeight = weights[p.position] || 1;
-    return Math.max(1, ((p.attributes || {}).defense || p.overall || 70) * posWeight);
+    return Math.max(1, getEffectiveAttribute(p, 'defense', p.overall || 70) * posWeight);
   });
 }
 

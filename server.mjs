@@ -31,6 +31,28 @@ function resolvePath(urlPath) {
 }
 
 const server = createServer((req, res) => {
+  const urlPath = (req.url || '/').split('?')[0] || '/';
+  if (req.method === 'POST' && urlPath === '/debug-log') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk;
+      if (body.length > 64 * 1024) req.destroy();
+    });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const scope = payload.scope || 'client';
+        const event = payload.event || 'log';
+        console.log(`[${scope}] ${event}`, payload.data || {});
+      } catch (err) {
+        console.log('[client] malformed debug log');
+      }
+      res.writeHead(204);
+      res.end();
+    });
+    return;
+  }
+
   const filePath = resolvePath(req.url || '/');
   if (!filePath.startsWith(root) || !existsSync(filePath) || !statSync(filePath).isFile()) {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
