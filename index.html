@@ -4297,6 +4297,7 @@
   </div>
 </div>
 <script src="teams.js"></script>
+<script src="name-lists.js"></script>
 <script>
 /* Team and conference data lives in teams.js. */
 const TEAM_NAME_PACK_STORAGE_KEY = 'customTeamNamePack';
@@ -4588,7 +4589,7 @@ let pressAnswers = [];
 let pressAwaitingNext = false;
 let currentGameIndex = 0;
 let allRosters = null;
-let namePool = null;
+let namePool = getEmbeddedNamePool();
 let gameplan = null;
 let gameplanKey = null;
 let activeGame = null;
@@ -4653,6 +4654,7 @@ let statsMode = 'team';
 let statsSelectedConf = null;
 let statsSelectedTeam = null;
 const ROSTER_GENERATION_VERSION = 'team-style-6';
+const STANDINGS_REBUILD_VERSION = 'league-results-2';
 let coachProfile = {
   firstName:'',
   lastName:'',
@@ -4957,6 +4959,8 @@ function saveCurrentGameSnapshot(screenOverride) {
     if (selectedConf) saveGameSetItem('playerConf', selectedConf);
     if (selectedTeam) saveGameSetItem('playerTeam', selectedTeam);
     if (typeof saveAllRosters === 'function' && allRosters) saveAllRosters();
+    if (typeof syncCachedScheduleWithLeagueSchedule === 'function' && cachedSchedule && selectedTeam) syncCachedScheduleWithLeagueSchedule();
+    if (typeof syncConferenceRecordsFromLeagueSchedule === 'function' && standingsState && leagueSchedule) syncConferenceRecordsFromLeagueSchedule();
     if (typeof saveCachedSchedule === 'function' && cachedSchedule) saveCachedSchedule();
     if (typeof saveLeagueSchedule === 'function' && leagueSchedule) saveLeagueSchedule();
     if (typeof saveConferenceTournamentState === 'function' && conferenceTournamentState) saveConferenceTournamentState();
@@ -5862,12 +5866,13 @@ function goToDashboard() {
   document.getElementById('dash-conf-name').textContent = selectedConf || '';
   const seasonLabel = document.getElementById('dash-season-label');
   if (seasonLabel) seasonLabel.textContent = `* ${getSeasonLabel()} HUB *`;
-  renderDashboardRecord();
   if (!cachedSchedule) {
     cachedSchedule = loadCachedSchedule() || generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
     saveCachedSchedule();
   }
+  restoreSeasonResultsFromSchedule();
   currentGameIndex = getNextUnplayedGameIndex();
+  renderDashboardRecord();
   ensureDefaultGameplanSaved();
   ensureRecruitingClass();
   try { if (typeof Saves !== 'undefined') Saves.saveCurrentToActive(); } catch (_) {}
@@ -6148,6 +6153,8 @@ function startConferenceTournaments() {
   ensureRosterLoaded();
   ensureLeagueSchedule();
   ensureStandingsState();
+  if (cachedSchedule) syncCachedScheduleWithLeagueSchedule();
+  syncConferenceRecordsFromLeagueSchedule();
   conferenceTournamentState = loadConferenceTournamentState() || buildConferenceTournamentState();
   saveConferenceTournamentState();
   saveCareerState('conference-tournament');
@@ -9870,8 +9877,11 @@ function loadCachedSchedule() {
 }
 
 function getNextUnplayedGameIndex() {
-  const idx = (cachedSchedule || []).findIndex(g => g && !g.result);
-  return idx < 0 ? (cachedSchedule || []).length : idx;
+  const schedule = cachedSchedule || [];
+  const idx = schedule.findIndex(g => g && !g.result);
+  const resultIndex = idx < 0 ? schedule.length : idx;
+  const savedProgressIndex = Math.max(0, Math.min(Number(currentGameIndex) || 0, schedule.length));
+  return Math.max(resultIndex, savedProgressIndex);
 }
 function quickSim()  {
   ensureDefaultGameplanSaved();
@@ -9906,6 +9916,7 @@ function goToRecruiting() {
 function goToStandings() {
   ensureRosterLoaded();
   ensureLeagueSchedule();
+  if (cachedSchedule) syncCachedScheduleWithLeagueSchedule();
   renderStandings();
   flash(() => showPanel('standings'));
 }
@@ -10016,6 +10027,8 @@ async function prepareRosters() {
 }
 
 async function loadNamePool() {
+  const embedded = getEmbeddedNamePool();
+  if (embedded) return embedded;
   try {
     const res = await fetch('name_lists.py', { cache:'no-store' });
     if (!res.ok) throw new Error('name list fetch failed');
@@ -10027,6 +10040,20 @@ async function loadNamePool() {
     // Opening the HTML directly can block fetch(); keep generation playable.
   }
   return getFallbackNamePool();
+}
+
+function getEmbeddedNamePool() {
+  const source = (typeof window !== 'undefined') ? window.UB_NAME_POOL : null;
+  if (
+    source &&
+    Array.isArray(source.first) &&
+    Array.isArray(source.last) &&
+    source.first.length &&
+    source.last.length
+  ) {
+    return source;
+  }
+  return null;
 }
 
 function parsePythonList(source, varName) {
@@ -10043,6 +10070,8 @@ function parsePythonList(source, varName) {
 }
 
 function getFallbackNamePool() {
+  const embedded = getEmbeddedNamePool();
+  if (embedded) return embedded;
   return {
     first:['Aaron','Caleb','Darius','Elijah','Gavin','Isaiah','Jalen','Marcus','Noah','Tyler','Andre','Carter','Dylan','Malik','Owen','Xavier'],
     last:['Anderson','Bennett','Carter','Davis','Evans','Garcia','Harris','Jackson','Johnson','Lewis','Miller','Robinson','Smith','Taylor','Walker','Young']
@@ -11878,10 +11907,37 @@ function syncConferenceRecordsFromLeagueSchedule() {
   if (!standingsState || !standingsState.teams || !leagueSchedule || leagueSchedule.season !== (seasonNumber || 1)) return;
   const resultSignature = getLeagueScheduleResultSignature();
   if (!resultSignature) return;
-  if (standingsState.resumeSyncedResultSignature === resultSignature) return;
+  const leagueResultCount = getLeagueScheduleResultCount();
+  const standingsResultCount = getStandingsRecordedResultCount();
+  if (standingsResultCount > leagueResultCount) return;
+  if (
+    standingsState.resumeSyncedResultSignature === resultSignature &&
+    standingsState.rebuildVersion === STANDINGS_REBUILD_VERSION &&
+    standingsResultCount === leagueResultCount
+  ) {
+    return;
+  }
   rebuildStandingsResumeFromLeagueSchedule();
   standingsState.resumeSyncedResultSignature = resultSignature;
+  standingsState.rebuildVersion = STANDINGS_REBUILD_VERSION;
   saveGameJSON(getStandingsStateKey(), standingsState);
+}
+
+function getLeagueScheduleResultCount() {
+  if (!leagueSchedule || !leagueSchedule.byDate) return 0;
+  let count = 0;
+  Object.values(leagueSchedule.byDate || {}).forEach(games => {
+    (games || []).forEach(game => { if (game && game.result) count++; });
+  });
+  return count;
+}
+
+function getStandingsRecordedResultCount() {
+  if (!standingsState || !standingsState.teams) return 0;
+  const total = Object.values(standingsState.teams || {}).reduce((acc, entry) => {
+    return acc + (Number(entry && entry.wins) || 0) + (Number(entry && entry.losses) || 0);
+  }, 0);
+  return Math.floor(total / 2);
 }
 
 function getLeagueScheduleResultSignature() {
@@ -11898,6 +11954,7 @@ function getLeagueScheduleResultSignature() {
 
 function rebuildStandingsResumeFromLeagueSchedule() {
   if (!standingsState || !standingsState.teams || !leagueSchedule || leagueSchedule.season !== (seasonNumber || 1)) return;
+  const rebuiltWeeksSimmed = {};
   Object.values(standingsState.teams).forEach(entry => {
     entry.wins = 0;
     entry.losses = 0;
@@ -11906,6 +11963,11 @@ function rebuildStandingsResumeFromLeagueSchedule() {
     entry.games = [];
   });
   Object.entries(leagueSchedule.byDate || {}).forEach(([date, games]) => {
+    const nonUserGames = (games || []).filter(game => game && game.home !== selectedTeam && game.away !== selectedTeam);
+    const completedNonUserGames = nonUserGames.filter(game => game.result);
+    if (nonUserGames.length && completedNonUserGames.length === nonUserGames.length) {
+      rebuiltWeeksSimmed[date] = completedNonUserGames.length;
+    }
     (games || []).forEach(game => {
       if (!game || !game.result) return;
       const home = getTeamStandingEntryNoEnsure(game.home);
@@ -11926,6 +11988,7 @@ function rebuildStandingsResumeFromLeagueSchedule() {
       }
     });
   });
+  standingsState.weeksSimmed = rebuiltWeeksSimmed;
   recomputeStandingsPowerIndexes();
 }
 
@@ -14724,7 +14787,8 @@ function generateTeamSchedule(team, conf, season) {
       date,
       opponent: isHome ? game.away : game.home,
       home: isHome,
-      isConf: !!game.isConf
+      isConf: !!game.isConf,
+      ...(game.result ? { result:copyGameResult(game.result) } : {})
     });
   }
   return sched;
@@ -14736,11 +14800,65 @@ function findLeagueGame(date, home, away) {
   return lg.byDate[date].find(g => g.home === home && g.away === away) || null;
 }
 
+function copyGameResult(result) {
+  if (!result) return null;
+  return {
+    homeScore:Number(result.homeScore) || 0,
+    awayScore:Number(result.awayScore) || 0
+  };
+}
+
+function sameGameResult(a, b) {
+  if (!a || !b) return false;
+  return (Number(a.homeScore) || 0) === (Number(b.homeScore) || 0) &&
+    (Number(a.awayScore) || 0) === (Number(b.awayScore) || 0);
+}
+
+function getLeagueGameForUserScheduleGame(scheduleGame) {
+  if (!scheduleGame || !selectedTeam) return null;
+  const home = scheduleGame.home ? selectedTeam : scheduleGame.opponent;
+  const away = scheduleGame.home ? scheduleGame.opponent : selectedTeam;
+  return findLeagueGame(scheduleGame.date, home, away);
+}
+
+function syncCachedScheduleWithLeagueSchedule() {
+  if (!cachedSchedule || !Array.isArray(cachedSchedule)) return false;
+  ensureLeagueSchedule();
+  let cachedChanged = false;
+  let leagueChanged = false;
+  cachedSchedule.forEach(scheduleGame => {
+    const leagueGame = getLeagueGameForUserScheduleGame(scheduleGame);
+    if (!leagueGame) return;
+    if (leagueGame.result) {
+      if (!sameGameResult(scheduleGame.result, leagueGame.result)) {
+        scheduleGame.result = copyGameResult(leagueGame.result);
+        cachedChanged = true;
+      }
+      return;
+    }
+    if (scheduleGame.result) {
+      leagueGame.result = copyGameResult(scheduleGame.result);
+      leagueChanged = true;
+    }
+  });
+  if (cachedChanged) saveCachedSchedule();
+  if (leagueChanged) saveLeagueSchedule();
+  return cachedChanged || leagueChanged;
+}
+
+function restoreSeasonResultsFromSchedule() {
+  ensureLeagueSchedule();
+  syncCachedScheduleWithLeagueSchedule();
+  ensureStandingsState();
+  syncConferenceRecordsFromLeagueSchedule();
+}
+
 function goToSchedule() {
   if (!cachedSchedule) {
     cachedSchedule = loadCachedSchedule() || generateTeamSchedule(selectedTeam, selectedConf, seasonNumber);
     saveCachedSchedule();
   }
+  restoreSeasonResultsFromSchedule();
   flash(() => {
     showPanel('schedule');
     renderSchedule();
@@ -15381,6 +15499,8 @@ function restoreSavedCareerScreen(career) {
   const screen = career && career.currentScreen ? career.currentScreen : 'dashboard';
   cachedSchedule = loadCachedSchedule() || cachedSchedule;
   leagueSchedule = loadLeagueSchedule() || leagueSchedule;
+  currentGameIndex = Math.max(0, Number(career && career.currentGameIndex) || 0);
+  restoreSeasonResultsFromSchedule();
   currentGameIndex = getNextUnplayedGameIndex();
   conferenceTournamentState = loadConferenceTournamentState() || conferenceTournamentState;
   tournamentState = loadTournamentState() || tournamentState;

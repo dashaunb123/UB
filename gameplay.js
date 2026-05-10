@@ -40,6 +40,8 @@ function simTraceError(label, err, data = {}) {
 }
 
 function startGameSimulation(fastFinish) {
+  if (typeof restoreSeasonResultsFromSchedule === 'function') restoreSeasonResultsFromSchedule();
+  currentGameIndex = getNextUnplayedGameIndex();
   const game = cachedSchedule ? cachedSchedule[currentGameIndex] : null;
   simTrace('startGameSimulation:enter', { fastFinish:!!fastFinish, game });
   if (!game) {
@@ -100,6 +102,7 @@ async function startMultiGameSuperSim(count) {
     simTrace('startMultiGameSuperSim:already-in-progress');
     return;
   }
+  if (typeof restoreSeasonResultsFromSchedule === 'function') restoreSeasonResultsFromSchedule();
   // Always re-derive remaining games from the schedule, so we sim only what's actually unplayed.
   currentGameIndex = getNextUnplayedGameIndex();
   const remainingGames = (cachedSchedule || []).length - currentGameIndex;
