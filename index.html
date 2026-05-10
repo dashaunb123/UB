@@ -5,6 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>University Basketball</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
+  <!-- Ad network: Monetag -->
+  <script src="https://quge5.com/88/tag.min.js" data-zone="228378" data-cfasync="false" async></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      var detected = false, checks = 0, totalChecks = 3;
+      function checkDone(blocked) {
+        if (blocked) detected = true;
+        checks++;
+        if (checks >= totalChecks && detected) showAdBlockWall();
+      }
+      var testScript = document.createElement('script');
+      testScript.src = 'https://quge5.com/88/tag.min.js';
+      testScript.dataset.zone = '0';
+      testScript.onerror = function() { checkDone(true); };
+      testScript.onload = function() { checkDone(false); };
+      document.head.appendChild(testScript);
+      var bait = document.createElement('div');
+      bait.className = 'ad-banner ad-placement textad adsbox ad-container';
+      bait.setAttribute('id', 'ad-test-bait');
+      bait.style.cssText = 'position:absolute;top:-10px;left:-10px;width:1px;height:1px;overflow:hidden;';
+      bait.innerHTML = '&nbsp;';
+      document.body.appendChild(bait);
+      setTimeout(function() {
+        var hidden = !bait || bait.offsetHeight === 0 || bait.offsetWidth === 0 ||
+          bait.clientHeight === 0 || getComputedStyle(bait).display === 'none' ||
+          getComputedStyle(bait).visibility === 'hidden';
+        if (bait && bait.parentNode) bait.parentNode.removeChild(bait);
+        checkDone(hidden);
+      }, 500);
+      fetch('https://quge5.com/88/tag.min.js', { mode: 'no-cors', cache: 'no-store' })
+        .then(function() { checkDone(false); })
+        .catch(function() { checkDone(true); });
+      setTimeout(function() { if (detected) showAdBlockWall(); }, 4000);
+      function showAdBlockWall() {
+        var wall = document.getElementById('adblock-wall');
+        if (wall) wall.style.display = 'flex';
+      }
+    });
+  </script>
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; image-rendering:pixelated; }
 
@@ -3740,6 +3779,12 @@
   </style>
 </head>
 <body>
+<!-- Ad blocker wall -->
+<div id="adblock-wall" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.96);color:#fff;justify-content:center;align-items:center;flex-direction:column;text-align:center;padding:24px;font-family:system-ui,sans-serif;">
+  <div style="font-size:2rem;font-weight:800;margin-bottom:12px;letter-spacing:0.04em;">AD BLOCKER DETECTED</div>
+  <div style="max-width:420px;font-size:1rem;line-height:1.6;color:#cbd5e1;margin-bottom:20px;">PlayRBB is free to play and supported by ads. Please disable your ad blocker to continue, then refresh the page.</div>
+  <button onclick="location.reload()" style="padding:12px 32px;font-size:1rem;font-weight:700;border:none;border-radius:8px;background:#e65c00;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;">I've Disabled It — Refresh</button>
+</div>
 <audio id="game-soundtrack" src="soundtrack.mp3" loop preload="auto"></audio>
 <div id="flash"></div>
 <div id="page-peel"></div>
