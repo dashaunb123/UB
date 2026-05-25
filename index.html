@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>University Basketball</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
-  <!-- Ad network: Monetag -->
-  <script src="https://quge5.com/88/tag.min.js" data-zone="228378" data-cfasync="false" async></script>
+  <!-- Ad network: shared Dashaun Studios Monetag controller -->
+  <script src="/scripts/studio-game-ads.js" data-studio-ads="true"></script>
   <script>
     window.addEventListener('DOMContentLoaded', function() {
       var detected = false, checks = 0, totalChecks = 3;
@@ -15,12 +15,16 @@
         checks++;
         if (checks >= totalChecks && detected) showAdBlockWall();
       }
-      var testScript = document.createElement('script');
-      testScript.src = 'https://quge5.com/88/tag.min.js';
-      testScript.dataset.zone = '0';
-      testScript.onerror = function() { checkDone(true); };
-      testScript.onload = function() { checkDone(false); };
-      document.head.appendChild(testScript);
+      if (typeof window.playrbbIsAdRedirectCooldownActive === 'function' && window.playrbbIsAdRedirectCooldownActive()) {
+        checkDone(false);
+      } else {
+        var testScript = document.createElement('script');
+        testScript.src = 'https://quge5.com/88/tag.min.js';
+        testScript.dataset.zone = '0';
+        testScript.onerror = function() { checkDone(true); };
+        testScript.onload = function() { checkDone(false); };
+        document.head.appendChild(testScript);
+      }
       var bait = document.createElement('div');
       bait.className = 'ad-banner ad-placement textad adsbox ad-container';
       bait.setAttribute('id', 'ad-test-bait');
