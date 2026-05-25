@@ -53,6 +53,10 @@
     return getRedirectCooldownRemainingMs() > 0;
   }
 
+  function isTagLoadCooldownActive() {
+    return getTagLoadCooldownRemainingMs() > 0;
+  }
+
   function markAdTagLoad() {
     setStoredTime(TAG_LOAD_COOLDOWN_KEY, '__playrbbLastAdTagLoadAt', Date.now());
   }
@@ -61,6 +65,11 @@
     const scripts = document.querySelectorAll(`script[src="${AD_SRC}"][data-zone="${AD_ZONE}"]`);
     scripts.forEach((script) => script.remove());
     return scripts.length > 0;
+  }
+
+  function cleanupAdRuntime() {
+    adBreakOpenUntil = 0;
+    removeMonetagScripts();
   }
 
   function areSurfaceGeneralAdsBlocked() {
@@ -76,7 +85,7 @@
     const now = Date.now();
     setStoredTime(REDIRECT_COOLDOWN_KEY, '__playrbbLastAdRedirectOpenAt', now);
     setStoredTime(TAG_LOAD_COOLDOWN_KEY, '__playrbbLastAdTagLoadAt', now);
-    removeMonetagScripts();
+    cleanupAdRuntime();
   }
 
   function getBlockDuration(rawValue) {
@@ -164,7 +173,7 @@
     adBreakTickTimer = 0;
     nextAdBreakAt = 0;
     setAdBreakNotice('Ad break', true);
-    const remaining = getRedirectCooldownRemainingMs();
+    const remaining = Math.max(getRedirectCooldownRemainingMs(), getTagLoadCooldownRemainingMs());
     const didRun = remaining <= 0 && window.playrbbRunMonetagAction();
     const nextDelay = didRun ? AD_BREAK_INTERVAL_MS : Math.max(remaining || 10000, 10000);
     window.setTimeout(function hideAdBreakNotice() {
@@ -219,12 +228,10 @@
           window.clearTimeout(actionOpenResetTimer);
           actionOpenResetTimer = 0;
         }
-        adBreakOpenUntil = 0;
         markAdRedirectOpen();
         return nativeOpen.apply(window, arguments);
       }
       if (areGeneralAdTabsBlockedNow()) return null;
-      adBreakOpenUntil = 0;
       markAdRedirectOpen();
       return nativeOpen.apply(window, arguments);
     };
@@ -245,7 +252,7 @@
   document.addEventListener('click', guardPriorityAdInteraction, true);
 
   window.playrbbEnsureMonetagTag = function playrbbEnsureMonetagTag() {
-    removeMonetagScripts();
+    cleanupAdRuntime();
     return false;
   };
 
@@ -257,7 +264,8 @@
     const head = document.head || document.getElementsByTagName('head')[0];
     if (!head) return false;
     if (isRedirectCooldownActive()) return false;
-    removeMonetagScripts();
+    if (isTagLoadCooldownActive()) return false;
+    cleanupAdRuntime();
     openAdBreakWindow(ACTION_OPEN_ALLOW_MS);
     if (typeof window.playrbbAllowRewardedAdOpen === 'function') window.playrbbAllowRewardedAdOpen(1, ACTION_OPEN_ALLOW_MS);
     const script = document.createElement('script');
@@ -270,8 +278,7 @@
     script.addEventListener('error', function removeFailedRuntimeTag() { script.remove(); }, { once: true });
     head.appendChild(script);
     window.setTimeout(function closeAdBreakWindow() {
-      adBreakOpenUntil = 0;
-      removeMonetagScripts();
+      cleanupAdRuntime();
     }, ACTION_OPEN_ALLOW_MS + 1000);
     markAdTagLoad();
     return true;
