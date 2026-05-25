@@ -17,6 +17,7 @@
   let adBreakTickTimer = 0;
   let nextAdBreakAt = 0;
   let adBreakNoticeEl = null;
+  let adBreakOpenUntil = 0;
 
   function getStoredTime(key, fallbackKey) {
     try {
@@ -81,6 +82,16 @@
   function getBlockDuration(rawValue) {
     const parsed = Number(rawValue);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_BLOCK_MS;
+  }
+
+  function isAdBreakOpenNow() {
+    return Date.now() < adBreakOpenUntil;
+  }
+
+  function openAdBreakWindow(ms = ACTION_OPEN_ALLOW_MS) {
+    const duration = getBlockDuration(ms);
+    adBreakOpenUntil = Math.max(adBreakOpenUntil, Date.now() + duration);
+    return adBreakOpenUntil;
   }
 
   function formatSeconds(ms) {
@@ -163,7 +174,7 @@
   }
 
   function areGeneralAdTabsBlockedNow() {
-    return Date.now() < blockUntil || areSurfaceGeneralAdsBlocked() || isRedirectCooldownActive();
+    return Date.now() < blockUntil || areSurfaceGeneralAdsBlocked() || isRedirectCooldownActive() || !isAdBreakOpenNow();
   }
 
   window.playrbbGetAdRedirectCooldownRemainingMs = getRedirectCooldownRemainingMs;
@@ -171,6 +182,7 @@
   window.playrbbMarkAdRedirectOpen = markAdRedirectOpen;
   window.playrbbGetAdTagLoadCooldownRemainingMs = getTagLoadCooldownRemainingMs;
   window.playrbbScheduleNextAdBreak = scheduleAdBreak;
+  window.playrbbOpenAdBreakWindow = openAdBreakWindow;
 
   window.playrbbBlockGeneralAdTabsUntil = function playrbbBlockGeneralAdTabsUntil(ms) {
     const duration = getBlockDuration(ms);
@@ -201,16 +213,18 @@
   if (nativeOpen) {
     window.open = function playrbbGuardedWindowOpen() {
       if (allowedActionOpens > 0) {
+        if (isRedirectCooldownActive() || !isAdBreakOpenNow()) return null;
         allowedActionOpens -= 1;
         if (allowedActionOpens <= 0 && actionOpenResetTimer) {
           window.clearTimeout(actionOpenResetTimer);
           actionOpenResetTimer = 0;
         }
-        if (isRedirectCooldownActive()) return null;
+        adBreakOpenUntil = 0;
         markAdRedirectOpen();
         return nativeOpen.apply(window, arguments);
       }
       if (areGeneralAdTabsBlockedNow()) return null;
+      adBreakOpenUntil = 0;
       markAdRedirectOpen();
       return nativeOpen.apply(window, arguments);
     };
@@ -243,8 +257,9 @@
     const head = document.head || document.getElementsByTagName('head')[0];
     if (!head) return false;
     if (isRedirectCooldownActive()) return false;
-    if (typeof window.playrbbRemoveMonetagTag === 'function') window.playrbbRemoveMonetagTag();
-    if (typeof window.playrbbAllowRewardedAdOpen === 'function') window.playrbbAllowRewardedAdOpen(1, 4000);
+    removeMonetagScripts();
+    openAdBreakWindow(ACTION_OPEN_ALLOW_MS);
+    if (typeof window.playrbbAllowRewardedAdOpen === 'function') window.playrbbAllowRewardedAdOpen(1, ACTION_OPEN_ALLOW_MS);
     const script = document.createElement('script');
     script.src = AD_SRC;
     script.dataset.zone = AD_ZONE;
@@ -254,6 +269,10 @@
     script.addEventListener('load', function removeRuntimeTag() { script.remove(); }, { once: true });
     script.addEventListener('error', function removeFailedRuntimeTag() { script.remove(); }, { once: true });
     head.appendChild(script);
+    window.setTimeout(function closeAdBreakWindow() {
+      adBreakOpenUntil = 0;
+      removeMonetagScripts();
+    }, ACTION_OPEN_ALLOW_MS + 1000);
     markAdTagLoad();
     return true;
   };
