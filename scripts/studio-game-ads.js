@@ -1,7 +1,6 @@
 (function setupDashaunStudioGameAds() {
   const AD_TAGS = [
-    { kind: 'popunder', src: 'https://al5sm.com/tag.min.js', zone: '11057410' },
-    { kind: 'vignette', src: 'https://n6wxm.com/vignette.min.js', zone: '11057419' },
+    { kind: 'popunder', src: 'https://pl29552407.effectivecpmnetwork.com/8c/75/87/8c7587438d9de51e8f7c643c7b345748.js' },
   ];
   const POPUNDER_COOLDOWN_MS = 60000;
   const POPUNDER_LAST_OPEN_KEY = 'playrbb_popunder_last_open_at';
@@ -43,7 +42,7 @@
     const target = document.body || document.documentElement;
     if (!target) return false;
     const script = document.createElement('script');
-    script.dataset.zone = tag.zone;
+    if (tag.zone) script.dataset.zone = tag.zone;
     script.src = tag.src;
     script.async = true;
     script.dataset.cfasync = 'false';
