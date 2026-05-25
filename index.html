@@ -15,16 +15,7 @@
         checks++;
         if (checks >= totalChecks && detected) showAdBlockWall();
       }
-      if (typeof window.playrbbIsAdRedirectCooldownActive === 'function' && window.playrbbIsAdRedirectCooldownActive()) {
-        checkDone(false);
-      } else {
-        var testScript = document.createElement('script');
-        testScript.src = 'https://quge5.com/88/tag.min.js';
-        testScript.dataset.zone = '0';
-        testScript.onerror = function() { checkDone(true); };
-        testScript.onload = function() { checkDone(false); };
-        document.head.appendChild(testScript);
-      }
+      checkDone(false);
       var bait = document.createElement('div');
       bait.className = 'ad-banner ad-placement textad adsbox ad-container';
       bait.setAttribute('id', 'ad-test-bait');
