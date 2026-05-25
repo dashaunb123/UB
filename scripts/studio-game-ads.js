@@ -1,106 +1,32 @@
 (function setupDashaunStudioGameAds() {
-  const AD_SRC = 'https://quge5.com/88/tag.min.js';
-  const AD_ZONE = '228378';
-  const DEFAULT_BLOCK_MS = 12000;
-  const ACTION_OPEN_ALLOW_MS = 4000;
-  const REDIRECT_COOLDOWN_MS = 120000;
-  const REDIRECT_COOLDOWN_KEY = 'playrbb_ad_redirect_last_at';
-  const TAG_LOAD_COOLDOWN_KEY = 'playrbb_ad_tag_loaded_last_at';
-  const AD_BREAK_INTERVAL_MS = 120000;
-  const INITIAL_AD_BREAK_DELAY_MS = 1500;
-  const nativeOpen = typeof window.open === 'function' ? window.open.bind(window) : null;
-  let blockUntil = 0;
-  let clearTimer = 0;
-  let allowedActionOpens = 0;
-  let actionOpenResetTimer = 0;
+  const AD_TAGS = [
+    { kind: 'popunder', src: 'https://al5sm.com/tag.min.js', zone: '11057410' },
+    { kind: 'vignette', src: 'https://n6wxm.com/vignette.min.js', zone: '11057419' },
+  ];
+  const AD_BREAK_INTERVAL_MS = 60000;
+  const INITIAL_AD_BREAK_DELAY_MS = 60000;
+
   let adBreakTimer = 0;
   let adBreakTickTimer = 0;
   let nextAdBreakAt = 0;
   let adBreakNoticeEl = null;
-  let adBreakOpenUntil = 0;
+  let armedForNextClick = false;
+  let armedClickListener = null;
 
-  function getStoredTime(key, fallbackKey) {
-    try {
-      const stored = Number(window.sessionStorage && window.sessionStorage.getItem(key));
-      return Number.isFinite(stored) && stored > 0 ? stored : 0;
-    } catch (_error) {
-      return Number(window[fallbackKey] || 0) || 0;
-    }
+  function pickAdTag() {
+    return AD_TAGS[Math.floor(Math.random() * AD_TAGS.length)];
   }
 
-  function setStoredTime(key, fallbackKey, value) {
-    try {
-      if (window.sessionStorage) window.sessionStorage.setItem(key, String(value));
-    } catch (_error) {
-      window[fallbackKey] = value;
-    }
-  }
-
-  function getCooldownRemainingMs(key, fallbackKey) {
-    const remaining = REDIRECT_COOLDOWN_MS - (Date.now() - getStoredTime(key, fallbackKey));
-    return remaining > 0 ? remaining : 0;
-  }
-
-  function getRedirectCooldownRemainingMs() {
-    return getCooldownRemainingMs(REDIRECT_COOLDOWN_KEY, '__playrbbLastAdRedirectOpenAt');
-  }
-
-  function getTagLoadCooldownRemainingMs() {
-    return getCooldownRemainingMs(TAG_LOAD_COOLDOWN_KEY, '__playrbbLastAdTagLoadAt');
-  }
-
-  function isRedirectCooldownActive() {
-    return getRedirectCooldownRemainingMs() > 0;
-  }
-
-  function isTagLoadCooldownActive() {
-    return getTagLoadCooldownRemainingMs() > 0;
-  }
-
-  function markAdTagLoad() {
-    setStoredTime(TAG_LOAD_COOLDOWN_KEY, '__playrbbLastAdTagLoadAt', Date.now());
-  }
-
-  function removeMonetagScripts() {
-    const scripts = document.querySelectorAll(`script[src="${AD_SRC}"][data-zone="${AD_ZONE}"]`);
-    scripts.forEach((script) => script.remove());
-    return scripts.length > 0;
-  }
-
-  function cleanupAdRuntime() {
-    adBreakOpenUntil = 0;
-    removeMonetagScripts();
-  }
-
-  function areSurfaceGeneralAdsBlocked() {
-    try {
-      return typeof window.playrbbShouldBlockGeneralAdTabs === 'function'
-        && !!window.playrbbShouldBlockGeneralAdTabs();
-    } catch (_error) {
-      return false;
-    }
-  }
-
-  function markAdRedirectOpen() {
-    const now = Date.now();
-    setStoredTime(REDIRECT_COOLDOWN_KEY, '__playrbbLastAdRedirectOpenAt', now);
-    setStoredTime(TAG_LOAD_COOLDOWN_KEY, '__playrbbLastAdTagLoadAt', now);
-    cleanupAdRuntime();
-  }
-
-  function getBlockDuration(rawValue) {
-    const parsed = Number(rawValue);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_BLOCK_MS;
-  }
-
-  function isAdBreakOpenNow() {
-    return Date.now() < adBreakOpenUntil;
-  }
-
-  function openAdBreakWindow(ms = ACTION_OPEN_ALLOW_MS) {
-    const duration = getBlockDuration(ms);
-    adBreakOpenUntil = Math.max(adBreakOpenUntil, Date.now() + duration);
-    return adBreakOpenUntil;
+  function injectAdTag(tag) {
+    const target = document.body || document.documentElement;
+    if (!target) return false;
+    const script = document.createElement('script');
+    script.dataset.zone = tag.zone;
+    script.src = tag.src;
+    script.async = true;
+    script.dataset.cfasync = 'false';
+    target.appendChild(script);
+    return true;
   }
 
   function formatSeconds(ms) {
@@ -144,6 +70,10 @@
   }
 
   function updateAdBreakNotice() {
+    if (armedForNextClick) {
+      setAdBreakNotice('Ad on next click', true);
+      return;
+    }
     if (!nextAdBreakAt) {
       setAdBreakNotice('', false);
       return;
@@ -154,6 +84,26 @@
       return;
     }
     setAdBreakNotice('', false);
+  }
+
+  function disarmAd() {
+    if (armedClickListener) {
+      try { window.removeEventListener('click', armedClickListener, true); } catch (_error) {}
+      armedClickListener = null;
+    }
+    armedForNextClick = false;
+  }
+
+  function armForNextClick() {
+    disarmAd();
+    armedForNextClick = true;
+    armedClickListener = function adArmedClickHandler() {
+      injectAdTag(pickAdTag());
+      disarmAd();
+      scheduleAdBreak(AD_BREAK_INTERVAL_MS);
+    };
+    window.addEventListener('click', armedClickListener, { capture: true, once: true });
+    updateAdBreakNotice();
   }
 
   function scheduleAdBreak(delayMs) {
@@ -172,134 +122,40 @@
     adBreakTimer = 0;
     adBreakTickTimer = 0;
     nextAdBreakAt = 0;
-    setAdBreakNotice('Ad break', true);
-    const remaining = Math.max(getRedirectCooldownRemainingMs(), getTagLoadCooldownRemainingMs());
-    const didRun = remaining <= 0 && window.playrbbRunMonetagAction();
-    const nextDelay = didRun ? AD_BREAK_INTERVAL_MS : Math.max(remaining || 10000, 10000);
-    window.setTimeout(function hideAdBreakNotice() {
-      setAdBreakNotice('', false);
-      scheduleAdBreak(nextDelay);
-    }, 2200);
+    armForNextClick();
   }
 
-  function areGeneralAdTabsBlockedNow() {
-    return Date.now() < blockUntil || areSurfaceGeneralAdsBlocked() || isRedirectCooldownActive() || !isAdBreakOpenNow();
-  }
-
-  window.playrbbGetAdRedirectCooldownRemainingMs = getRedirectCooldownRemainingMs;
-  window.playrbbIsAdRedirectCooldownActive = isRedirectCooldownActive;
-  window.playrbbMarkAdRedirectOpen = markAdRedirectOpen;
-  window.playrbbGetAdTagLoadCooldownRemainingMs = getTagLoadCooldownRemainingMs;
-  window.playrbbScheduleNextAdBreak = scheduleAdBreak;
-  window.playrbbOpenAdBreakWindow = openAdBreakWindow;
-
-  window.playrbbBlockGeneralAdTabsUntil = function playrbbBlockGeneralAdTabsUntil(ms) {
-    const duration = getBlockDuration(ms);
-    blockUntil = Math.max(blockUntil, Date.now() + duration);
-    if (clearTimer) window.clearTimeout(clearTimer);
-    clearTimer = window.setTimeout(function clearGeneralAdBlock() {
-      if (Date.now() >= blockUntil) blockUntil = 0;
-    }, duration + 50);
-    return blockUntil;
-  };
-
-  window.playrbbAreGeneralAdTabsBlocked = function playrbbAreGeneralAdTabsBlocked() {
-    return areGeneralAdTabsBlockedNow();
-  };
-
-  window.playrbbAllowRewardedAdOpen = function playrbbAllowRewardedAdOpen(count, ms) {
-    const nextCount = Math.max(1, Math.round(Number(count) || 1));
-    const duration = getBlockDuration(ms || ACTION_OPEN_ALLOW_MS);
-    allowedActionOpens = Math.max(allowedActionOpens, nextCount);
-    if (actionOpenResetTimer) window.clearTimeout(actionOpenResetTimer);
-    actionOpenResetTimer = window.setTimeout(function clearAllowedActionOpens() {
-      allowedActionOpens = 0;
-      actionOpenResetTimer = 0;
-    }, duration);
-    return allowedActionOpens;
-  };
-
-  if (nativeOpen) {
-    window.open = function playrbbGuardedWindowOpen() {
-      if (allowedActionOpens > 0) {
-        if (isRedirectCooldownActive() || !isAdBreakOpenNow()) return null;
-        allowedActionOpens -= 1;
-        if (allowedActionOpens <= 0 && actionOpenResetTimer) {
-          window.clearTimeout(actionOpenResetTimer);
-          actionOpenResetTimer = 0;
-        }
-        markAdRedirectOpen();
-        return nativeOpen.apply(window, arguments);
-      }
-      if (areGeneralAdTabsBlockedNow()) return null;
-      markAdRedirectOpen();
-      return nativeOpen.apply(window, arguments);
-    };
-  }
-
-  function guardPriorityAdInteraction(event) {
-    if (typeof Element === 'undefined') return;
-    const target = event.target instanceof Element
-      ? event.target.closest('[data-block-general-ad-tabs]')
-      : null;
-    if (!target) return;
-    window.playrbbBlockGeneralAdTabsUntil(target.getAttribute('data-block-general-ad-tabs'));
-  }
-
-  document.addEventListener('pointerdown', guardPriorityAdInteraction, true);
-  document.addEventListener('mousedown', guardPriorityAdInteraction, true);
-  document.addEventListener('touchstart', guardPriorityAdInteraction, true);
-  document.addEventListener('click', guardPriorityAdInteraction, true);
-
-  window.playrbbEnsureMonetagTag = function playrbbEnsureMonetagTag() {
-    cleanupAdRuntime();
-    return false;
-  };
-
-  window.playrbbRemoveMonetagTag = function playrbbRemoveMonetagTag() {
-    return removeMonetagScripts();
-  };
-
-  window.playrbbRunMonetagAction = function playrbbRunMonetagAction() {
-    const head = document.head || document.getElementsByTagName('head')[0];
-    if (!head) return false;
-    if (isRedirectCooldownActive()) return false;
-    if (isTagLoadCooldownActive()) return false;
-    cleanupAdRuntime();
-    openAdBreakWindow(ACTION_OPEN_ALLOW_MS);
-    if (typeof window.playrbbAllowRewardedAdOpen === 'function') window.playrbbAllowRewardedAdOpen(1, ACTION_OPEN_ALLOW_MS);
-    const script = document.createElement('script');
-    script.src = AD_SRC;
-    script.dataset.zone = AD_ZONE;
-    script.dataset.runtime = 'true';
-    script.async = true;
-    script.dataset.cfasync = 'false';
-    script.addEventListener('load', function removeRuntimeTag() { script.remove(); }, { once: true });
-    script.addEventListener('error', function removeFailedRuntimeTag() { script.remove(); }, { once: true });
-    head.appendChild(script);
-    window.setTimeout(function closeAdBreakWindow() {
-      cleanupAdRuntime();
-    }, ACTION_OPEN_ALLOW_MS + 1000);
-    markAdTagLoad();
-    return true;
-  };
-
-  window.playrbbEntitlement = window.playrbbEntitlement || {
-    shouldShowGameplayAds: () => true,
-    syncGeneralAds: () => window.playrbbEnsureMonetagTag(),
-    removeGeneralAds: () => window.playrbbRemoveMonetagTag(),
-    ensureGeneralAds: () => window.playrbbEnsureMonetagTag(),
-    runRewardedAd: () => window.playrbbRunMonetagAction(),
-  };
-
-  function startGeneralAds() {
-    window.playrbbRemoveMonetagTag();
+  function startAdBreaks() {
     scheduleAdBreak(INITIAL_AD_BREAK_DELAY_MS);
   }
 
+  window.playrbbScheduleNextAdBreak = scheduleAdBreak;
+  window.playrbbStartScheduledAdBreaks = startAdBreaks;
+  window.playrbbRunMonetagAction = function playrbbRunMonetagAction() {
+    return injectAdTag(pickAdTag());
+  };
+
+  window.playrbbEnsureMonetagTag = function () { return false; };
+  window.playrbbRemoveMonetagTag = function () { return false; };
+  window.playrbbAllowRewardedAdOpen = function () { return 0; };
+  window.playrbbBlockGeneralAdTabsUntil = function () { return 0; };
+  window.playrbbAreGeneralAdTabsBlocked = function () { return !armedForNextClick; };
+  window.playrbbIsAdRedirectCooldownActive = function () { return false; };
+  window.playrbbGetAdRedirectCooldownRemainingMs = function () { return 0; };
+  window.playrbbIsAdTagLoadCooldownActive = function () { return false; };
+  window.playrbbGetAdTagLoadCooldownRemainingMs = function () { return 0; };
+
+  window.playrbbEntitlement = window.playrbbEntitlement || {
+    shouldShowGameplayAds: () => true,
+    syncGeneralAds: () => false,
+    removeGeneralAds: () => false,
+    ensureGeneralAds: () => false,
+    runRewardedAd: () => window.playrbbRunMonetagAction(),
+  };
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startGeneralAds, { once: true });
+    document.addEventListener('DOMContentLoaded', startAdBreaks, { once: true });
   } else {
-    startGeneralAds();
+    startAdBreaks();
   }
 })();
