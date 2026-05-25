@@ -1,6 +1,6 @@
 (function setupDashaunStudioGameAds() {
   const AD_TAGS = [
-    { kind: 'popunder', src: 'https://pl29552407.effectivecpmnetwork.com/8c/75/87/8c7587438d9de51e8f7c643c7b345748.js' },
+    { kind: 'multitag', src: 'https://quge5.com/88/tag.min.js', zone: '228378' },
   ];
   const POPUNDER_COOLDOWN_MS = 60000;
   const POPUNDER_LAST_OPEN_KEY = 'playrbb_popunder_last_open_at';
