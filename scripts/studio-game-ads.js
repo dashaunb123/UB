@@ -3,8 +3,41 @@
     { kind: 'popunder', src: 'https://al5sm.com/tag.min.js', zone: '11057410' },
     { kind: 'vignette', src: 'https://n6wxm.com/vignette.min.js', zone: '11057419' },
   ];
+  const POPUNDER_COOLDOWN_MS = 60000;
+  const POPUNDER_LAST_OPEN_KEY = 'playrbb_popunder_last_open_at';
 
   let injectedAds = false;
+
+  function getPopunderLastOpenAt() {
+    try {
+      const stored = Number(window.sessionStorage && window.sessionStorage.getItem(POPUNDER_LAST_OPEN_KEY));
+      return Number.isFinite(stored) && stored > 0 ? stored : 0;
+    } catch (_error) {
+      return Number(window.__playrbbLastPopunderOpenAt || 0) || 0;
+    }
+  }
+
+  function stampPopunderOpen() {
+    const now = Date.now();
+    try {
+      if (window.sessionStorage) window.sessionStorage.setItem(POPUNDER_LAST_OPEN_KEY, String(now));
+    } catch (_error) {
+      window.__playrbbLastPopunderOpenAt = now;
+    }
+  }
+
+  function isPopunderCooldownActive() {
+    return Date.now() - getPopunderLastOpenAt() < POPUNDER_COOLDOWN_MS;
+  }
+
+  const nativeOpen = typeof window.open === 'function' ? window.open.bind(window) : null;
+  if (nativeOpen) {
+    window.open = function playrbbCooldownGuardedOpen() {
+      if (isPopunderCooldownActive()) return null;
+      stampPopunderOpen();
+      return nativeOpen.apply(window, arguments);
+    };
+  }
 
   function injectAdTag(tag) {
     const target = document.body || document.documentElement;
